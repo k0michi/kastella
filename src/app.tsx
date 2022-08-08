@@ -11,6 +11,7 @@ interface Note {
 export default function App() {
   const [input, setInput] = React.useState<string>('');
   const [notes, setNotes] = React.useState<Note[]>([]);
+  const [writeOnly, setWriteOnly] = React.useState<boolean>(true);
 
   React.useEffect(() => {
     console.log(localStorage.getItem('notes'))
@@ -34,20 +35,24 @@ export default function App() {
         localStorage.setItem('notes', JSON.stringify(newNotes));
         setInput('');
       }}>Confirm</button>
+      <input checked={writeOnly} type="checkbox" id="write-only" onChange={e => {
+        setWriteOnly(e.target.checked);
+      }} />
+      <label htmlFor="write-only">Write-only</label>
     </div>
-    <table>
+    {writeOnly ? null : <table>
       <tbody>
         {notesReversed.map(n => {
           const id = n.id;
 
           return <tr key={id}><td>{n.content}</td><td><button onClick={e => {
             const newNotes = [...notes];
-            newNotes.splice(newNotes.findIndex(n=>n.id == id), 1);
+            newNotes.splice(newNotes.findIndex(n => n.id == id), 1);
             setNotes(newNotes);
             localStorage.setItem('notes', JSON.stringify(newNotes));
           }}>x</button></td></tr>;
         })}
       </tbody>
-    </table>
+    </table>}
   </>;
 }
