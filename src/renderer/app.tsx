@@ -12,6 +12,7 @@ export default function App() {
   const [input, setInput] = React.useState<string>('');
   const [notes, setNotes] = React.useState<Note[]>([]);
   const [writeOnly, setWriteOnly] = React.useState<boolean>(true);
+  const composing = React.useRef<boolean>(false);
 
   React.useEffect(() => {
     console.log(localStorage.getItem('notes'))
@@ -24,17 +25,27 @@ export default function App() {
   const notesReversed = [...notes];
   notesReversed.reverse();
 
+  function confirm() {
+    const newNotes = [...notes];
+    const now = new Date();
+    newNotes.push({ content: input, created: now, modified: now, id: uuidv4() });
+    setNotes(newNotes);
+    localStorage.setItem('notes', JSON.stringify(newNotes));
+    setInput('');
+  }
+
   return <>
     <div className='input'>
-      <textarea onChange={e => setInput(e.target.value)} value={input} />
-      <button onClick={e => {
-        const newNotes = [...notes];
-        const now = new Date();
-        newNotes.push({ content: input, created: now, modified: now, id: uuidv4() });
-        setNotes(newNotes);
-        localStorage.setItem('notes', JSON.stringify(newNotes));
-        setInput('');
-      }}>Confirm</button>
+      <textarea onChange={e => setInput(e.target.value)} onKeyDown={e => {
+        if (e.key == 'Enter' && !composing.current) {
+          confirm();
+        }
+      }} onCompositionStart={e=>{
+        composing.current = true;
+      }} onCompositionEnd={e=>{
+        composing.current = false;
+      }} value={input} />
+      <button onClick={e => confirm()}>Confirm</button>
       <input checked={writeOnly} type="checkbox" id="write-only" onChange={e => {
         setWriteOnly(e.target.checked);
       }} />
