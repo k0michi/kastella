@@ -56,7 +56,7 @@ export default function App() {
     <div>
       <textarea onChange={e => setSearch(e.target.value)} value={search} />
     </div>
-    {writeOnly ? null : <table>
+    {writeOnly ? null : <table id="notes">
       <tbody>
         {notesReversed.filter(n => search.length > 0 ? n.content.includes(search) : true).map(n => {
           const id = n.id;

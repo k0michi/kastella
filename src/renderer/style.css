@@ -29,3 +29,11 @@ textarea {
   height: 1.2em;
   width: 500px;
 }
+
+#notes {
+  width: 100%;
+}
+
+td {
+  word-break: break-all;
+}
