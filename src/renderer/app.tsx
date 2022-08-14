@@ -13,6 +13,7 @@ export default function App() {
   const [notes, setNotes] = React.useState<Note[]>([]);
   const [writeOnly, setWriteOnly] = React.useState<boolean>(true);
   const composing = React.useRef<boolean>(false);
+  const [search, setSearch] = React.useState<string>('');
 
   React.useEffect(() => {
     console.log(localStorage.getItem('notes'))
@@ -41,9 +42,9 @@ export default function App() {
           e.preventDefault();
           confirm();
         }
-      }} onCompositionStart={e=>{
+      }} onCompositionStart={e => {
         composing.current = true;
-      }} onCompositionEnd={e=>{
+      }} onCompositionEnd={e => {
         composing.current = false;
       }} value={input} />
       <button onClick={e => confirm()}>Confirm</button>
@@ -52,9 +53,12 @@ export default function App() {
       }} />
       <label htmlFor="write-only">Write-only</label>
     </div>
+    <div>
+      <textarea onChange={e => setSearch(e.target.value)} value={search} />
+    </div>
     {writeOnly ? null : <table>
       <tbody>
-        {notesReversed.map(n => {
+        {notesReversed.filter(n => search.length > 0 ? n.content.includes(search) : true).map(n => {
           const id = n.id;
 
           return <tr key={id}><td>{n.content}</td><td><button onClick={e => {
