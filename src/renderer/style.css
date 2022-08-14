@@ -15,9 +15,13 @@ html {
   }
 }
 
-#root h1 {
-  font-family: sans-serif;
-  font-weight: lighter;
+#input {
+  display: flex;
+  flex-direction: row;
+}
+
+#input>* {
+  display: block;
 }
 
 textarea {

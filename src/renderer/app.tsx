@@ -36,7 +36,7 @@ export default function App() {
   }
 
   return <>
-    <div className='input'>
+    <div id='input'>
       <textarea onChange={e => setInput(e.target.value)} onKeyDown={e => {
         if (e.key == 'Enter' && !composing.current) {
           e.preventDefault();
