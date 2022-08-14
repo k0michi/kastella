@@ -3,6 +3,18 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+@media (prefers-color-scheme: dark) {
+  html {
+    color: white;
+    background-color: black;
+  }
+
+  textarea {
+    color: white;
+    background-color: black;
+  }
+}
+
 #root h1 {
   font-family: sans-serif;
   font-weight: lighter;
