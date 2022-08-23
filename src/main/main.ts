@@ -1,7 +1,8 @@
 // Modules to control application life and create native browser window
 
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import * as path from 'path';
+import * as fs from 'fs/promises';
 
 function createWindow() {
   // Create the browser window.
@@ -46,3 +47,13 @@ app.on('window-all-closed', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+ipcMain.handle('read-note', async e => {
+  const filePath = path.join(app.getPath('appData'), 'note.json');
+  return fs.readFile(filePath, 'utf-8');
+});
+
+ipcMain.handle('write-note', (e, content: string) => {
+  const filePath = path.join(app.getPath('appData'), 'note.json');
+  return fs.writeFile(filePath, content);
+});

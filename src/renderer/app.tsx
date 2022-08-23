@@ -16,11 +16,12 @@ export default function App() {
   const [search, setSearch] = React.useState<string>('');
 
   React.useEffect(() => {
-    console.log(localStorage.getItem('notes'))
-    if (localStorage.getItem('notes') != null) {
-      const notes = JSON.parse(localStorage.getItem('notes')!) as Note[];
+    bridge.readNote().then((c: string) => {
+      const notes = JSON.parse(c) as Note[];
       setNotes(notes);
-    }
+    }).catch(e => {
+      setNotes([]);
+    });
   }, []);
 
   const notesReversed = [...notes];
@@ -31,8 +32,8 @@ export default function App() {
     const now = new Date();
     newNotes.push({ content: input, created: now, modified: now, id: uuidv4() });
     setNotes(newNotes);
-    localStorage.setItem('notes', JSON.stringify(newNotes));
     setInput('');
+    bridge.writeNote(JSON.stringify(newNotes));
   }
 
   return <>
@@ -65,7 +66,7 @@ export default function App() {
             const newNotes = [...notes];
             newNotes.splice(newNotes.findIndex(n => n.id == id), 1);
             setNotes(newNotes);
-            localStorage.setItem('notes', JSON.stringify(newNotes));
+            bridge.writeNote(JSON.stringify(newNotes));
           }}>x</button></td></tr>;
         })}
       </tbody>
