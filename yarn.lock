@@ -3204,6 +3204,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"koyomi-note@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "koyomi-note@workspace:."
+  dependencies:
+    "@electron-forge/cli": ^6.0.0-beta.65
+    "@electron-forge/maker-deb": ^6.0.0-beta.65
+    "@electron-forge/maker-rpm": ^6.0.0-beta.65
+    "@electron-forge/maker-squirrel": ^6.0.0-beta.65
+    "@electron-forge/maker-zip": ^6.0.0-beta.65
+    "@types/react": ^18.0.15
+    "@types/react-dom": ^18.0.6
+    "@types/uuid": ^8.3.4
+    "@vitejs/plugin-react": ^2.0.0
+    concurrently: ^7.3.0
+    electron: ^20.0.1
+    electron-squirrel-startup: ^1.0.0
+    react: ^18.2.0
+    react-dom: ^18.2.0
+    typescript: ^4.6.4
+    uuid: ^8.3.2
+    vite: ^3.0.0
+  languageName: unknown
+  linkType: soft
+
 "load-json-file@npm:^2.0.0":
   version: 2.0.0
   resolution: "load-json-file@npm:2.0.0"
@@ -5041,30 +5065,6 @@ __metadata:
   checksum: 35703ac889d419cf2aceef63daeadbe4e77227c39ab6287eeb6c1b36a746b364f50ba22e88591f5d017bc54685d8137bc2d328d0a896e4d3fd22093c0f32a9ad
   languageName: node
   linkType: hard
-
-"vite-react-boilerplate@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "vite-react-boilerplate@workspace:."
-  dependencies:
-    "@electron-forge/cli": ^6.0.0-beta.65
-    "@electron-forge/maker-deb": ^6.0.0-beta.65
-    "@electron-forge/maker-rpm": ^6.0.0-beta.65
-    "@electron-forge/maker-squirrel": ^6.0.0-beta.65
-    "@electron-forge/maker-zip": ^6.0.0-beta.65
-    "@types/react": ^18.0.15
-    "@types/react-dom": ^18.0.6
-    "@types/uuid": ^8.3.4
-    "@vitejs/plugin-react": ^2.0.0
-    concurrently: ^7.3.0
-    electron: ^20.0.1
-    electron-squirrel-startup: ^1.0.0
-    react: ^18.2.0
-    react-dom: ^18.2.0
-    typescript: ^4.6.4
-    uuid: ^8.3.2
-    vite: ^3.0.0
-  languageName: unknown
-  linkType: soft
 
 "vite@npm:^3.0.0":
   version: 3.0.4
