@@ -49,11 +49,11 @@ app.on('window-all-closed', function () {
 // code. You can also put them in separate files and require them here.
 
 ipcMain.handle('read-note', async e => {
-  const filePath = path.join(app.getPath('appData'), 'note.json');
+  const filePath = path.join(app.getPath('userData'), 'notes.json');
   return fs.readFile(filePath, 'utf-8');
 });
 
 ipcMain.handle('write-note', (e, content: string) => {
-  const filePath = path.join(app.getPath('appData'), 'note.json');
+  const filePath = path.join(app.getPath('userData'), 'notes.json');
   return fs.writeFile(filePath, content);
 });
