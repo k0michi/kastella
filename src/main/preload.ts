@@ -1,8 +1,8 @@
 import { ipcRenderer, contextBridge } from 'electron';
 
 export class Bridge {
-  readNote = (...args: any[]) => ipcRenderer.invoke('read-note', ...args);
-  writeNote = (...args: any[]) => ipcRenderer.invoke('write-note', ...args);
+  readNote = () => ipcRenderer.invoke('read-note');
+  writeNote = (content: string) => ipcRenderer.invoke('write-note', content);
 }
 
 contextBridge.exposeInMainWorld('bridge', new Bridge());
