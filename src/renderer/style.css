@@ -15,6 +15,11 @@ html {
   }
 }
 
+body {
+  margin: 12px;
+  word-break: break-all;
+}
+
 #input {
   display: flex;
   flex-direction: row;
@@ -36,4 +41,15 @@ textarea {
 
 td {
   word-break: break-all;
+}
+
+.date {
+  color: rgb(120, 120, 120);
+  font-style: italic;
+}
+
+button {
+  border: none;
+  padding: 2px 6px;
+  border-radius: 4px;
 }

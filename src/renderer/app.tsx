@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { format } from 'date-fns';
 
 interface Note {
   id: string;
@@ -17,7 +18,13 @@ export default function App() {
 
   React.useEffect(() => {
     bridge.readNote().then((c: string) => {
-      const notes = JSON.parse(c) as Note[];
+      const notes = JSON.parse(c, (key, value)=>{
+        if (key == 'created' || key == 'modified') {
+          return new Date(value);
+        }
+
+        return value;
+      }) as Note[];
       setNotes(notes);
     }).catch(e => {
       setNotes([]);
@@ -57,19 +64,24 @@ export default function App() {
     <div>
       <textarea onChange={e => setSearch(e.target.value)} value={search} />
     </div>
-    {writeOnly ? null : <table id="notes">
-      <tbody>
+    {writeOnly ? null : <div id="notes">
         {notesReversed.filter(n => search.length > 0 ? n.content.includes(search) : true).map(n => {
           const id = n.id;
 
-          return <tr key={id}><td>{n.content}</td><td><button onClick={e => {
+          return <div key={id}>
+            <span>{n.content}</span>{' '}
+            <span className='date'>{dateToString(n.created)}</span>{' '}
+            <button onClick={e => {
             const newNotes = [...notes];
             newNotes.splice(newNotes.findIndex(n => n.id == id), 1);
             setNotes(newNotes);
             bridge.writeNote(JSON.stringify(newNotes));
-          }}>x</button></td></tr>;
+          }}>x</button></div>;
         })}
-      </tbody>
-    </table>}
+    </div>}
   </>;
+}
+
+function dateToString(date: Date) {
+  return format(date, 'yyyy/MM/dd HH:mm:ss');
 }
