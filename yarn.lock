@@ -3192,28 +3192,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"keyv@npm:^3.0.0":
-  version: 3.1.0
-  resolution: "keyv@npm:3.1.0"
-  dependencies:
-    json-buffer: 3.0.0
-  checksum: bb7e8f3acffdbafbc2dd5b63f377fe6ec4c0e2c44fc82720449ef8ab54f4a7ce3802671ed94c0f475ae0a8549703353a2124561fcf3317010c141b32ca1ce903
-  languageName: node
-  linkType: hard
-
-"keyv@npm:^4.0.0":
-  version: 4.3.3
-  resolution: "keyv@npm:4.3.3"
-  dependencies:
-    compress-brotli: ^1.3.8
-    json-buffer: 3.0.1
-  checksum: bcc946eeec3407fb3b42d831ce985357162113c5f07a8c45c12ede39704ba2d99be4c3dded76d2d2d2a2366627e42440bdde24393216164156928399949c12a1
-  languageName: node
-  linkType: hard
-
-"koyomi-note@workspace:.":
+"kakisute@workspace:.":
   version: 0.0.0-use.local
-  resolution: "koyomi-note@workspace:."
+  resolution: "kakisute@workspace:."
   dependencies:
     "@electron-forge/cli": ^6.0.0-beta.65
     "@electron-forge/maker-deb": ^6.0.0-beta.65
@@ -3235,6 +3216,25 @@ __metadata:
     vite: ^3.0.0
   languageName: unknown
   linkType: soft
+
+"keyv@npm:^3.0.0":
+  version: 3.1.0
+  resolution: "keyv@npm:3.1.0"
+  dependencies:
+    json-buffer: 3.0.0
+  checksum: bb7e8f3acffdbafbc2dd5b63f377fe6ec4c0e2c44fc82720449ef8ab54f4a7ce3802671ed94c0f475ae0a8549703353a2124561fcf3317010c141b32ca1ce903
+  languageName: node
+  linkType: hard
+
+"keyv@npm:^4.0.0":
+  version: 4.3.3
+  resolution: "keyv@npm:4.3.3"
+  dependencies:
+    compress-brotli: ^1.3.8
+    json-buffer: 3.0.1
+  checksum: bcc946eeec3407fb3b42d831ce985357162113c5f07a8c45c12ede39704ba2d99be4c3dded76d2d2d2a2366627e42440bdde24393216164156928399949c12a1
+  languageName: node
+  linkType: hard
 
 "load-json-file@npm:^2.0.0":
   version: 2.0.0

@@ -1,6 +1,6 @@
 {
-  "name": "koyomi-note",
-  "productName": "KoyomiNote",
+  "name": "kakisute",
+  "productName": "Kakisute",
   "private": true,
   "version": "0.0.0",
   "main": "dist/main/main.js",
