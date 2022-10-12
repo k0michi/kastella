@@ -14,6 +14,8 @@
   "dependencies": {
     "date-fns": "^2.29.3",
     "electron-squirrel-startup": "^1.0.0",
+    "immer": "^9.0.15",
+    "mime": "^3.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "uuid": "^8.3.2"
@@ -24,6 +26,7 @@
     "@electron-forge/maker-rpm": "^6.0.0-beta.65",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.65",
     "@electron-forge/maker-zip": "^6.0.0-beta.65",
+    "@types/mime": "^3.0.1",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "@types/uuid": "^8.3.4",

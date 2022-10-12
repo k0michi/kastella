@@ -48,12 +48,43 @@ app.on('window-all-closed', function () {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
+const libraryPath = path.join(app.getPath('userData'), 'library');
+
 ipcMain.handle('read-note', async e => {
-  const filePath = path.join(app.getPath('userData'), 'notes.json');
+  const filePath = path.join(libraryPath, 'notes.json');
   return fs.readFile(filePath, 'utf-8');
 });
 
-ipcMain.handle('write-note', (e, content: string) => {
-  const filePath = path.join(app.getPath('userData'), 'notes.json');
-  return fs.writeFile(filePath, content);
+ipcMain.handle('write-note', async (e, content: string) => {
+  const filePath = path.join(libraryPath, 'notes.json');
+  await fs.mkdir(libraryPath, { recursive: true });
+  return await fs.writeFile(filePath, content);
+});
+
+ipcMain.handle('copy-file', async (e, id: string, filePath: string) => {
+  const ext = path.extname(filePath);
+  await fs.mkdir(path.join(libraryPath, 'files'), { recursive: true });
+  const destPath = path.join(libraryPath, 'files', id + ext);
+  return await fs.copyFile(filePath, destPath);
+});
+
+async function findFile(id: string) {
+  const files = await fs.readdir(path.join(libraryPath, 'files'));
+
+  for (const file of files) {
+    if (file.startsWith(id)) {
+      return path.join(path.join(libraryPath, 'files'), file);
+    }
+  }
+
+  throw new Error('Not found');
+}
+
+ipcMain.handle('read-file', async (e, id: string) => {
+  const found = await findFile(id);
+  return await fs.readFile(found);
+});
+
+ipcMain.handle('basename', (e, filePath: string) => {
+  return path.basename(filePath);
 });

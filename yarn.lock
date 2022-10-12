@@ -876,6 +876,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/mime@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "@types/mime@npm:3.0.1"
+  checksum: 4040fac73fd0cea2460e29b348c1a6173da747f3a87da0dbce80dd7a9355a3d0e51d6d9a401654f3e5550620e3718b5a899b2ec1debf18424e298a2c605346e7
+  languageName: node
+  linkType: hard
+
 "@types/minimatch@npm:*":
   version: 3.0.5
   resolution: "@types/minimatch@npm:3.0.5"
@@ -2924,6 +2931,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"immer@npm:^9.0.15":
+  version: 9.0.15
+  resolution: "immer@npm:9.0.15"
+  checksum: 92e3d63e810e3c3c2bb61b70c45443e37ef983ad12924e3edaf03725ae5979618f5b473439bb3bb4a8c4769f25132f18dec10ea15c40f0b20da5691ff96ff611
+  languageName: node
+  linkType: hard
+
 "imurmurhash@npm:^0.1.4":
   version: 0.1.4
   resolution: "imurmurhash@npm:0.1.4"
@@ -3201,6 +3215,7 @@ __metadata:
     "@electron-forge/maker-rpm": ^6.0.0-beta.65
     "@electron-forge/maker-squirrel": ^6.0.0-beta.65
     "@electron-forge/maker-zip": ^6.0.0-beta.65
+    "@types/mime": ^3.0.1
     "@types/react": ^18.0.15
     "@types/react-dom": ^18.0.6
     "@types/uuid": ^8.3.4
@@ -3209,6 +3224,8 @@ __metadata:
     date-fns: ^2.29.3
     electron: ^20.0.1
     electron-squirrel-startup: ^1.0.0
+    immer: ^9.0.15
+    mime: ^3.0.0
     react: ^18.2.0
     react-dom: ^18.2.0
     typescript: ^4.6.4
@@ -3457,6 +3474,15 @@ __metadata:
     braces: ^3.0.2
     picomatch: ^2.3.1
   checksum: 02a17b671c06e8fefeeb6ef996119c1e597c942e632a21ef589154f23898c9c6a9858526246abb14f8bca6e77734aa9dcf65476fca47cedfb80d9577d52843fc
+  languageName: node
+  linkType: hard
+
+"mime@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "mime@npm:3.0.0"
+  bin:
+    mime: cli.js
+  checksum: f43f9b7bfa64534e6b05bd6062961681aeb406a5b53673b53b683f27fcc4e739989941836a355eef831f4478923651ecc739f4a5f6e20a76487b432bfd4db928
   languageName: node
   linkType: hard
 

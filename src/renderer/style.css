@@ -61,3 +61,7 @@ button {
     background-color: black;
   }
 }
+
+img.content {
+  width: 256px;
+}
