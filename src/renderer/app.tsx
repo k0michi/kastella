@@ -45,7 +45,9 @@ export default function App() {
     }).catch(e => {
       setNotes([]);
     });
+  }, []);
 
+  React.useEffect(() => {
     const onDrop = async (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
