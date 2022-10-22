@@ -3,13 +3,14 @@ import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime';
 import { dateToString } from './utils';
 import { useModel, useObservable } from 'kyoka';
-import Model, { Image, Type } from './model';
+import Model, { Image, TagView, Type } from './model';
 import produce from 'immer';
 
 export default function EditorPane() {
   const model = useModel<Model>();
   const notes = useObservable(model.notes);
   const tags = useObservable(model.tags);
+  const view = useObservable(model.view);
   const [input, setInput] = React.useState<string>('');
   const [writeOnly, setWriteOnly] = React.useState<boolean>(true);
   const composing = React.useRef<boolean>(false);
@@ -102,9 +103,19 @@ export default function EditorPane() {
     setInput('');
   }
 
+  let filtered = notes;
+
+  if (search.length > 0) {
+    filtered = filtered.filter(n => (n.type == undefined || n.type == Type.Text) && (n.content as string).includes(search));
+  }
+
+  if (view != null && view.type == 'tag') {
+    filtered = filtered.filter(n => n.tags?.includes((view as TagView).tag));
+  }
+
   return <div id='editor-pane' ref={appRef}>
     {writeOnly ? null : <div id="notes">
-      {notes.filter(n => search.length > 0 ? (n.type == undefined || n.type == Type.Text) && (n.content as string).includes(search) : true).map(n => {
+      {filtered.map(n => {
         const id = n.id;
 
         if (n.type == undefined || n.type == Type.Text) {

@@ -33,12 +33,26 @@ export interface Data {
   tags: Tag[];
 }
 
+export interface View {
+  type: 'directory' | 'tag';
+}
+
+export interface DirectoryView extends View {
+  type: 'directory';
+  path: string;
+}
+
+export interface TagView extends View {
+  type: 'tag';
+  tag: string;
+}
+
 export default class Model {
   notes = new Observable<Note[]>([]);
   tags = new Observable<Tag[]>([]);
+  view = new Observable<View | undefined>(undefined);
 
   constructor() {
-
   }
 
   loadNotes() {
@@ -118,5 +132,9 @@ export default class Model {
       notes: this.notes.get(),
       tags: this.tags.get()
     }));
+  }
+
+  changeView(view: View) {
+    this.view.set(view);
   }
 }
