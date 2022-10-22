@@ -34,7 +34,7 @@ export interface Data {
 }
 
 export interface View {
-  type: 'directory' | 'tag';
+  type: 'directory' | 'tag' | 'date';
 }
 
 export interface DirectoryView extends View {
@@ -45,6 +45,11 @@ export interface DirectoryView extends View {
 export interface TagView extends View {
   type: 'tag';
   tag: string;
+}
+
+export interface DateView extends View {
+  type: 'date';
+  date: string;
 }
 
 export default class Model {

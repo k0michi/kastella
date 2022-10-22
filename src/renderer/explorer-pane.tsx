@@ -1,17 +1,29 @@
 import * as React from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import * as mime from 'mime';
-import { dateToString } from './utils';
 import { useModel, useObservable } from 'kyoka';
-import Model, { Image, TagView, Type } from './model';
-import produce from 'immer';
+import Model, { DateView, Image, TagView, Type } from './model';
+import { formatISO } from 'date-fns';
 
 export default function ExplorerPane() {
   const model = useModel<Model>();
+  const notes = useObservable(model.notes);
   const tags = useObservable(model.tags);
   const modalRef = React.useRef<HTMLDialogElement>(null);
   const [directoryPath, setDirectoryPath] = React.useState<string>();
   const [validPath, setValidPath] = React.useState<boolean>(false);
+  const [dates, setDates] = React.useState<string[]>([]);
+
+  React.useEffect(() => {
+    const dateSet = new Set<string>();
+
+    for (const note of notes) {
+      const dateString = formatISO(note.created, { representation: 'date' });
+      dateSet.add(dateString);
+    }
+
+    const dates = Array.from(dateSet);
+    dates.sort((a, b) => b.localeCompare(a, undefined));
+    setDates(dates);
+  }, [notes]);
 
   return (
     <>
@@ -30,11 +42,15 @@ export default function ExplorerPane() {
             {tags.map(t => <div onClick={e => model.changeView({ 'type': 'tag', tag: t.id } as TagView)}>{t.name}</div>)}
           </div>
         </div>
+        <div className="section">
+          <div className="header">DATES</div>
+          <div className="container">
+            {dates.map(d => <div onClick={e => model.changeView({ 'type': 'date', date: d } as DateView)}>{d}</div>)}
+          </div>
+        </div>
       </div>
-      <dialog ref={modalRef} onClick={e => {
-
-      }}>
-        <div className='dialog-container' onClick={e => e.stopPropagation()}>
+      <dialog ref={modalRef}>
+        <div className='dialog-container'>
           <div className='dialog-title'>Create New Directory</div>
           Path <input type="text" className={validPath != null ? validPath ? 'valid' : 'invalid' : ''} placeholder='/.../...' onChange={e => {
             const pathExp = /^\/(([^\/]+)\/)*([^\/]+)?$/;

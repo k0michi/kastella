@@ -3,8 +3,9 @@ import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime';
 import { dateToString } from './utils';
 import { useModel, useObservable } from 'kyoka';
-import Model, { Image, TagView, Type } from './model';
+import Model, { DateView, Image, TagView, Type } from './model';
 import produce from 'immer';
+import { formatISO } from 'date-fns';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -111,6 +112,10 @@ export default function EditorPane() {
 
   if (view != null && view.type == 'tag') {
     filtered = filtered.filter(n => n.tags?.includes((view as TagView).tag));
+  }
+
+  if (view != null && view.type == 'date') {
+    filtered = filtered.filter(n => formatISO(n.created, { representation: 'date' }) == (view as DateView).date);
   }
 
   return <div id='editor-pane' ref={appRef}>

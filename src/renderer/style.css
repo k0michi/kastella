@@ -21,8 +21,11 @@ html {
 }
 
 body {
-  margin: 0px;
+  margin: 0;
   word-break: break-all;
+}
+
+#root {
 }
 
 #app {
@@ -54,7 +57,6 @@ body {
 }
 
 #editor-pane #notes {
-  width: 100%;
   white-space: pre-wrap;
 }
 
@@ -89,10 +91,12 @@ body {
   top: 0;
   height: fit-content;
   padding: 12px;
+  max-height: 100vh;
+  overflow-y: scroll;
 }
 
 #explorer-pane .section {
-  margin-bottom: 12px;
+  margin-bottom: 24px;
 }
 
 #explorer-pane .section .header {
