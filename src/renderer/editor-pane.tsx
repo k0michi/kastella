@@ -147,7 +147,7 @@ export default function EditorPane() {
             <img className='content' src={imageURL}></img>{' '}
             <span className='date'>{dateToString(n.created)}</span>{' '}
             <button onClick={e => {
-              model.removeNote(id);
+              model.removeImageNote(id);
             }}>x</button></div>;
         }
       })}

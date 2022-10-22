@@ -85,6 +85,11 @@ ipcMain.handle('read-file', async (e, id: string) => {
   return await fs.readFile(found);
 });
 
+ipcMain.handle('remove-file', async (e, id: string) => {
+  const found = await findFile(id);
+  return await fs.rm(found);
+});
+
 ipcMain.handle('basename', (e, filePath: string) => {
   return path.basename(filePath);
 });

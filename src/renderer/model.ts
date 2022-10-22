@@ -112,6 +112,18 @@ export default class Model {
     this.save();
   }
 
+  removeImageNote(id: string) {
+    const found = this.notes.get().findIndex(n => n.id == id);
+    bridge.removeFile((this.notes.get()[found].content as Image).id);
+
+    const newNotes = produce(this.notes.get(), n => {
+      n.splice(n.findIndex(n => n.id == id), 1);
+    });
+
+    this.notes.set(newNotes);
+    this.save();
+  }
+
   addTag(name: string) {
     const id = uuidv4();
 

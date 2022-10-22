@@ -5,6 +5,7 @@ export class Bridge {
   writeNote = (content: string): Promise<void> => ipcRenderer.invoke('write-note', content);
   copyFile = (id: string, filePath: string): Promise<void> => ipcRenderer.invoke('copy-file', id, filePath);
   readFile = (id: string): Promise<Uint8Array> => ipcRenderer.invoke('read-file', id);
+  removeFile = (id: string): Promise<Uint8Array> => ipcRenderer.invoke('remove-file', id);
   basename = (filePath: string): Promise<string> => ipcRenderer.invoke('basename', filePath);
 }
 
