@@ -134,7 +134,7 @@ export default class Model {
     }));
   }
 
-  changeView(view: View) {
+  changeView(view: View | undefined) {
     this.view.set(view);
   }
 }

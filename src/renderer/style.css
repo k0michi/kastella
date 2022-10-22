@@ -4,6 +4,10 @@ html {
   font-family: sans-serif;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color: white;
@@ -17,43 +21,13 @@ html {
 }
 
 body {
-  margin: 12px;
+  margin: 0px;
   word-break: break-all;
 }
 
-#input {
+#app {
   display: flex;
   flex-direction: row;
-}
-
-#input>* {
-  display: block;
-}
-
-textarea {
-  resize: none;
-  height: 1.2em;
-  width: 500px;
-}
-
-#notes {
-  width: 100%;
-  white-space: pre-wrap;
-}
-
-td {
-  word-break: break-all;
-}
-
-.date {
-  color: rgb(120, 120, 120);
-  font-style: italic;
-}
-
-button {
-  border: 1px solid rgb(158, 158, 158);
-  padding: 2px 6px;
-  border-radius: 4px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -63,22 +37,65 @@ button {
   }
 }
 
-img.content {
-  width: 256px;
+#editor-pane button {
+  border: 1px solid rgb(158, 158, 158);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
-#app {
+
+/* Editor pane */
+
+#editor-pane {
+  flex: 1 1 0;
+  padding: 12px;
+}
+
+#editor-pane #input {
   display: flex;
   flex-direction: row;
 }
+
+#editor-pane #input>* {
+  display: block;
+}
+
+#editor-pane textarea {
+  resize: none;
+  height: 1.8em;
+  width: 500px;
+}
+
+#editor-pane #notes {
+  width: 100%;
+  white-space: pre-wrap;
+}
+
+#editor-pane .date {
+  color: rgb(120, 120, 120);
+  font-style: italic;
+}
+
+#editor-pane img.content {
+  width: 256px;
+}
+
+
+/* Editor pane */
 
 #explorer-pane {
   flex: 0 0 200px;
   position: sticky;
   top: 0;
   height: fit-content;
+  padding: 12px;
 }
 
-#editor-pane {
-  flex: 1 1 0;
+#explorer-pane .section {
+  margin-bottom: 12px;
+}
+
+#explorer-pane .section .name {
+  color: rgb(165, 165, 165);
+  font-weight: lighter;
 }

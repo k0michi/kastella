@@ -11,12 +11,17 @@ export default function ExplorerPane() {
   const tags = useObservable(model.tags);
 
   return (<div id="explorer-pane">
-    <div>
-      Tree
+    <div className="section">
+      <div className="name">TREE</div>
+      <div className="container">
+        <div onClick={e => model.changeView(undefined)}>/</div>
+      </div>
     </div>
-    <div>
-      Tags
-      {tags.map(t => <div onClick={e => model.changeView({ 'type': 'tag', tag: t.id } as TagView)}>{t.name}</div>)}
+    <div className="section">
+      <div className="name">TAGS</div>
+      <div className="container">
+        {tags.map(t => <div onClick={e => model.changeView({ 'type': 'tag', tag: t.id } as TagView)}>{t.name}</div>)}
+      </div>
     </div>
   </div>);
 }
