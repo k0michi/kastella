@@ -3225,6 +3225,7 @@ __metadata:
     electron: ^20.0.1
     electron-squirrel-startup: ^1.0.0
     immer: ^9.0.15
+    kyoka: ^0.0.3
     mime: ^3.0.0
     react: ^18.2.0
     react-dom: ^18.2.0
@@ -3250,6 +3251,15 @@ __metadata:
     compress-brotli: ^1.3.8
     json-buffer: 3.0.1
   checksum: bcc946eeec3407fb3b42d831ce985357162113c5f07a8c45c12ede39704ba2d99be4c3dded76d2d2d2a2366627e42440bdde24393216164156928399949c12a1
+  languageName: node
+  linkType: hard
+
+"kyoka@npm:^0.0.3":
+  version: 0.0.3
+  resolution: "kyoka@npm:0.0.3"
+  dependencies:
+    react: ^18.1.0
+  checksum: ca9b4ea6c0f85e8f12a314a24f1ddad032d09ac36701e3a69d95c873fff058724536296bfcada889b648e4ce9ad40fd24dc0a6f5657119cf72ddf68788279281
   languageName: node
   linkType: hard
 
@@ -4248,7 +4258,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^18.2.0":
+"react@npm:^18.1.0, react@npm:^18.2.0":
   version: 18.2.0
   resolution: "react@npm:18.2.0"
   dependencies:

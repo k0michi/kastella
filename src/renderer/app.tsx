@@ -1,50 +1,26 @@
 import * as React from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { format } from 'date-fns';
 import * as mime from 'mime';
+import { dateToString } from './utils';
+import { useModel, useObservable } from 'kyoka';
+import Model, { Image, Type } from './model';
 import produce from 'immer';
 
-enum Type {
-  Text = 'text',
-  Image = 'image'
-}
-
-interface Note {
-  id: string;
-  type?: string;
-  content: string | Image;
-  created: Date;
-  modified: Date;
-}
-
-interface Image {
-  id: string;
-  name: string;
-  type: string;
-  description?: string;
-}
-
 export default function App() {
+  const model = useModel<Model>();
+  const notes = useObservable(model.notes);
   const [input, setInput] = React.useState<string>('');
-  const [notes, setNotes] = React.useState<Note[]>([]);
   const [writeOnly, setWriteOnly] = React.useState<boolean>(true);
   const composing = React.useRef<boolean>(false);
   const [search, setSearch] = React.useState<string>('');
   const [images, setImages] = React.useState<Record<string, string | undefined>>({});
 
   React.useEffect(() => {
-    bridge.readNote().then((c: string) => {
-      const notes = JSON.parse(c, (key, value) => {
-        if (key == 'created' || key == 'modified') {
-          return new Date(value);
-        }
-
-        return value;
-      }) as Note[];
-      setNotes(notes);
-    }).catch(e => {
-      setNotes([]);
-    });
+    return () => {
+      for (const image of Object.values(images)) {
+        URL.revokeObjectURL(image!);
+      }
+    };
   }, []);
 
   React.useEffect(() => {
@@ -63,13 +39,9 @@ export default function App() {
           const image = { id, name: basename, type: mimeType };
 
           const now = new Date();
-          const newNotes = produce(notes, d => {
-            d.push({
-              type: Type.Image, content: image, created: now, modified: now, id: uuidv4()
-            })
+          model.addNote({
+            type: Type.Image, content: image, created: now, modified: now, id: uuidv4()
           });
-          setNotes(newNotes);
-          bridge.writeNote(JSON.stringify(newNotes));
         }
       }
     };
@@ -94,12 +66,8 @@ export default function App() {
 
   function confirm() {
     const now = new Date();
-    const newNotes = produce(notes, d => {
-      d.push({ content: input, created: now, modified: now, id: uuidv4() });
-    });
-    setNotes(newNotes);
+    model.addNote({ content: input, created: now, modified: now, id: uuidv4() });
     setInput('');
-    bridge.writeNote(JSON.stringify(newNotes));
   }
 
   return <>
@@ -132,10 +100,7 @@ export default function App() {
             <span className='content'>{n.content as string}</span>{' '}
             <span className='date'>{dateToString(n.created)}</span>{' '}
             <button onClick={e => {
-              const newNotes = [...notes];
-              newNotes.splice(newNotes.findIndex(n => n.id == id), 1);
-              setNotes(newNotes);
-              bridge.writeNote(JSON.stringify(newNotes));
+              model.removeNote(id);
             }}>x</button></div>;
         } else if (n.type == Type.Image) {
           const image = n.content as Image;
@@ -154,19 +119,12 @@ export default function App() {
             <img className='content' src={imageURL}></img>{' '}
             <span className='date'>{dateToString(n.created)}</span>{' '}
             <button onClick={e => {
-              const newNotes = [...notes];
-              newNotes.splice(newNotes.findIndex(n => n.id == id), 1);
-              setNotes(newNotes);
-              bridge.writeNote(JSON.stringify(newNotes));
+              model.removeNote(id);
             }}>x</button></div>;
         }
       })}
     </div>}
   </>;
-}
-
-function dateToString(date: Date) {
-  return format(date, 'yyyy/MM/dd HH:mm:ss');
 }
 
 function uint8ArrayObjectURL(array: Uint8Array, mediaType: string) {
