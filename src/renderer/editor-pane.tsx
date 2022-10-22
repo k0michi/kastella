@@ -9,6 +9,7 @@ import produce from 'immer';
 export default function EditorPane() {
   const model = useModel<Model>();
   const notes = useObservable(model.notes);
+  const tags = useObservable(model.tags);
   const [input, setInput] = React.useState<string>('');
   const [writeOnly, setWriteOnly] = React.useState<boolean>(true);
   const composing = React.useRef<boolean>(false);
@@ -65,11 +66,7 @@ export default function EditorPane() {
           await bridge.copyFile(id, filePath);
           const basename = await bridge.basename(filePath);
           const image = { id, name: basename, type: mimeType };
-
-          const now = new Date();
-          model.addNote({
-            type: Type.Image, content: image, created: now, modified: now, id: uuidv4()
-          });
+          model.addImageNote(image);
         }
       }
     };
@@ -90,8 +87,18 @@ export default function EditorPane() {
   }, [notes]);
 
   function confirm() {
-    const now = new Date();
-    model.addNote({ content: input, created: now, modified: now, id: uuidv4() });
+    const [content, tags] = splitTags(input);
+    const tagIDs = tags.map(t => {
+      const found = model.findTag(t);
+
+      if (found == null) {
+        return model.addTag(t);
+      }
+
+      return found.id;
+    });
+
+    model.addNote(content, tagIDs);
     setInput('');
   }
 
@@ -156,4 +163,19 @@ export default function EditorPane() {
 
 function uint8ArrayObjectURL(array: Uint8Array, mediaType: string) {
   return URL.createObjectURL(new Blob([array.buffer], { type: mediaType }));
+}
+
+// '... #tagName' => ['...', ['tagName']]
+function splitTags(string: string): [string, string[]] {
+  const tagExp = /#(\S+)$/;
+  let result: RegExpExecArray | null;
+  const tags = [];
+
+  while (string = string.trim(), result = tagExp.exec(string), result != null) {
+    tags.push(result[1]);
+    string = string.substring(0, result.index);
+  }
+
+  string = string.trim();
+  return [string, tags];
 }
