@@ -137,4 +137,10 @@ export default class Model {
   changeView(view: View | undefined) {
     this.view.set(view);
   }
+
+  createDirectory(path: string) {
+    const dirs = path.split('/').filter(d => d.length > 0);
+    // TODO
+
+  }
 }

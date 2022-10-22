@@ -30,19 +30,6 @@ body {
   flex-direction: row;
 }
 
-@media (prefers-color-scheme: dark) {
-  button {
-    color: white;
-    background-color: black;
-  }
-}
-
-#editor-pane button {
-  border: 1px solid rgb(158, 158, 158);
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
 
 /* Editor pane */
 
@@ -80,6 +67,19 @@ body {
   width: 256px;
 }
 
+@media (prefers-color-scheme: dark) {
+  #editor-pane button {
+    color: white;
+    background-color: black;
+  }
+}
+
+#editor-pane button {
+  border: 1px solid rgb(158, 158, 158);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
 
 /* Editor pane */
 
@@ -95,7 +95,69 @@ body {
   margin-bottom: 12px;
 }
 
-#explorer-pane .section .name {
+#explorer-pane .section .header {
   color: rgb(165, 165, 165);
   font-weight: lighter;
+  display: flex;
+  flex-direction: row;
+}
+
+#explorer-pane .section .header .name {
+  flex: 1 1 0;
+}
+
+#explorer-pane .section .header .menu {
+  cursor: pointer;
+}
+
+
+/* Dialog */
+
+dialog {
+  padding: 24px;
+  border: none;
+  border-radius: 8px;
+}
+
+dialog::backdrop {
+  backdrop-filter: blur(8px);
+}
+
+.dialog-title {
+  margin-bottom: 24px;
+  font-weight: bold;
+}
+
+.dialog-buttons {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: row;
+}
+
+.dialog-buttons .left {
+  flex: 1 1 0;
+}
+
+input[type="text"] {
+  border: none;
+  outline: none;
+  border-bottom: 1px solid gray;
+  font-size: 16px;
+  width: 256px;
+}
+
+input[type="text"].invalid {
+  border-bottom: 1px solid red;
+}
+
+.dialog-buttons button {
+  padding: 5px 12px;
+  border-radius: 4px;
+  min-width: 80px;
+  border: none;
+}
+
+.dialog-buttons button.highlighted {
+  background-color: rgb(63, 114, 226);
+  color: rgb(255, 255, 255);
 }
