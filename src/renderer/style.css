@@ -1,6 +1,7 @@
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-family: sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -64,4 +65,20 @@ button {
 
 img.content {
   width: 256px;
+}
+
+#app {
+  display: flex;
+  flex-direction: row;
+}
+
+#explorer-pane {
+  flex: 0 0 200px;
+  position: sticky;
+  top: 0;
+  height: fit-content;
+}
+
+#editor-pane {
+  flex: 1 1 0;
 }

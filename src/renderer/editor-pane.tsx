@@ -6,7 +6,7 @@ import { useModel, useObservable } from 'kyoka';
 import Model, { Image, Type } from './model';
 import produce from 'immer';
 
-export default function App() {
+export default function EditorPane() {
   const model = useModel<Model>();
   const notes = useObservable(model.notes);
   const [input, setInput] = React.useState<string>('');
@@ -95,7 +95,7 @@ export default function App() {
     setInput('');
   }
 
-  return <div id='app' ref={appRef}>
+  return <div id='editor-pane' ref={appRef}>
     {writeOnly ? null : <div id="notes">
       {notes.filter(n => search.length > 0 ? (n.type == undefined || n.type == Type.Text) && (n.content as string).includes(search) : true).map(n => {
         const id = n.id;
