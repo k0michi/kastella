@@ -14,14 +14,42 @@ export default function App() {
   const composing = React.useRef<boolean>(false);
   const [search, setSearch] = React.useState<string>('');
   const [images, setImages] = React.useState<Record<string, string | undefined>>({});
+  const appRef = React.useRef<HTMLDivElement>(null);
+  const [atBottom, setAtBottom] = React.useState(true);
 
   React.useEffect(() => {
+    const onScroll = () => {
+      const clientHeight = document.documentElement.clientHeight;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const scrollTop = document.documentElement.scrollTop;
+      const atBottom = scrollHeight - clientHeight - scrollTop <= 0;
+      setAtBottom(atBottom);
+    }
+
+    window.addEventListener('scroll', onScroll);
+
     return () => {
+      window.removeEventListener('scroll', onScroll);
+
       for (const image of Object.values(images)) {
         URL.revokeObjectURL(image!);
       }
     };
   }, []);
+
+  React.useEffect(() => {
+    const resizeObserver = new ResizeObserver(entries => {
+      if (atBottom) {
+        window.scroll(0, document.documentElement.scrollHeight);
+      }
+    });
+
+    resizeObserver.observe(appRef.current!);
+
+    return () => {
+      resizeObserver.disconnect();
+    }
+  }, [atBottom]);
 
   React.useEffect(() => {
     const onDrop = async (e: DragEvent) => {
@@ -61,38 +89,15 @@ export default function App() {
     };
   }, [notes]);
 
-  const notesReversed = [...notes];
-  notesReversed.reverse();
-
   function confirm() {
     const now = new Date();
     model.addNote({ content: input, created: now, modified: now, id: uuidv4() });
     setInput('');
   }
 
-  return <>
-    <div id='input'>
-      <textarea onChange={e => setInput(e.target.value)} onKeyDown={e => {
-        if (e.key == 'Enter' && !composing.current) {
-          e.preventDefault();
-          confirm();
-        }
-      }} onCompositionStart={e => {
-        composing.current = true;
-      }} onCompositionEnd={e => {
-        composing.current = false;
-      }} value={input} />
-      <button onClick={e => confirm()}>Confirm</button>
-      <input checked={writeOnly} type="checkbox" id="write-only" onChange={e => {
-        setWriteOnly(e.target.checked);
-      }} />
-      <label htmlFor="write-only">Write-only</label>
-    </div>
-    <div>
-      <textarea onChange={e => setSearch(e.target.value)} value={search} />
-    </div>
+  return <div id='app' ref={appRef}>
     {writeOnly ? null : <div id="notes">
-      {notesReversed.filter(n => search.length > 0 ? (n.type == undefined || n.type == Type.Text) && (n.content as string).includes(search) : true).map(n => {
+      {notes.filter(n => search.length > 0 ? (n.type == undefined || n.type == Type.Text) && (n.content as string).includes(search) : true).map(n => {
         const id = n.id;
 
         if (n.type == undefined || n.type == Type.Text) {
@@ -124,7 +129,29 @@ export default function App() {
         }
       })}
     </div>}
-  </>;
+    <div id="controls">
+      <div id='input'>
+        <textarea onChange={e => setInput(e.target.value)} onKeyDown={e => {
+          if (e.key == 'Enter' && !composing.current) {
+            e.preventDefault();
+            confirm();
+          }
+        }} onCompositionStart={e => {
+          composing.current = true;
+        }} onCompositionEnd={e => {
+          composing.current = false;
+        }} value={input} />
+        <button onClick={e => confirm()}>Confirm</button>
+        <input checked={writeOnly} type="checkbox" id="write-only" onChange={e => {
+          setWriteOnly(e.target.checked);
+        }} />
+        <label htmlFor="write-only">Write-only</label>
+      </div>
+      <div>
+        <textarea onChange={e => setSearch(e.target.value)} value={search} />
+      </div>
+    </div>
+  </div>;
 }
 
 function uint8ArrayObjectURL(array: Uint8Array, mediaType: string) {

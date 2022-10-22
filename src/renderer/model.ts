@@ -37,6 +37,7 @@ export default class Model {
 
         return value;
       }) as Note[];
+
       this.notes.set(notes);
     });
   }
@@ -47,7 +48,7 @@ export default class Model {
     });
 
     this.notes.set(newNotes);
-    bridge.writeNote(JSON.stringify(newNotes));
+    this.saveNote();
   }
 
   removeNote(id: string) {
@@ -56,6 +57,10 @@ export default class Model {
     });
 
     this.notes.set(newNotes);
-    bridge.writeNote(JSON.stringify(newNotes));
+    this.saveNote();
+  }
+
+  saveNote() {
+    bridge.writeNote(JSON.stringify(this.notes.get()));
   }
 }
