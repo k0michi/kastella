@@ -7,7 +7,7 @@ import Model from './model';
 import './style.css';
 
 const model = new Model();
-model.loadNotes();
+model.loadLibrary();
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <ModelProvider model={model}>

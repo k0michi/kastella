@@ -2,25 +2,51 @@ import { Observable } from "kyoka";
 import produce from 'immer';
 import { v4 as uuidv4 } from 'uuid';
 
-export enum Type {
+export enum NodeType {
   Text = 'text',
-  Image = 'image'
+  Image = 'image',
+  Anchor = 'anchor',
+  Directory = 'directory',
 }
 
-export interface Note {
+export interface Node {
   id: string;
-  type?: string;
-  content: string | Image;
+  type?: NodeType;
   created: Date;
   modified: Date;
   tags?: string[];
 }
 
-export interface Image {
-  id: string;
-  name: string;
-  type: string;
+export interface TextNode extends Node {
+  type?: NodeType.Text;
+  content: string;
+}
+
+export interface ImageNode extends Node {
+  type?: NodeType.Image;
+  fileID: string;
+  description: string;
+}
+
+export interface AnchorNode extends Node {
+  type?: NodeType.Anchor;
+  url: string;
+  title?: string;
+  imageFileID?: string;
+  faviconFileID?: string;
   description?: string;
+}
+
+export interface DirectoryNode extends Node {
+  type?: NodeType.Directory;
+  name: string;
+}
+
+export interface File {
+  id: string;
+  type: string;
+  name?: string;
+  url?: string;
 }
 
 export interface Tag {
@@ -29,7 +55,8 @@ export interface Tag {
 }
 
 export interface Data {
-  notes: Note[];
+  nodes: Node[];
+  files: File[];
   tags: Tag[];
 }
 
@@ -53,15 +80,17 @@ export interface DateView extends View {
 }
 
 export default class Model {
-  notes = new Observable<Note[]>([]);
+  nodes = new Observable<Node[]>([]);
+  files = new Observable<File[]>([]);
   tags = new Observable<Tag[]>([]);
   view = new Observable<View | undefined>(undefined);
+  saving = new Observable<boolean>(false);
 
   constructor() {
   }
 
-  loadNotes() {
-    bridge.readNote().then((c: string) => {
+  loadLibrary() {
+    bridge.readLibrary().then((c: string) => {
       const data = JSON.parse(c, (key, value) => {
         if (key == 'created' || key == 'modified') {
           return new Date(value);
@@ -70,12 +99,13 @@ export default class Model {
         return value;
       }) as Data;
 
-      this.notes.set(data.notes ?? []);
+      this.nodes.set(data.nodes ?? []);
+      this.files.set(data.files ?? []);
       this.tags.set(data.tags ?? []);
     });
   }
 
-  addNote(text: string, tags: string[] | undefined) {
+  addTextNode(text: string, tags: string[] | undefined) {
     const now = new Date();
     const id = uuidv4();
 
@@ -83,45 +113,63 @@ export default class Model {
       tags = undefined;
     }
 
-    const newNotes = produce(this.notes.get(), n => {
-      n.push({ content: text, tags, created: now, modified: now, id });
+    const newNodes = produce(this.nodes.get(), n => {
+      n.push({ type: NodeType.Text, content: text, tags, created: now, modified: now, id } as TextNode);
     });
 
-    this.notes.set(newNotes);
+    this.nodes.set(newNodes);
     this.save();
   }
 
-  addImageNote(image: Image) {
+  addImageNode(file: File) {
     const now = new Date();
     const id = uuidv4()
 
-    const newNotes = produce(this.notes.get(), n => {
-      n.push({ type: Type.Image, content: image, created: now, modified: now, id });
+    const newFiles = produce(this.files.get(), f => {
+      f.push(file);
     });
 
-    this.notes.set(newNotes);
+    this.files.set(newFiles);
+
+    const newNodes = produce(this.nodes.get(), n => {
+      n.push({ type: NodeType.Image, fileID: file.id, created: now, modified: now, id } as ImageNode);
+    });
+
+    this.nodes.set(newNodes);
     this.save();
   }
 
-  removeNote(id: string) {
-    const newNotes = produce(this.notes.get(), n => {
+  removeNode(id: string) {
+    const foundIndex = this.nodes.get().findIndex(n => n.id == id);
+    const found = this.nodes.get()[foundIndex];
+
+    if (found.type == NodeType.Image) {
+      this.removeFile((found as ImageNode).fileID);
+    }
+
+    const newNodes = produce(this.nodes.get(), n => {
       n.splice(n.findIndex(n => n.id == id), 1);
     });
 
-    this.notes.set(newNotes);
+    this.nodes.set(newNodes);
     this.save();
   }
 
-  removeImageNote(id: string) {
-    const found = this.notes.get().findIndex(n => n.id == id);
-    bridge.removeFile((this.notes.get()[found].content as Image).id);
+  removeFile(fileID: string) {
+    const found = this.files.get().findIndex(f => f.id == fileID);
+    bridge.removeFile(this.files.get()[found].id);
 
-    const newNotes = produce(this.notes.get(), n => {
-      n.splice(n.findIndex(n => n.id == id), 1);
+    const newFiles = produce(this.files.get(), f => {
+      f.splice(f.findIndex(f => f.id == fileID), 1);
     });
 
-    this.notes.set(newNotes);
+    this.files.set(newFiles);
     this.save();
+  }
+
+  getFile(fileID: string) {
+    const found = this.files.get().find(f => f.id == fileID);
+    return found;
   }
 
   addTag(name: string) {
@@ -145,10 +193,19 @@ export default class Model {
   }
 
   async save() {
-    await bridge.writeNote(JSON.stringify({
-      notes: this.notes.get(),
+    if (this.saving.get()) {
+      return;
+    }
+
+    this.saving.set(true);
+
+    await bridge.writeLibrary(JSON.stringify({
+      nodes: this.nodes.get(),
+      files: this.files.get(),
       tags: this.tags.get()
     }));
+
+    this.saving.set(false);
   }
 
   changeView(view: View | undefined) {
@@ -158,6 +215,5 @@ export default class Model {
   createDirectory(path: string) {
     const dirs = path.split('/').filter(d => d.length > 0);
     // TODO
-
   }
 }

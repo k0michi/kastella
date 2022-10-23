@@ -50,13 +50,13 @@ app.on('window-all-closed', function () {
 
 const libraryPath = path.join(app.getPath('userData'), 'library');
 
-ipcMain.handle('read-note', async e => {
-  const filePath = path.join(libraryPath, 'notes.json');
+ipcMain.handle('read-library', async e => {
+  const filePath = path.join(libraryPath, 'data.json');
   return fs.readFile(filePath, 'utf-8');
 });
 
-ipcMain.handle('write-note', async (e, content: string) => {
-  const filePath = path.join(libraryPath, 'notes.json');
+ipcMain.handle('write-library', async (e, content: string) => {
+  const filePath = path.join(libraryPath, 'data.json');
   await fs.mkdir(libraryPath, { recursive: true });
   return await fs.writeFile(filePath, content);
 });

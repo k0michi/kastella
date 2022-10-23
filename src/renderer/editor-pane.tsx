@@ -3,15 +3,16 @@ import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime';
 import { dateToString } from './utils';
 import { useModel, useObservable } from 'kyoka';
-import Model, { DateView, Image, TagView, Type } from './model';
 import produce from 'immer';
 import { formatISO } from 'date-fns';
+import Model, { DateView, ImageNode, NodeType, TagView, TextNode } from './model';
 
 export default function EditorPane() {
   const model = useModel<Model>();
-  const notes = useObservable(model.notes);
+  const nodes = useObservable(model.nodes);
   const tags = useObservable(model.tags);
   const view = useObservable(model.view);
+  const saving = useObservable(model.saving);
   const [input, setInput] = React.useState<string>('');
   const [writeOnly, setWriteOnly] = React.useState<boolean>(true);
   const composing = React.useRef<boolean>(false);
@@ -68,7 +69,7 @@ export default function EditorPane() {
           await bridge.copyFile(id, filePath);
           const basename = await bridge.basename(filePath);
           const image = { id, name: basename, type: mimeType };
-          model.addImageNote(image);
+          model.addImageNode(image);
         }
       }
     };
@@ -86,7 +87,7 @@ export default function EditorPane() {
       document.removeEventListener('drop', onDrop);
       document.removeEventListener('dragover', onDragover);
     };
-  }, [notes]);
+  }, [nodes]);
 
   function confirm() {
     const [content, tags] = splitTags(input);
@@ -100,14 +101,14 @@ export default function EditorPane() {
       return found.id;
     });
 
-    model.addNote(content, tagIDs);
+    model.addTextNode(content, tagIDs);
     setInput('');
   }
 
-  let filtered = notes;
+  let filtered = nodes;
 
   if (search.length > 0) {
-    filtered = filtered.filter(n => (n.type == undefined || n.type == Type.Text) && (n.content as string).includes(search));
+    filtered = filtered.filter(n => (n.type == undefined || n.type == NodeType.Text) && ((n as TextNode).content as string).includes(search));
   }
 
   if (view != null && view.type == 'tag') {
@@ -123,15 +124,18 @@ export default function EditorPane() {
       {filtered.map(n => {
         const id = n.id;
 
-        if (n.type == undefined || n.type == Type.Text) {
+        if (n.type == undefined || n.type == NodeType.Text) {
+          const textNode = n as TextNode;
+
           return <div key={id}>
-            <span className='content'>{n.content as string}</span>{' '}
-            <span className='date'>{dateToString(n.created)}</span>{' '}
+            <span className='content'>{textNode.content as string}</span>{' '}
+            <span className='date'>{dateToString(textNode.created)}</span>{' '}
             <button onClick={e => {
-              model.removeNote(id);
+              model.removeNode(id);
             }}>x</button></div>;
-        } else if (n.type == Type.Image) {
-          const image = n.content as Image;
+        } else if (n.type == NodeType.Image) {
+          const imageNode = n as ImageNode;
+          const image = model.getFile(imageNode.fileID)!;
           const imageURL = images[image.id];
 
           if (imageURL == undefined) {
@@ -147,7 +151,7 @@ export default function EditorPane() {
             <img className='content' src={imageURL}></img>{' '}
             <span className='date'>{dateToString(n.created)}</span>{' '}
             <button onClick={e => {
-              model.removeImageNote(id);
+              model.removeNode(id);
             }}>x</button></div>;
         }
       })}
@@ -172,6 +176,7 @@ export default function EditorPane() {
       </div>
       <div>
         <textarea onChange={e => setSearch(e.target.value)} value={search} />
+        {saving ? 'Saving...' : ''}
       </div>
     </div>
   </div>;

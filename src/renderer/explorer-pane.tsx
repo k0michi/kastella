@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { useModel, useObservable } from 'kyoka';
-import Model, { DateView, Image, TagView, Type } from './model';
 import { formatISO } from 'date-fns';
+import Model, { DateView, TagView } from './model';
 
 export default function ExplorerPane() {
   const model = useModel<Model>();
-  const notes = useObservable(model.notes);
+  const nodes = useObservable(model.nodes);
   const tags = useObservable(model.tags);
   const modalRef = React.useRef<HTMLDialogElement>(null);
   const [directoryPath, setDirectoryPath] = React.useState<string>();
@@ -15,7 +15,7 @@ export default function ExplorerPane() {
   React.useEffect(() => {
     const dateSet = new Set<string>();
 
-    for (const note of notes) {
+    for (const note of nodes) {
       const dateString = formatISO(note.created, { representation: 'date' });
       dateSet.add(dateString);
     }
@@ -23,7 +23,7 @@ export default function ExplorerPane() {
     const dates = Array.from(dateSet);
     dates.sort((a, b) => b.localeCompare(a, undefined));
     setDates(dates);
-  }, [notes]);
+  }, [nodes]);
 
   return (
     <>
