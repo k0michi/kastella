@@ -54,7 +54,7 @@ export interface Tag {
   name: string;
 }
 
-export interface Data {
+export interface Library {
   nodes: Node[];
   files: File[];
   tags: Tag[];
@@ -89,23 +89,15 @@ export default class Model {
   constructor() {
   }
 
-  loadLibrary() {
-    bridge.readLibrary().then((c: string) => {
-      const data = JSON.parse(c, (key, value) => {
-        if (key == 'created' || key == 'modified') {
-          return new Date(value);
-        }
-
-        return value;
-      }) as Data;
-
-      this.nodes.set(data.nodes ?? []);
-      this.files.set(data.files ?? []);
-      this.tags.set(data.tags ?? []);
+  addNode(node: Node) {
+    const newNodes = produce(this.nodes.get(), n => {
+      n.push(node);
     });
+
+    this.nodes.set(newNodes);
   }
 
-  addTextNode(text: string, tags: string[] | undefined) {
+  addTextNode(text: string, tags?: string[]) {
     const now = new Date();
     const id = uuidv4();
 
@@ -113,29 +105,20 @@ export default class Model {
       tags = undefined;
     }
 
-    const newNodes = produce(this.nodes.get(), n => {
-      n.push({ type: NodeType.Text, content: text, tags, created: now, modified: now, id } as TextNode);
-    });
-
-    this.nodes.set(newNodes);
+    this.addNode({ type: NodeType.Text, content: text, tags, created: now, modified: now, id } as TextNode);
     this.save();
   }
 
-  addImageNode(file: File) {
+  addImageNode(file: File, tags?: string[]) {
     const now = new Date();
     const id = uuidv4()
 
-    const newFiles = produce(this.files.get(), f => {
-      f.push(file);
-    });
+    if (tags?.length == 0) {
+      tags = undefined;
+    }
 
-    this.files.set(newFiles);
-
-    const newNodes = produce(this.nodes.get(), n => {
-      n.push({ type: NodeType.Image, fileID: file.id, created: now, modified: now, id } as ImageNode);
-    });
-
-    this.nodes.set(newNodes);
+    this.addFile(file);
+    this.addNode({ type: NodeType.Image, fileID: file.id, tags, created: now, modified: now, id } as ImageNode);
     this.save();
   }
 
@@ -155,6 +138,17 @@ export default class Model {
     this.save();
   }
 
+
+  // Files
+
+  addFile(file: File) {
+    const newFiles = produce(this.files.get(), f => {
+      f.push(file);
+    });
+
+    this.files.set(newFiles);
+  }
+
   removeFile(fileID: string) {
     const found = this.files.get().findIndex(f => f.id == fileID);
     bridge.removeFile(this.files.get()[found].id);
@@ -172,7 +166,10 @@ export default class Model {
     return found;
   }
 
-  addTag(name: string) {
+
+  // Tags
+
+  createTag(name: string) {
     const id = uuidv4();
 
     const newTags = produce(this.tags.get(), t => {
@@ -192,6 +189,49 @@ export default class Model {
     // TODO
   }
 
+
+  // Directories
+
+  findDirectory() {
+    // TODO
+  }
+
+  createDirectory(path: string) {
+    const dirs = path.split('/').filter(d => d.length > 0);
+
+    for (const dir of dirs) {
+
+    }
+
+    // TODO
+  }
+
+
+  // Views
+
+  changeView(view: View | undefined) {
+    this.view.set(view);
+  }
+
+
+  // File System
+
+  async loadLibrary() {
+    const c = await bridge.readLibrary();
+
+    const data = JSON.parse(c, (key, value) => {
+      if (key == 'created' || key == 'modified') {
+        return new Date(value);
+      }
+
+      return value;
+    }) as Library;
+
+    this.nodes.set(data.nodes ?? []);
+    this.files.set(data.files ?? []);
+    this.tags.set(data.tags ?? []);
+  }
+
   async save() {
     if (this.saving.get()) {
       return;
@@ -206,14 +246,5 @@ export default class Model {
     }));
 
     this.saving.set(false);
-  }
-
-  changeView(view: View | undefined) {
-    this.view.set(view);
-  }
-
-  createDirectory(path: string) {
-    const dirs = path.split('/').filter(d => d.length > 0);
-    // TODO
   }
 }

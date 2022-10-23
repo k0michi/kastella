@@ -95,7 +95,7 @@ export default function EditorPane() {
       const found = model.findTag(t);
 
       if (found == null) {
-        return model.addTag(t);
+        return model.createTag(t);
       }
 
       return found.id;
