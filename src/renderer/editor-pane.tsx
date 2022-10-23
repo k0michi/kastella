@@ -101,7 +101,18 @@ export default function EditorPane() {
       return found.id;
     });
 
-    model.addTextNode(content, tagIDs);
+    const view = model.view.get();
+    let parentID = undefined;
+
+    if (view != null && view.type == 'directory') {
+      parentID = (view as DirectoryView).parentID;
+    }
+
+    if (view != null && view.type == 'tag') {
+      tagIDs.push((view as TagView).tag);
+    }
+
+    model.addTextNode(content, parentID, tagIDs);
     setInput('');
   }
 

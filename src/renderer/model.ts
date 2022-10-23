@@ -102,7 +102,7 @@ export default class Model {
     this.nodes.set(newNodes);
   }
 
-  addTextNode(text: string, tags?: string[]) {
+  addTextNode(text: string, parentID?: string, tags?: string[]) {
     const now = new Date();
     const id = uuidv4();
 
@@ -110,13 +110,13 @@ export default class Model {
       tags = undefined;
     }
 
-    const node = { type: NodeType.Text, content: text, tags, created: now, modified: now, id, index: this.getNextIndex() } as TextNode;
+    const node = { type: NodeType.Text, content: text, tags, created: now, modified: now, id, parentID, index: this.getNextIndex() } as TextNode;
     this.addNode(node);
     this.save();
     return node;
   }
 
-  addImageNode(file: File, tags?: string[]) {
+  addImageNode(file: File, parentID?: string, tags?: string[]) {
     const now = new Date();
     const id = uuidv4()
 
@@ -124,7 +124,7 @@ export default class Model {
       tags = undefined;
     }
 
-    const node = { type: NodeType.Image, fileID: file.id, tags, created: now, modified: now, id, index: this.getNextIndex() } as ImageNode;
+    const node = { type: NodeType.Image, fileID: file.id, tags, created: now, modified: now, id, parentID, index: this.getNextIndex() } as ImageNode;
     this.addFile(file);
     this.addNode(node);
     this.save();
