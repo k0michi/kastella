@@ -5,7 +5,7 @@ import { dateToString } from './utils';
 import { useModel, useObservable } from 'kyoka';
 import produce from 'immer';
 import { formatISO } from 'date-fns';
-import Model, { DateView, DirectoryView, ImageNode, NodeType, TagView, TextNode } from './model';
+import Model, { DateView, DirectoryNode, DirectoryView, ImageNode, NodeType, TagView, TextNode } from './model';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -165,6 +165,15 @@ export default function EditorPane() {
           return <div key={id}>
             <img className='content' src={imageURL}></img>{' '}
             <span className='date'>{dateToString(n.created)}</span>{' '}
+            <button onClick={e => {
+              model.removeNode(id);
+            }}>x</button></div>;
+        } else if (n.type == NodeType.Directory) {
+          const dNode = n as DirectoryNode;
+
+          return <div key={id}>
+            <span className='content'>[dir] {dNode.name as string}</span>{' '}
+            <span className='date'>{dateToString(dNode.created)}</span>{' '}
             <button onClick={e => {
               model.removeNode(id);
             }}>x</button></div>;
