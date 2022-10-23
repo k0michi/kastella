@@ -15,6 +15,8 @@ export interface Node {
   created: Date;
   modified: Date;
   tags?: string[];
+  index: number;
+  parentID?: string;
 }
 
 export interface TextNode extends Node {
@@ -89,6 +91,9 @@ export default class Model {
   constructor() {
   }
 
+
+  // Nodes
+
   addNode(node: Node) {
     const newNodes = produce(this.nodes.get(), n => {
       n.push(node);
@@ -105,8 +110,10 @@ export default class Model {
       tags = undefined;
     }
 
-    this.addNode({ type: NodeType.Text, content: text, tags, created: now, modified: now, id } as TextNode);
+    const node = { type: NodeType.Text, content: text, tags, created: now, modified: now, id } as TextNode;
+    this.addNode(node);
     this.save();
+    return node;
   }
 
   addImageNode(file: File, tags?: string[]) {
@@ -117,9 +124,24 @@ export default class Model {
       tags = undefined;
     }
 
+    const node = { type: NodeType.Image, fileID: file.id, tags, created: now, modified: now, id } as ImageNode;
     this.addFile(file);
-    this.addNode({ type: NodeType.Image, fileID: file.id, tags, created: now, modified: now, id } as ImageNode);
+    this.addNode(node);
     this.save();
+    return node;
+  }
+
+  addDirectoryNode(name: string, tags?: string[]) {
+    const now = new Date();
+    const id = uuidv4()
+
+    if (tags?.length == 0) {
+      tags = undefined;
+    }
+
+    const node = { type: NodeType.Directory, name: name, tags, created: now, modified: now, id } as DirectoryNode;
+    this.addNode(node);
+    return node;
   }
 
   removeNode(id: string) {
@@ -136,6 +158,10 @@ export default class Model {
 
     this.nodes.set(newNodes);
     this.save();
+  }
+
+  getNode(id: string) {
+    return this.nodes.get().find(n => n.id == id);
   }
 
 
@@ -192,18 +218,30 @@ export default class Model {
 
   // Directories
 
-  findDirectory() {
-    // TODO
+  findDirectory(parentID: string | undefined, name: string) {
+    return this.nodes.get().find(n =>
+      n.type == NodeType.Directory &&
+      n.parentID == parentID &&
+      (n as DirectoryNode).name.localeCompare(name, undefined, { sensitivity: 'accent' }) == 0
+    );
   }
 
   createDirectory(path: string) {
     const dirs = path.split('/').filter(d => d.length > 0);
+    let parentID: string | undefined = undefined;
 
     for (const dir of dirs) {
+      const found = this.findDirectory(parentID, dir);
 
+      if (found == null) {
+        parentID = this.addDirectoryNode(dir).id;
+      } else {
+        parentID = found.id;
+      }
     }
 
-    // TODO
+    this.save();
+    return parentID;
   }
 
 

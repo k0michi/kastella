@@ -30,6 +30,7 @@ export default function ExplorerPane() {
       <div id="explorer-pane">
         <div className="section">
           <div className="header"><div className="name">TREE</div><div className="menu" onClick={e => {
+            setDirectoryPath(undefined);
             modalRef.current?.showModal();
           }}>+</div></div>
           <div className="container">
@@ -56,7 +57,7 @@ export default function ExplorerPane() {
             const pathExp = /^\/(([^\/]+)\/)*([^\/]+)?$/;
             setValidPath(pathExp.test(e.target.value));
             setDirectoryPath(e.target.value);
-          }} />
+          }} value={directoryPath} />
           <div className='dialog-buttons'>
             <div className='left'><button onClick={e => modalRef.current?.close()}>Cancel</button></div>
             <div className='right'><button className='highlighted' onClick={e => {
