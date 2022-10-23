@@ -93,6 +93,7 @@ body {
   padding: 12px;
   max-height: 100vh;
   height: 100vh;
+  overflow-y: auto;
   background-color: rgb(21, 21, 21);
   border-right: solid 1px rgb(69, 69, 69);
 }
