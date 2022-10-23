@@ -68,7 +68,7 @@ export interface View {
 
 export interface DirectoryView extends View {
   type: 'directory';
-  path: string;
+  parentID?: string;
 }
 
 export interface TagView extends View {
@@ -110,7 +110,7 @@ export default class Model {
       tags = undefined;
     }
 
-    const node = { type: NodeType.Text, content: text, tags, created: now, modified: now, id } as TextNode;
+    const node = { type: NodeType.Text, content: text, tags, created: now, modified: now, id, index: this.getNextIndex() } as TextNode;
     this.addNode(node);
     this.save();
     return node;
@@ -124,14 +124,14 @@ export default class Model {
       tags = undefined;
     }
 
-    const node = { type: NodeType.Image, fileID: file.id, tags, created: now, modified: now, id } as ImageNode;
+    const node = { type: NodeType.Image, fileID: file.id, tags, created: now, modified: now, id, index: this.getNextIndex() } as ImageNode;
     this.addFile(file);
     this.addNode(node);
     this.save();
     return node;
   }
 
-  addDirectoryNode(name: string, tags?: string[]) {
+  addDirectoryNode(name: string, parentID?: string, tags?: string[]) {
     const now = new Date();
     const id = uuidv4()
 
@@ -139,7 +139,7 @@ export default class Model {
       tags = undefined;
     }
 
-    const node = { type: NodeType.Directory, name: name, tags, created: now, modified: now, id } as DirectoryNode;
+    const node = { type: NodeType.Directory, name: name, tags, created: now, modified: now, id, parentID, index: this.getNextIndex() } as DirectoryNode;
     this.addNode(node);
     return node;
   }
@@ -162,6 +162,18 @@ export default class Model {
 
   getNode(id: string) {
     return this.nodes.get().find(n => n.id == id);
+  }
+
+  getChildNodes(parentID: string | undefined) {
+    return this.nodes.get().filter(n => n.parentID == parentID);
+  }
+
+  getChildDirectories(parentID: string | undefined) {
+    return this.nodes.get().filter(n => n.type == NodeType.Directory && n.parentID == parentID);
+  }
+
+  getNextIndex() {
+    return this.nodes.get().length;
   }
 
 
@@ -234,7 +246,7 @@ export default class Model {
       const found = this.findDirectory(parentID, dir);
 
       if (found == null) {
-        parentID = this.addDirectoryNode(dir).id;
+        parentID = this.addDirectoryNode(dir, parentID).id;
       } else {
         parentID = found.id;
       }

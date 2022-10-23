@@ -5,7 +5,7 @@ import { dateToString } from './utils';
 import { useModel, useObservable } from 'kyoka';
 import produce from 'immer';
 import { formatISO } from 'date-fns';
-import Model, { DateView, ImageNode, NodeType, TagView, TextNode } from './model';
+import Model, { DateView, DirectoryView, ImageNode, NodeType, TagView, TextNode } from './model';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -109,6 +109,10 @@ export default function EditorPane() {
 
   if (search.length > 0) {
     filtered = filtered.filter(n => (n.type == undefined || n.type == NodeType.Text) && ((n as TextNode).content as string).includes(search));
+  }
+
+  if (view != null && view.type == 'directory') {
+    filtered = filtered.filter(n => n.parentID == (view as DirectoryView).parentID);
   }
 
   if (view != null && view.type == 'tag') {

@@ -1,7 +1,14 @@
 import * as React from 'react';
 import { useModel, useObservable } from 'kyoka';
 import { formatISO } from 'date-fns';
-import Model, { DateView, TagView } from './model';
+import Model, { DateView, DirectoryNode, DirectoryView, Node, NodeType, TagView } from './model';
+
+interface TreeNode {
+  name?: string;
+  id?: string
+  children: TreeNode[];
+  depth: number;
+}
 
 export default function ExplorerPane() {
   const model = useModel<Model>();
@@ -25,6 +32,30 @@ export default function ExplorerPane() {
     setDates(dates);
   }, [nodes]);
 
+  function createTree(parentID: string | undefined, depth = 0) {
+    let name = null;
+
+    if (parentID != null) {
+      name = (model.getNode(parentID) as DirectoryNode).name;
+    }
+
+    const treeNode = { name, id: parentID, children: [], depth } as TreeNode;
+
+    for (const child of model.getChildNodes(parentID)) {
+      if (child.type == NodeType.Directory) {
+        treeNode.children.push(createTree(child.id, depth + 1));
+      }
+    }
+
+    return treeNode;
+  }
+
+  function mapToArray(node: TreeNode): any {
+    return [node, node.children.map(n => mapToArray(n))];
+  }
+
+  const directories = mapToArray(createTree(undefined)).flat(Infinity) as TreeNode[];
+
   return (
     <>
       <div id="explorer-pane">
@@ -34,7 +65,7 @@ export default function ExplorerPane() {
             modalRef.current?.showModal();
           }}>+</div></div>
           <div className="container">
-            <div onClick={e => model.changeView(undefined)}>/</div>
+            {directories.map(d => <div style={{ paddingLeft: `${d.depth * 10}px` }} onClick={e => model.changeView({ 'type': 'directory', parentID: d.id } as DirectoryView)}>{d.name ?? '/'}</div>)}
           </div>
         </div>
         <div className="section">
