@@ -25,19 +25,30 @@ body {
   word-break: break-all;
 }
 
-#root {}
-
-#app {
+#root {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
 }
 
+#main {
+  display: flex;
+  flex-direction: row;
+  flex: 1 1 0;
+  overflow-y: hidden;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
 
 /* Editor pane */
 
 #editor-pane {
   flex: 1 1 0;
   padding: 12px;
+  overflow-y: auto;
 }
 
 #editor-pane #input {
@@ -86,12 +97,8 @@ body {
 
 #explorer-pane {
   flex: 0 0 200px;
-  position: sticky;
   top: 0;
-  height: fit-content;
   padding: 12px;
-  max-height: 100vh;
-  height: 100vh;
   overflow-y: auto;
   background-color: rgb(21, 21, 21);
   border-right: solid 1px rgb(69, 69, 69);
@@ -100,6 +107,10 @@ body {
 
 #explorer-pane .section {
   margin-bottom: 24px;
+}
+
+#explorer-pane .section:last-child {
+  margin-bottom: 0;
 }
 
 #explorer-pane .section .header {
@@ -125,6 +136,19 @@ body {
 #explorer-pane .selected {
   background-color: rgb(63, 123, 200);
   border-radius: 3px;
+}
+
+
+/* Status bar */
+
+#status-bar {
+  border-top: 1px solid rgb(69, 69, 69);
+  box-sizing: content-box;
+  padding: 4px;
+  min-height: 1em;
+  line-height: 1;
+  flex: 0 0 fit-content;
+  background-color: rgb(28, 28, 28);
 }
 
 
