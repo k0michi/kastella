@@ -85,7 +85,7 @@ export default class Model {
   nodes = new Observable<Node[]>([]);
   files = new Observable<File[]>([]);
   tags = new Observable<Tag[]>([]);
-  view = new Observable<View | undefined>(undefined);
+  view = new Observable<View>({ type: 'directory' });
   saving = new Observable<boolean>(false);
 
   constructor() {
@@ -259,7 +259,7 @@ export default class Model {
 
   // Views
 
-  changeView(view: View | undefined) {
+  changeView(view: View) {
     this.view.set(view);
   }
 

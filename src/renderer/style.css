@@ -25,8 +25,7 @@ body {
   word-break: break-all;
 }
 
-#root {
-}
+#root {}
 
 #app {
   display: flex;
@@ -83,7 +82,7 @@ body {
 }
 
 
-/* Editor pane */
+/* Explorer pane */
 
 #explorer-pane {
   flex: 0 0 200px;
@@ -96,6 +95,7 @@ body {
   overflow-y: auto;
   background-color: rgb(21, 21, 21);
   border-right: solid 1px rgb(69, 69, 69);
+  user-select: none;
 }
 
 #explorer-pane .section {
@@ -115,6 +115,16 @@ body {
 
 #explorer-pane .section .header .menu {
   cursor: pointer;
+}
+
+#explorer-pane .item {
+  cursor: default;
+  padding: 1px 4px;
+}
+
+#explorer-pane .selected {
+  background-color: rgb(63, 123, 200);
+  border-radius: 3px;
 }
 
 
