@@ -200,7 +200,6 @@ export default function EditorPane() {
       </div>
       <div>
         <textarea onChange={e => setSearch(e.target.value)} value={search} />
-        {saving ? 'Saving...' : ''}
       </div>
     </div>
   </div>;
