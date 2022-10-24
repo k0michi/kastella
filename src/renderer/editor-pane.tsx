@@ -12,13 +12,13 @@ export default function EditorPane() {
   const nodes = useObservable(model.nodes);
   const tags = useObservable(model.tags);
   const view = useObservable(model.view);
-  const saving = useObservable(model.saving);
   const [input, setInput] = React.useState<string>('');
   const [writeOnly, setWriteOnly] = React.useState<boolean>(true);
   const composing = React.useRef<boolean>(false);
   const [search, setSearch] = React.useState<string>('');
   const [images, setImages] = React.useState<Record<string, string | undefined>>({});
-  const appRef = React.useRef<HTMLDivElement>(null);
+  const editorRef = React.useRef<HTMLDivElement>(null);
+  const notesRef = React.useRef<HTMLDivElement>(null);
   const [atBottom, setAtBottom] = React.useState(true);
 
   React.useEffect(() => {
@@ -30,10 +30,10 @@ export default function EditorPane() {
       setAtBottom(atBottom);
     }
 
-    window.addEventListener('scroll', onScroll);
+    editorRef.current?.addEventListener('scroll', onScroll);
 
     return () => {
-      window.removeEventListener('scroll', onScroll);
+      editorRef.current?.removeEventListener('scroll', onScroll);
 
       for (const image of Object.values(images)) {
         URL.revokeObjectURL(image!);
@@ -44,11 +44,11 @@ export default function EditorPane() {
   React.useEffect(() => {
     const resizeObserver = new ResizeObserver(entries => {
       if (atBottom) {
-        window.scroll(0, document.documentElement.scrollHeight);
+        editorRef.current?.scroll(0, editorRef.current?.scrollHeight);
       }
     });
 
-    resizeObserver.observe(appRef.current!);
+    resizeObserver.observe(notesRef.current!);
 
     return () => {
       resizeObserver.disconnect();
@@ -134,52 +134,53 @@ export default function EditorPane() {
     filtered = filtered.filter(n => formatISO(n.created, { representation: 'date' }) == (view as DateView).date);
   }
 
-  return <div id='editor-pane' ref={appRef}>
-    {writeOnly ? null : <div id="notes">
-      {filtered.map(n => {
-        const id = n.id;
+  return <div id='editor-pane' ref={editorRef}>
+    <div id="notes" ref={notesRef}>
+      {writeOnly ? null :
+        filtered.map(n => {
+          const id = n.id;
 
-        if (n.type == undefined || n.type == NodeType.Text) {
-          const textNode = n as TextNode;
+          if (n.type == undefined || n.type == NodeType.Text) {
+            const textNode = n as TextNode;
 
-          return <div key={id}>
-            <span className='content'>{textNode.content as string}</span>{' '}
-            <span className='date'>{dateToString(textNode.created)}</span>{' '}
-            <button onClick={e => {
-              model.removeNode(id);
-            }}>x</button></div>;
-        } else if (n.type == NodeType.Image) {
-          const imageNode = n as ImageNode;
-          const image = model.getFile(imageNode.fileID)!;
-          const imageURL = images[image.id];
+            return <div key={id}>
+              <span className='content'>{textNode.content as string}</span>{' '}
+              <span className='date'>{dateToString(textNode.created)}</span>{' '}
+              <button onClick={e => {
+                model.removeNode(id);
+              }}>x</button></div>;
+          } else if (n.type == NodeType.Image) {
+            const imageNode = n as ImageNode;
+            const image = model.getFile(imageNode.fileID)!;
+            const imageURL = images[image.id];
 
-          if (imageURL == undefined) {
-            bridge.readFile(image.id).then(bytes => {
-              const newImages = produce(images, d => {
-                d[image.id] = uint8ArrayObjectURL(bytes, image.type);
+            if (imageURL == undefined) {
+              bridge.readFile(image.id).then(bytes => {
+                const newImages = produce(images, d => {
+                  d[image.id] = uint8ArrayObjectURL(bytes, image.type);
+                });
+                setImages(newImages);
               });
-              setImages(newImages);
-            });
+            }
+
+            return <div key={id}>
+              <img className='content' src={imageURL}></img>{' '}
+              <span className='date'>{dateToString(n.created)}</span>{' '}
+              <button onClick={e => {
+                model.removeNode(id);
+              }}>x</button></div>;
+          } else if (n.type == NodeType.Directory) {
+            const dNode = n as DirectoryNode;
+
+            return <div key={id}>
+              <span className='content'>[dir] {dNode.name as string}</span>{' '}
+              <span className='date'>{dateToString(dNode.created)}</span>{' '}
+              <button onClick={e => {
+                model.removeNode(id);
+              }}>x</button></div>;
           }
-
-          return <div key={id}>
-            <img className='content' src={imageURL}></img>{' '}
-            <span className='date'>{dateToString(n.created)}</span>{' '}
-            <button onClick={e => {
-              model.removeNode(id);
-            }}>x</button></div>;
-        } else if (n.type == NodeType.Directory) {
-          const dNode = n as DirectoryNode;
-
-          return <div key={id}>
-            <span className='content'>[dir] {dNode.name as string}</span>{' '}
-            <span className='date'>{dateToString(dNode.created)}</span>{' '}
-            <button onClick={e => {
-              model.removeNode(id);
-            }}>x</button></div>;
-        }
-      })}
-    </div>}
+        })
+      }</div>
     <div id="controls">
       <div id='input'>
         <textarea onChange={e => setInput(e.target.value)} onKeyDown={e => {
