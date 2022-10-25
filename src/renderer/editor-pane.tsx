@@ -142,6 +142,42 @@ export default function EditorPane() {
   }, [nodes, view]);
 
   React.useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key == 'ArrowUp') {
+        e.preventDefault();
+
+        if (selected == null) {
+          setSelected(filtered.at(-1)?.id);
+        } else {
+          const foundIndex = filtered.findIndex(n => n.id == selected);
+          const prev = filtered[foundIndex - 1];
+
+          if (prev != null && foundIndex != -1) {
+            setTimeout(() => setSelected(prev.id));
+          }
+        }
+      } else if (e.key == 'ArrowDown') {
+        e.preventDefault();
+        const foundIndex = filtered.findIndex(n => n.id == selected);
+        const next = filtered[foundIndex + 1];
+
+        if (next != null && foundIndex != -1) {
+          setTimeout(() => setSelected(next.id));
+        } else {
+          setSelected(undefined);
+          inputRef.current?.focus();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [selected, filtered]);
+
+  React.useEffect(() => {
     setSelected(undefined);
   }, [view]);
 
@@ -156,6 +192,10 @@ export default function EditorPane() {
       } else if (editorRef.current != null && rect.y + rect.height > editorRef.current.clientHeight) {
         editorRef.current.scrollBy(0, rect.y + rect.height - editorRef.current.clientHeight);
       }
+    }
+
+    if (selected != null) {
+      inputRef.current?.blur();
     }
   }, [selected]);
 
@@ -213,32 +253,21 @@ export default function EditorPane() {
       }</div>
     <div id="controls">
       <div id='input'>
-        <textarea ref={inputRef} rows={1} onChange={e => setInput(e.target.value)} onKeyDown={e => {
-          if (e.key == 'Enter' && !composing.current) {
-            e.preventDefault();
-            confirm();
-          } else if (e.key == 'ArrowUp') {
-            if (selected == null) {
-              setSelected(filtered.at(-1)?.id);
-            } else {
-              const prev = filtered[filtered.findIndex(n => n.id == selected) - 1];
-
-              if (prev != null) {
-                setTimeout(() => setSelected(prev.id));
-              }
+        <textarea ref={inputRef} rows={1} onChange={e => setInput(e.target.value)}
+          onFocus={e => {
+            setSelected(undefined);
+          }}
+          onKeyDown={e => {
+            if (e.key == 'Enter' && !composing.current) {
+              e.preventDefault();
+              confirm();
             }
-          } else if (e.key == 'ArrowDown') {
-            const next = filtered[filtered.findIndex(n => n.id == selected) + 1];
-
-            if (next != null) {
-              setTimeout(() => setSelected(next.id));
-            }
-          }
-        }} onCompositionStart={e => {
-          composing.current = true;
-        }} onCompositionEnd={e => {
-          composing.current = false;
-        }} value={input} />
+          }}
+          onCompositionStart={e => {
+            composing.current = true;
+          }} onCompositionEnd={e => {
+            composing.current = false;
+          }} value={input} />
         <button onClick={e => confirm()}>Confirm</button>
         <input checked={writeOnly} type="checkbox" id="write-only" onChange={e => {
           setWriteOnly(e.target.checked);
