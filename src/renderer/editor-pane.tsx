@@ -20,6 +20,8 @@ export default function EditorPane() {
   const editorRef = React.useRef<HTMLDivElement>(null);
   const notesRef = React.useRef<HTMLDivElement>(null);
   const [atBottom, setAtBottom] = React.useState(true);
+  const [selected, setSelected] = React.useState<string>();
+  const inputRef = React.useRef<HTMLTextAreaElement>(null);
 
   React.useEffect(() => {
     const onScroll = () => {
@@ -116,34 +118,43 @@ export default function EditorPane() {
     setInput('');
   }
 
-  let filtered = nodes;
+  const filtered = React.useMemo(() => {
+    let filtered = nodes;
 
-  if (search.length > 0) {
-    filtered = filtered.filter(n => (n.type == undefined || n.type == NodeType.Text) && ((n as TextNode).content as string).includes(search));
-  }
+    if (search.length > 0) {
+      filtered = filtered.filter(n => (n.type == undefined || n.type == NodeType.Text) && ((n as TextNode).content as string).includes(search));
+    }
 
-  if (view != null && view.type == 'directory') {
-    filtered = filtered.filter(n => n.parentID == (view as DirectoryView).parentID);
-  }
+    if (view != null && view.type == 'directory') {
+      filtered = filtered.filter(n => n.parentID == (view as DirectoryView).parentID);
+    }
 
-  if (view != null && view.type == 'tag') {
-    filtered = filtered.filter(n => n.tags?.includes((view as TagView).tag));
-  }
+    if (view != null && view.type == 'tag') {
+      filtered = filtered.filter(n => n.tags?.includes((view as TagView).tag));
+    }
 
-  if (view != null && view.type == 'date') {
-    filtered = filtered.filter(n => formatISO(n.created, { representation: 'date' }) == (view as DateView).date);
-  }
+    if (view != null && view.type == 'date') {
+      filtered = filtered.filter(n => formatISO(n.created, { representation: 'date' }) == (view as DateView).date);
+    }
+
+    return filtered;
+  }, [nodes, view]);
 
   return <div id='editor-pane' ref={editorRef}>
     <div id="notes" ref={notesRef}>
       {writeOnly ? null :
         filtered.map(n => {
           const id = n.id;
+          let className = '';
+
+          if (id == selected) {
+            className += ' selected';
+          }
 
           if (n.type == undefined || n.type == NodeType.Text) {
             const textNode = n as TextNode;
 
-            return <div key={id}>
+            return <div key={id} className={className}>
               <span className='content'>{textNode.content as string}</span>{' '}
               <span className='date'>{dateToString(textNode.created)}</span>{' '}
               <button onClick={e => {
@@ -163,7 +174,7 @@ export default function EditorPane() {
               });
             }
 
-            return <div key={id}>
+            return <div key={id} className={className}>
               <img className='content' src={imageURL}></img>{' '}
               <span className='date'>{dateToString(n.created)}</span>{' '}
               <button onClick={e => {
@@ -172,7 +183,7 @@ export default function EditorPane() {
           } else if (n.type == NodeType.Directory) {
             const dNode = n as DirectoryNode;
 
-            return <div key={id}>
+            return <div key={id} className={className}>
               <span className='content'>[dir] {dNode.name as string}</span>{' '}
               <span className='date'>{dateToString(dNode.created)}</span>{' '}
               <button onClick={e => {
@@ -183,10 +194,26 @@ export default function EditorPane() {
       }</div>
     <div id="controls">
       <div id='input'>
-        <textarea rows={1} onChange={e => setInput(e.target.value)} onKeyDown={e => {
+        <textarea ref={inputRef} rows={1} onChange={e => setInput(e.target.value)} onKeyDown={e => {
           if (e.key == 'Enter' && !composing.current) {
             e.preventDefault();
             confirm();
+          } else if (e.key == 'ArrowUp') {
+            if (selected == null) {
+              setSelected(filtered.at(-1)?.id);
+            } else {
+              const prev = filtered[filtered.findIndex(n => n.id == selected) - 1];
+
+              if (prev != null) {
+                setSelected(prev.id);
+              }
+            }
+          } else if (e.key == 'ArrowDown') {
+            const next = filtered[filtered.findIndex(n => n.id == selected) + 1];
+
+            if (next != null) {
+              setSelected(next.id);
+            }
           }
         }} onCompositionStart={e => {
           composing.current = true;

@@ -78,6 +78,24 @@ body,
   white-space: pre-wrap;
 }
 
+#editor-pane #notes>div {
+  padding-left: 8px;
+  position: relative;
+}
+
+#editor-pane #notes>div.selected {
+  background-color: rgb(40, 76, 87);
+}
+
+#editor-pane #notes>div.selected::before {
+  content: '';
+  position: absolute;
+  background-color: rgb(24, 176, 222);
+  height: 100%;
+  width: 4px;
+  left: 0px;
+}
+
 #editor-pane .date {
   color: rgb(120, 120, 120);
   font-style: italic;
