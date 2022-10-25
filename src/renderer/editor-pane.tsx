@@ -205,14 +205,14 @@ export default function EditorPane() {
               const prev = filtered[filtered.findIndex(n => n.id == selected) - 1];
 
               if (prev != null) {
-                setSelected(prev.id);
+                setTimeout(() => setSelected(prev.id));
               }
             }
           } else if (e.key == 'ArrowDown') {
             const next = filtered[filtered.findIndex(n => n.id == selected) + 1];
 
             if (next != null) {
-              setSelected(next.id);
+              setTimeout(() => setSelected(next.id));
             }
           }
         }} onCompositionStart={e => {
