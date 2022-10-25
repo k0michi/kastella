@@ -62,8 +62,16 @@ body,
 
 #editor-pane textarea {
   resize: none;
-  height: 1.8em;
+  font-size: inherit;
+  font-family: inherit;
   width: 500px;
+  border: none;
+  border-bottom: 1px solid rgb(69, 69, 69);
+  outline: none;
+}
+
+#editor-pane textarea:focus {
+  border-bottom: 1px solid rgb(125, 210, 255);
 }
 
 #editor-pane #notes {

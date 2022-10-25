@@ -183,7 +183,7 @@ export default function EditorPane() {
       }</div>
     <div id="controls">
       <div id='input'>
-        <textarea onChange={e => setInput(e.target.value)} onKeyDown={e => {
+        <textarea rows={1} onChange={e => setInput(e.target.value)} onKeyDown={e => {
           if (e.key == 'Enter' && !composing.current) {
             e.preventDefault();
             confirm();
@@ -200,7 +200,7 @@ export default function EditorPane() {
         <label htmlFor="write-only">Write-only</label>
       </div>
       <div>
-        <textarea onChange={e => setSearch(e.target.value)} value={search} />
+        <textarea rows={1} onChange={e => setSearch(e.target.value)} value={search} />
       </div>
     </div>
   </div>;
@@ -212,7 +212,7 @@ function uint8ArrayObjectURL(array: Uint8Array, mediaType: string) {
 
 // '... #tagName' => ['...', ['tagName']]
 function splitTags(string: string): [string, string[]] {
-  const tagExp = /#(\S+)$/;
+  const tagExp = /\s+#(\S+)$/;
   let result: RegExpExecArray | null;
   const tags = [];
 
