@@ -25,6 +25,7 @@ export default function EditorPane() {
 
   React.useEffect(() => {
     const onScroll = () => {
+      // FIXME
       const clientHeight = document.documentElement.clientHeight;
       const scrollHeight = document.documentElement.scrollHeight;
       const scrollTop = document.documentElement.scrollTop;
@@ -140,6 +141,24 @@ export default function EditorPane() {
     return filtered;
   }, [nodes, view]);
 
+  React.useEffect(() => {
+    setSelected(undefined);
+  }, [view]);
+
+  React.useEffect(() => {
+    const node = notesRef.current?.querySelector(`[data-id="${selected}"]`);
+
+    if (node != null) {
+      const rect = node.getBoundingClientRect();
+
+      if (rect.y < 0) {
+        editorRef.current?.scrollBy(0, rect.y);
+      } else if (editorRef.current != null && rect.y + rect.height > editorRef.current.clientHeight) {
+        editorRef.current.scrollBy(0, rect.y + rect.height - editorRef.current.clientHeight);
+      }
+    }
+  }, [selected]);
+
   return <div id='editor-pane' ref={editorRef}>
     <div id="notes" ref={notesRef}>
       {writeOnly ? null :
@@ -154,7 +173,7 @@ export default function EditorPane() {
           if (n.type == undefined || n.type == NodeType.Text) {
             const textNode = n as TextNode;
 
-            return <div key={id} className={className}>
+            return <div key={id} className={className} data-id={id}>
               <span className='content'>{textNode.content as string}</span>{' '}
               <span className='date'>{dateToString(textNode.created)}</span>{' '}
               <button onClick={e => {
@@ -174,7 +193,7 @@ export default function EditorPane() {
               });
             }
 
-            return <div key={id} className={className}>
+            return <div key={id} className={className} data-id={id}>
               <img className='content' src={imageURL}></img>{' '}
               <span className='date'>{dateToString(n.created)}</span>{' '}
               <button onClick={e => {
@@ -183,7 +202,7 @@ export default function EditorPane() {
           } else if (n.type == NodeType.Directory) {
             const dNode = n as DirectoryNode;
 
-            return <div key={id} className={className}>
+            return <div key={id} className={className} data-id={id}>
               <span className='content'>[dir] {dNode.name as string}</span>{' '}
               <span className='date'>{dateToString(dNode.created)}</span>{' '}
               <button onClick={e => {
