@@ -8,16 +8,16 @@ html {
   box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color: white;
-    background-color: black;
-  }
+html {
+  color: white;
+  background-color: black;
+}
 
-  textarea {
-    color: white;
-    background-color: black;
-  }
+textarea {
+  font-size: inherit;
+  font-family: inherit;
+  color: white;
+  background-color: black;
 }
 
 body {
@@ -47,8 +47,8 @@ body,
 
 #editor-pane {
   flex: 1 1 0;
-  padding: 12px;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 #editor-pane #input {
@@ -62,9 +62,6 @@ body,
 
 #editor-pane textarea {
   resize: none;
-  font-size: inherit;
-  font-family: inherit;
-  width: 500px;
   border: none;
   border-bottom: 1px solid rgb(69, 69, 69);
   outline: none;
@@ -116,6 +113,38 @@ body,
   border: 1px solid rgb(158, 158, 158);
   padding: 2px 6px;
   border-radius: 4px;
+}
+
+/* Editor bar */
+
+#editor-bar {
+  background-color: rgb(33, 33, 33);
+  border-bottom: 1px solid rgb(61, 61, 61);
+  flex: 0 0 32px;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  padding: 6px;
+}
+
+#editor-bar>* {
+  display: block;
+  height: fit-content;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+#editor-bar>textarea {
+  flex: 1 1 0;
+}
+
+
+/* Editor area */
+
+#editor-area {
+  flex: 1 1 0;
+  padding: 12px;
+  overflow-y: auto;
 }
 
 

@@ -87,6 +87,8 @@ export default class Model {
   tags = new Observable<Tag[]>([]);
   view = new Observable<View>({ type: 'directory' });
   saving = new Observable<boolean>(false);
+  writeOnly = new Observable<boolean>(true);
+  search = new Observable<string>('');
 
   constructor() {
   }
@@ -261,6 +263,14 @@ export default class Model {
 
   changeView(view: View) {
     this.view.set(view);
+  }
+
+  setSearch(search: string) {
+    this.search.set(search);
+  }
+
+  setWriteOnly(writeOnly: boolean) {
+    this.writeOnly.set(writeOnly);
   }
 
 

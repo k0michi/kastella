@@ -6,6 +6,7 @@ import { useModel, useObservable } from 'kyoka';
 import produce from 'immer';
 import { formatISO } from 'date-fns';
 import Model, { DateView, DirectoryNode, DirectoryView, ImageNode, NodeType, TagView, TextNode } from './model';
+import EditorBar from './editor-bar';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -13,15 +14,15 @@ export default function EditorPane() {
   const tags = useObservable(model.tags);
   const view = useObservable(model.view);
   const [input, setInput] = React.useState<string>('');
-  const [writeOnly, setWriteOnly] = React.useState<boolean>(true);
   const composing = React.useRef<boolean>(false);
-  const [search, setSearch] = React.useState<string>('');
   const [images, setImages] = React.useState<Record<string, string | undefined>>({});
   const editorRef = React.useRef<HTMLDivElement>(null);
   const notesRef = React.useRef<HTMLDivElement>(null);
   const [atBottom, setAtBottom] = React.useState(true);
   const [selected, setSelected] = React.useState<string>();
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
+  const writeOnly = useObservable(model.writeOnly);
+  const search = useObservable(model.search);
 
   React.useEffect(() => {
     const onScroll = () => {
@@ -202,82 +203,80 @@ export default function EditorPane() {
   }, [selected]);
 
   return <div id='editor-pane' ref={editorRef}>
-    <div id="notes" ref={notesRef}>
-      {writeOnly ? null :
-        filtered.map(n => {
-          const id = n.id;
-          let className = '';
+    <EditorBar />
+    <div id="editor-area">
+      <div id="notes" ref={notesRef}>
+        {writeOnly ? null :
+          filtered.map(n => {
+            const id = n.id;
+            let className = '';
 
-          if (id == selected) {
-            className += ' selected';
-          }
+            if (id == selected) {
+              className += ' selected';
+            }
 
-          if (n.type == undefined || n.type == NodeType.Text) {
-            const textNode = n as TextNode;
+            if (n.type == undefined || n.type == NodeType.Text) {
+              const textNode = n as TextNode;
 
-            return <div key={id} className={className} data-id={id}>
-              <span className='content'>{textNode.content as string}</span>{' '}
-              <span className='date'>{dateToString(textNode.created)}</span>{' '}
-              <button onClick={e => {
-                model.removeNode(id);
-              }}>x</button></div>;
-          } else if (n.type == NodeType.Image) {
-            const imageNode = n as ImageNode;
-            const image = model.getFile(imageNode.fileID)!;
-            const imageURL = images[image.id];
+              return <div key={id} className={className} data-id={id}>
+                <span className='content'>{textNode.content as string}</span>{' '}
+                <span className='date'>{dateToString(textNode.created)}</span>{' '}
+                <button onClick={e => {
+                  model.removeNode(id);
+                }}>x</button></div>;
+            } else if (n.type == NodeType.Image) {
+              const imageNode = n as ImageNode;
+              const image = model.getFile(imageNode.fileID)!;
+              const imageURL = images[image.id];
 
-            if (imageURL == undefined) {
-              bridge.readFile(image.id).then(bytes => {
-                const newImages = produce(images, d => {
-                  d[image.id] = uint8ArrayObjectURL(bytes, image.type);
+              if (imageURL == undefined) {
+                bridge.readFile(image.id).then(bytes => {
+                  const newImages = produce(images, d => {
+                    d[image.id] = uint8ArrayObjectURL(bytes, image.type);
+                  });
+                  setImages(newImages);
                 });
-                setImages(newImages);
-              });
-            }
+              }
 
-            return <div key={id} className={className} data-id={id}>
-              <img className='content' src={imageURL}></img>{' '}
-              <span className='date'>{dateToString(n.created)}</span>{' '}
-              <button onClick={e => {
-                model.removeNode(id);
-              }}>x</button></div>;
-          } else if (n.type == NodeType.Directory) {
-            const dNode = n as DirectoryNode;
+              return <div key={id} className={className} data-id={id}>
+                <img className='content' src={imageURL}></img>{' '}
+                <span className='date'>{dateToString(n.created)}</span>{' '}
+                <button onClick={e => {
+                  model.removeNode(id);
+                }}>x</button></div>;
+            } else if (n.type == NodeType.Directory) {
+              const dNode = n as DirectoryNode;
 
-            return <div key={id} className={className} data-id={id}>
-              <span className='content'>[dir] {dNode.name as string}</span>{' '}
-              <span className='date'>{dateToString(dNode.created)}</span>{' '}
-              <button onClick={e => {
-                model.removeNode(id);
-              }}>x</button></div>;
-          }
-        })
-      }</div>
-    <div id="controls">
-      <div id='input'>
-        <textarea ref={inputRef} rows={1} onChange={e => setInput(e.target.value)}
-          onFocus={e => {
-            setSelected(undefined);
-          }}
-          onKeyDown={e => {
-            if (e.key == 'Enter' && !composing.current) {
-              e.preventDefault();
-              confirm();
+              return <div key={id} className={className} data-id={id}>
+                <span className='content'>[dir] {dNode.name as string}</span>{' '}
+                <span className='date'>{dateToString(dNode.created)}</span>{' '}
+                <button onClick={e => {
+                  model.removeNode(id);
+                }}>x</button></div>;
             }
-          }}
-          onCompositionStart={e => {
-            composing.current = true;
-          }} onCompositionEnd={e => {
-            composing.current = false;
-          }} value={input} />
-        <button onClick={e => confirm()}>Confirm</button>
-        <input checked={writeOnly} type="checkbox" id="write-only" onChange={e => {
-          setWriteOnly(e.target.checked);
-        }} />
-        <label htmlFor="write-only">Write-only</label>
-      </div>
-      <div>
-        <textarea rows={1} onChange={e => setSearch(e.target.value)} value={search} />
+          })
+        }</div>
+      <div id="controls">
+        <div id='input'>
+          <textarea ref={inputRef} rows={1} onChange={e => setInput(e.target.value)}
+            onFocus={e => {
+              setSelected(undefined);
+            }}
+            onKeyDown={e => {
+              if (e.key == 'Enter' && !composing.current) {
+                e.preventDefault();
+                confirm();
+              }
+            }}
+            onCompositionStart={e => {
+              composing.current = true;
+            }} onCompositionEnd={e => {
+              composing.current = false;
+            }} value={input} />
+          <button onClick={e => confirm()}>Confirm</button>
+        </div>
+        <div>
+        </div>
       </div>
     </div>
   </div>;
