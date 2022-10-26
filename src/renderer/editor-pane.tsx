@@ -202,9 +202,9 @@ export default function EditorPane() {
     }
   }, [selected]);
 
-  return <div id='editor-pane' ref={editorRef}>
+  return <div id='editor-pane'>
     <EditorBar />
-    <div id="editor-area">
+    <div id="editor-area" ref={editorRef}>
       <div id="notes" ref={notesRef}>
         {writeOnly ? null :
           filtered.map(n => {
@@ -273,7 +273,6 @@ export default function EditorPane() {
             }} onCompositionEnd={e => {
               composing.current = false;
             }} value={input} />
-          <button onClick={e => confirm()}>Confirm</button>
         </div>
         <div>
         </div>

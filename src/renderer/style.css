@@ -51,15 +51,6 @@ body,
   flex-direction: column;
 }
 
-#editor-pane #input {
-  display: flex;
-  flex-direction: row;
-}
-
-#editor-pane #input>* {
-  display: block;
-}
-
 #editor-pane textarea {
   resize: none;
   border: none;
@@ -69,37 +60,6 @@ body,
 
 #editor-pane textarea:focus {
   border-bottom: 1px solid rgb(125, 210, 255);
-}
-
-#editor-pane #notes {
-  white-space: pre-wrap;
-}
-
-#editor-pane #notes>div {
-  padding-left: 8px;
-  position: relative;
-}
-
-#editor-pane #notes>div.selected {
-  background-color: rgb(40, 76, 87);
-}
-
-#editor-pane #notes>div.selected::before {
-  content: '';
-  position: absolute;
-  background-color: rgb(24, 176, 222);
-  height: 100%;
-  width: 4px;
-  left: 0px;
-}
-
-#editor-pane .date {
-  color: rgb(120, 120, 120);
-  font-style: italic;
-}
-
-#editor-pane img.content {
-  width: 256px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -145,6 +105,41 @@ body,
   flex: 1 1 0;
   padding: 12px;
   overflow-y: auto;
+}
+
+#editor-area #notes {
+  white-space: pre-wrap;
+}
+
+#editor-area #notes>div {
+  padding-left: 8px;
+  position: relative;
+}
+
+#editor-area #notes>div.selected {
+  background-color: rgb(40, 76, 87);
+}
+
+#editor-area #notes>div.selected::before {
+  content: '';
+  position: absolute;
+  background-color: rgb(24, 176, 222);
+  height: 100%;
+  width: 4px;
+  left: 0px;
+}
+
+#editor-area .date {
+  color: rgb(120, 120, 120);
+  font-style: italic;
+}
+
+#editor-area img.content {
+  width: 256px;
+}
+
+#editor-area textarea {
+  width: 100%;
 }
 
 
