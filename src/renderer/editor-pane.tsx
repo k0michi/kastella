@@ -14,7 +14,6 @@ export default function EditorPane() {
   const tags = useObservable(model.tags);
   const view = useObservable(model.view);
   const [input, setInput] = React.useState<string>('');
-  const composing = React.useRef<boolean>(false);
   const [images, setImages] = React.useState<Record<string, string | undefined>>({});
   const editorRef = React.useRef<HTMLDivElement>(null);
   const notesRef = React.useRef<HTMLDivElement>(null);
@@ -263,15 +262,10 @@ export default function EditorPane() {
               setSelected(undefined);
             }}
             onKeyDown={e => {
-              if (e.key == 'Enter' && !composing.current) {
+              if (e.key == 'Enter' && !e.nativeEvent.isComposing) {
                 e.preventDefault();
                 confirm();
               }
-            }}
-            onCompositionStart={e => {
-              composing.current = true;
-            }} onCompositionEnd={e => {
-              composing.current = false;
             }} value={input} />
         </div>
         <div>
