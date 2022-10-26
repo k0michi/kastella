@@ -89,6 +89,7 @@ export default class Model {
   saving = new Observable<boolean>(false);
   writeOnly = new Observable<boolean>(true);
   search = new Observable<string>('');
+  savePromise: Promise<void> | null = null;
 
   constructor() {
   }
@@ -303,18 +304,20 @@ export default class Model {
   }
 
   async save() {
-    if (this.saving.get()) {
-      return;
+    if (this.savePromise != null) {
+      console.log('saving')
+      await this.savePromise;
     }
 
     this.saving.set(true);
 
-    await bridge.writeLibrary(JSON.stringify({
+    this.savePromise = bridge.writeLibrary(JSON.stringify({
       nodes: this.nodes.get(),
       files: this.files.get(),
       tags: this.tags.get()
-    }));
-
-    this.saving.set(false);
+    })).then((() => {
+      this.savePromise = null;
+      this.saving.set(false);
+    }).bind(this));
   }
 }
