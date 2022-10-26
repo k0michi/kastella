@@ -834,6 +834,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/electron@npm:^1.6.10":
+  version: 1.6.10
+  resolution: "@types/electron@npm:1.6.10"
+  dependencies:
+    electron: "*"
+  checksum: 1194d023d425fad826d719b761c67022ef97a4d3bea40ce6a3ac36aa40f913e3714775ef816744ec61214ab49b0ca377a939b18a8c29bfd76285011c21e2de76
+  languageName: node
+  linkType: hard
+
 "@types/fs-extra@npm:^9.0.1":
   version: 9.0.13
   resolution: "@types/fs-extra@npm:9.0.13"
@@ -1967,6 +1976,19 @@ __metadata:
     lodash.template: ^4.2.2
     temp: ^0.9.0
   checksum: ddfbc7bfb2dd0fb085c65d7e25fba616ecaeab46f058729a5455b40f93bce8d4de95f140a73ae516700573b71ad496b217b939225b81e5a67fc69db7899228ba
+  languageName: node
+  linkType: hard
+
+"electron@npm:*":
+  version: 21.2.0
+  resolution: "electron@npm:21.2.0"
+  dependencies:
+    "@electron/get": ^1.14.1
+    "@types/node": ^16.11.26
+    extract-zip: ^2.0.1
+  bin:
+    electron: cli.js
+  checksum: 46a8285db5b5c574576f7f46d09cf08bd00a1d39537b46519072e4a54ec803542d75f14baf2aba4c7dffdbc09f19b1e6a1177c4f1584e8775e53f7a20ffb6821
   languageName: node
   linkType: hard
 
@@ -3215,6 +3237,7 @@ __metadata:
     "@electron-forge/maker-rpm": ^6.0.0-beta.65
     "@electron-forge/maker-squirrel": ^6.0.0-beta.65
     "@electron-forge/maker-zip": ^6.0.0-beta.65
+    "@types/electron": ^1.6.10
     "@types/mime": ^3.0.1
     "@types/react": ^18.0.15
     "@types/react-dom": ^18.0.6
