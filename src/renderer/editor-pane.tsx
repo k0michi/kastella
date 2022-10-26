@@ -250,21 +250,26 @@ export default function EditorPane() {
                 <span className='date'>{dateToString(textNode.created)}</span></div>;
             } else if (n.type == NodeType.Image) {
               const imageNode = n as ImageNode;
-              const image = model.getFile(imageNode.fileID)!;
-              const imageURL = images[image.id];
+              const image = model.getFile(imageNode.fileID);
 
-              if (imageURL == undefined) {
-                bridge.readFile(image.id).then(bytes => {
-                  const newImages = produce(images, d => {
-                    d[image.id] = uint8ArrayObjectURL(bytes, image.type);
+              if (image != null) {
+                const imageURL = images[image.id];
+  
+                if (imageURL == undefined) {
+                  bridge.readFile(image.id).then(bytes => {
+                    const newImages = produce(images, d => {
+                      d[image.id] = uint8ArrayObjectURL(bytes, image.type);
+                    });
+                    setImages(newImages);
                   });
-                  setImages(newImages);
-                });
+                }
+  
+                return <div key={id} className={className} data-id={id}>
+                  <img className='content' src={imageURL}></img>{' '}
+                  <span className='date'>{dateToString(n.created)}</span></div>;
+              } else {
+                return <div className='error'>`Failed to lead ${imageNode.fileID}`</div>;
               }
-
-              return <div key={id} className={className} data-id={id}>
-                <img className='content' src={imageURL}></img>{' '}
-                <span className='date'>{dateToString(n.created)}</span></div>;
             } else if (n.type == NodeType.Directory) {
               const dNode = n as DirectoryNode;
 

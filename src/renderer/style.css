@@ -142,6 +142,10 @@ body,
   width: 100%;
 }
 
+#editor-area .error {
+  color: red;
+}
+
 
 /* Explorer pane */
 
