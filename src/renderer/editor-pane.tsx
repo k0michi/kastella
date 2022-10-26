@@ -185,7 +185,12 @@ export default function EditorPane() {
             inputRef.current?.focus();
           }
         } else if (e.key == 'Backspace' && selected != undefined) {
-          model.removeNode(selected);
+          if (view.type == 'directory' && (view as DirectoryView).parentID == 'trash') {
+            model.removeNode(selected);
+          } else {
+            model.setParent(selected, 'trash');
+          }
+
           setSelected(undefined);
         }
       }
@@ -196,7 +201,7 @@ export default function EditorPane() {
     return () => {
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [selected, filtered]);
+  }, [selected, filtered, view]);
 
   React.useEffect(() => {
     setSelected(undefined);

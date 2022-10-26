@@ -178,6 +178,16 @@ export default class Model {
     return this.nodes.get().length;
   }
 
+  setParent(id: string, parentID: string) {
+    const foundIndex = this.nodes.get().findIndex(n => n.id == id);
+
+    const newNodes = produce(this.nodes.get(), n => {
+      n[foundIndex].parentID = parentID;
+    });
+
+    this.nodes.set(newNodes);
+    this.save();
+  }
 
   // Files
 

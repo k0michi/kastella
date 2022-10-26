@@ -56,6 +56,7 @@ export default function ExplorerPane() {
   }
 
   const directories = mapToArray(createTree(undefined)).flat(Infinity) as TreeNode[];
+  directories.push({ name: 'Trash', id: 'trash', depth: 0, children: [] });
 
   return (
     <>
