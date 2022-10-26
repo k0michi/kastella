@@ -45,6 +45,22 @@ export default function EditorPane() {
   }, []);
 
   React.useEffect(() => {
+    const onClicked = (e: MouseEvent) => {
+      const id = getAncestorID(e.target as HTMLElement);
+
+      if (id != null) {
+        setSelected(id);
+      }
+    };
+
+    editorRef.current?.addEventListener('click', onClicked);
+
+    return () => {
+      editorRef.current?.removeEventListener('click', onClicked);
+    };
+  }, []);
+
+  React.useEffect(() => {
     const resizeObserver = new ResizeObserver(entries => {
       if (atBottom) {
         editorRef.current?.scroll(0, editorRef.current?.scrollHeight);
@@ -290,4 +306,16 @@ function splitTags(string: string): [string, string[]] {
 
   string = string.trim();
   return [string, tags];
+}
+
+function getAncestorID(element: HTMLElement | null): string | null {
+  if (element == null) {
+    return null;
+  }
+
+  if (element.dataset.id != null) {
+    return element.dataset.id;
+  }
+
+  return getAncestorID(element.parentElement);
 }
