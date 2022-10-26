@@ -139,7 +139,7 @@ export default function EditorPane() {
     }
 
     return filtered;
-  }, [nodes, view]);
+  }, [nodes, view, search]);
 
   React.useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
