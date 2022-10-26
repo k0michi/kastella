@@ -143,29 +143,31 @@ export default function EditorPane() {
 
   React.useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key == 'ArrowUp') {
-        e.preventDefault();
+      if (!e.isComposing) {
+        if (e.key == 'ArrowUp') {
+          e.preventDefault();
 
-        if (selected == null) {
-          setSelected(filtered.at(-1)?.id);
-        } else {
-          const foundIndex = filtered.findIndex(n => n.id == selected);
-          const prev = filtered[foundIndex - 1];
+          if (selected == null) {
+            setSelected(filtered.at(-1)?.id);
+          } else {
+            const foundIndex = filtered.findIndex(n => n.id == selected);
+            const prev = filtered[foundIndex - 1];
 
-          if (prev != null && foundIndex != -1) {
-            setTimeout(() => setSelected(prev.id));
+            if (prev != null && foundIndex != -1) {
+              setTimeout(() => setSelected(prev.id));
+            }
           }
-        }
-      } else if (e.key == 'ArrowDown') {
-        e.preventDefault();
-        const foundIndex = filtered.findIndex(n => n.id == selected);
-        const next = filtered[foundIndex + 1];
+        } else if (e.key == 'ArrowDown') {
+          e.preventDefault();
+          const foundIndex = filtered.findIndex(n => n.id == selected);
+          const next = filtered[foundIndex + 1];
 
-        if (next != null && foundIndex != -1) {
-          setTimeout(() => setSelected(next.id));
-        } else {
-          setSelected(undefined);
-          inputRef.current?.focus();
+          if (next != null && foundIndex != -1) {
+            setTimeout(() => setSelected(next.id));
+          } else {
+            setSelected(undefined);
+            inputRef.current?.focus();
+          }
         }
       }
     };
