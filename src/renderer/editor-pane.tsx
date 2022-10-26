@@ -168,6 +168,9 @@ export default function EditorPane() {
             setSelected(undefined);
             inputRef.current?.focus();
           }
+        } else if (e.key == 'Backspace' && selected != undefined) {
+          model.removeNode(selected);
+          setSelected(undefined);
         }
       }
     };
@@ -185,14 +188,18 @@ export default function EditorPane() {
 
   React.useEffect(() => {
     const node = notesRef.current?.querySelector(`[data-id="${selected}"]`);
+    const editorArea = editorRef.current;
 
-    if (node != null) {
+    if (node != null && editorArea != null) {
       const rect = node.getBoundingClientRect();
+      const rectFrame = editorArea.getBoundingClientRect();
+      // offsetY is a relative Y coordinate of an element from the top of #editor-area
+      const offsetY = rect.y - rectFrame.y;
 
-      if (rect.y < 0) {
-        editorRef.current?.scrollBy(0, rect.y);
-      } else if (editorRef.current != null && rect.y + rect.height > editorRef.current.clientHeight) {
-        editorRef.current.scrollBy(0, rect.y + rect.height - editorRef.current.clientHeight);
+      if (offsetY < 0) {
+        editorRef.current?.scrollBy(0, offsetY);
+      } else if (editorRef.current != null && offsetY + rect.height > editorArea.clientHeight) {
+        editorRef.current.scrollBy(0, offsetY + rect.height - editorArea.clientHeight);
       }
     }
 
@@ -219,10 +226,7 @@ export default function EditorPane() {
 
               return <div key={id} className={className} data-id={id}>
                 <span className='content'>{textNode.content as string}</span>{' '}
-                <span className='date'>{dateToString(textNode.created)}</span>{' '}
-                <button onClick={e => {
-                  model.removeNode(id);
-                }}>x</button></div>;
+                <span className='date'>{dateToString(textNode.created)}</span></div>;
             } else if (n.type == NodeType.Image) {
               const imageNode = n as ImageNode;
               const image = model.getFile(imageNode.fileID)!;
@@ -239,19 +243,13 @@ export default function EditorPane() {
 
               return <div key={id} className={className} data-id={id}>
                 <img className='content' src={imageURL}></img>{' '}
-                <span className='date'>{dateToString(n.created)}</span>{' '}
-                <button onClick={e => {
-                  model.removeNode(id);
-                }}>x</button></div>;
+                <span className='date'>{dateToString(n.created)}</span></div>;
             } else if (n.type == NodeType.Directory) {
               const dNode = n as DirectoryNode;
 
               return <div key={id} className={className} data-id={id}>
                 <span className='content'>[dir] {dNode.name as string}</span>{' '}
-                <span className='date'>{dateToString(dNode.created)}</span>{' '}
-                <button onClick={e => {
-                  model.removeNode(id);
-                }}>x</button></div>;
+                <span className='date'>{dateToString(dNode.created)}</span></div>;
             }
           })
         }</div>
