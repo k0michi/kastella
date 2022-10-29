@@ -142,15 +142,17 @@ export default function EditorPane() {
       filtered = filtered.filter(n => (n.type == undefined || n.type == NodeType.Text) && ((n as TextNode).content as string).includes(search));
     }
 
-    if (view != null && view.type == 'directory') {
+    if (view.type == 'directory') {
       filtered = filtered.filter(n => n.parentID == (view as DirectoryView).parentID);
+    } else {
+      filtered = filtered.filter(n => n.parentID != 'trash');
     }
 
-    if (view != null && view.type == 'tag') {
+    if (view.type == 'tag') {
       filtered = filtered.filter(n => n.tags?.includes((view as TagView).tag));
     }
 
-    if (view != null && view.type == 'date') {
+    if (view.type == 'date') {
       filtered = filtered.filter(n => formatISO(n.created, { representation: 'date' }) == (view as DateView).date);
     }
 
@@ -254,7 +256,7 @@ export default function EditorPane() {
 
               if (image != null) {
                 const imageURL = images[image.id];
-  
+
                 if (imageURL == undefined) {
                   bridge.readFile(image.id).then(bytes => {
                     const newImages = produce(images, d => {
@@ -263,7 +265,7 @@ export default function EditorPane() {
                     setImages(newImages);
                   });
                 }
-  
+
                 return <div key={id} className={className} data-id={id}>
                   <img className='content' src={imageURL}></img>{' '}
                   <span className='date'>{dateToString(n.created)}</span></div>;
