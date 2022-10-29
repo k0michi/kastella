@@ -7,6 +7,7 @@ import produce from 'immer';
 import { formatISO } from 'date-fns';
 import Model, { DateView, DirectoryNode, DirectoryView, ImageNode, NodeType, TagView, TextNode } from './model';
 import EditorBar from './editor-bar';
+import Image from './image';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -14,7 +15,6 @@ export default function EditorPane() {
   const tags = useObservable(model.tags);
   const view = useObservable(model.view);
   const [input, setInput] = React.useState<string>('');
-  const [images, setImages] = React.useState<Record<string, string | undefined>>({});
   const editorRef = React.useRef<HTMLDivElement>(null);
   const notesRef = React.useRef<HTMLDivElement>(null);
   const [atBottom, setAtBottom] = React.useState(true);
@@ -37,10 +37,6 @@ export default function EditorPane() {
 
     return () => {
       editorRef.current?.removeEventListener('scroll', onScroll);
-
-      for (const image of Object.values(images)) {
-        URL.revokeObjectURL(image!);
-      }
     };
   }, []);
 
@@ -252,25 +248,14 @@ export default function EditorPane() {
                 <span className='date'>{dateToString(textNode.created)}</span></div>;
             } else if (n.type == NodeType.Image) {
               const imageNode = n as ImageNode;
-              const image = model.getFile(imageNode.fileID);
+              const file = model.getFile(imageNode.fileID);
 
-              if (image != null) {
-                const imageURL = images[image.id];
-
-                if (imageURL == undefined) {
-                  bridge.readFile(image.id).then(bytes => {
-                    const newImages = produce(images, d => {
-                      d[image.id] = uint8ArrayObjectURL(bytes, image.type);
-                    });
-                    setImages(newImages);
-                  });
-                }
-
+              if (file != null) {
                 return <div key={id} className={className} data-id={id}>
-                  <img className='content' src={imageURL}></img>{' '}
+                  <Image file={file} />
                   <span className='date'>{dateToString(n.created)}</span></div>;
               } else {
-                return <div className='error'>`Failed to lead ${imageNode.fileID}`</div>;
+                return <div className='error'>{`Failed to read ${imageNode.fileID}`}</div>;
               }
             } else if (n.type == NodeType.Directory) {
               const dNode = n as DirectoryNode;
@@ -299,10 +284,6 @@ export default function EditorPane() {
       </div>
     </div>
   </div>;
-}
-
-function uint8ArrayObjectURL(array: Uint8Array, mediaType: string) {
-  return URL.createObjectURL(new Blob([array.buffer], { type: mediaType }));
 }
 
 // '... #tagName' => ['...', ['tagName']]
