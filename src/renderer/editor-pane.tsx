@@ -240,11 +240,14 @@ export default function EditorPane() {
               className += ' selected';
             }
 
+            const tagNames = n.tags?.map(t => '#' + model.getTag(t)?.name);
+
             if (n.type == undefined || n.type == NodeType.Text) {
               const textNode = n as TextNode;
 
               return <div key={id} className={className} data-id={id}>
                 <span className='content'>{textNode.content as string}</span>{' '}
+                <span className='tags'>{tagNames?.join(' ')}</span>{' '}
                 <span className='date'>{dateToString(textNode.created)}</span></div>;
             } else if (n.type == NodeType.Image) {
               const imageNode = n as ImageNode;
@@ -253,6 +256,7 @@ export default function EditorPane() {
               if (file != null) {
                 return <div key={id} className={className} data-id={id}>
                   <Image file={file} />
+                <span className='tags'>{tagNames?.join(' ')}</span>{' '}
                   <span className='date'>{dateToString(n.created)}</span></div>;
               } else {
                 return <div className='error'>{`Failed to read ${imageNode.fileID}`}</div>;
@@ -262,6 +266,7 @@ export default function EditorPane() {
 
               return <div key={id} className={className} data-id={id}>
                 <span className='content'>[dir] {dNode.name as string}</span>{' '}
+                <span className='tags'>{tagNames?.join(' ')}</span>{' '}
                 <span className='date'>{dateToString(dNode.created)}</span></div>;
             }
           })
@@ -278,8 +283,6 @@ export default function EditorPane() {
                 confirm();
               }
             }} value={input} />
-        </div>
-        <div>
         </div>
       </div>
     </div>
