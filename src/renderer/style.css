@@ -49,6 +49,7 @@ body,
   flex: 1 1 0;
   display: flex;
   flex-direction: column;
+  font-size: 14px;
 }
 
 #editor-pane textarea {
@@ -105,6 +106,8 @@ body,
   flex: 1 1 0;
   padding: 12px;
   overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.75;
 }
 
 #editor-area #notes {
@@ -157,6 +160,7 @@ body,
   background-color: rgb(21, 21, 21);
   border-right: solid 1px rgb(69, 69, 69);
   user-select: none;
+  font-size: 14px;
 }
 
 #explorer-pane .section {
