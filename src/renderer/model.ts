@@ -190,6 +190,25 @@ export default class Model {
     this.save();
   }
 
+  getPath(directoryID: string) {
+    const nodes = this.nodes.get();
+    let dirs = [];
+    let dirID: string | undefined = directoryID;
+
+    while (dirID != undefined) {
+      const found = nodes.find(n => n.id == dirID);
+
+      if (found == undefined) {
+        throw new Error();
+      }
+
+      dirs.unshift((found as DirectoryNode).name);
+      dirID = found.parentID;
+    }
+
+    return '/' + dirs.join('/');
+  }
+
   // Files
 
   addFile(file: File) {
@@ -234,6 +253,10 @@ export default class Model {
 
   findTag(name: string) {
     return this.tags.get().find(t => t.name.localeCompare(name, undefined, { sensitivity: 'accent' }) == 0);
+  }
+
+  getTag(id: string) {
+    return this.tags.get().find(t => t.id == id);
   }
 
   removeTag(id: string) {

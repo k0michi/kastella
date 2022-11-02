@@ -78,24 +78,27 @@ body,
 
 /* Editor bar */
 
-#editor-bar {
+.editor-bar-section {
   background-color: rgb(33, 33, 33);
   border-bottom: 1px solid rgb(61, 61, 61);
+  padding: 6px;
+}
+
+.editor-bar-section:nth-child(2) {
   flex: 0 0 32px;
   display: flex;
   flex-direction: row;
   gap: 4px;
-  padding: 6px;
 }
 
-#editor-bar>* {
+.editor-bar-section:nth-child(2)>* {
   display: block;
   height: fit-content;
   margin-top: auto;
   margin-bottom: auto;
 }
 
-#editor-bar>textarea {
+.editor-bar-section:nth-child(2) textarea {
   flex: 1 1 0;
 }
 
