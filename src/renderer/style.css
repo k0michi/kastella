@@ -130,6 +130,7 @@ body,
   padding-right: 4px;
   text-align: right;
   word-break: keep-all;
+  vertical-align: top;
 }
 
 #editor-area #notes .note {
