@@ -106,6 +106,10 @@ export default function EditorPane() {
   }, [nodes]);
 
   function confirm() {
+    if (input.length == 0) {
+      return;
+    }
+
     const [content, tags] = splitTags(input);
     const tagIDs = tags.map(t => {
       const found = model.findTag(t);
