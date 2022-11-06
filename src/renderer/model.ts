@@ -88,6 +88,7 @@ export default class Model {
   view = new Observable<View>({ type: 'directory' });
   saving = new Observable<boolean>(false);
   writeOnly = new Observable<boolean>(true);
+  lineNumberVisibility = new Observable<boolean>(true);
   search = new Observable<string>('');
   savePromise: Promise<void> | null = null;
 
@@ -309,6 +310,10 @@ export default class Model {
 
   setWriteOnly(writeOnly: boolean) {
     this.writeOnly.set(writeOnly);
+  }
+
+  setLineNumberVisibility(visibility: boolean) {
+    this.lineNumberVisibility.set(visibility);
   }
 
 

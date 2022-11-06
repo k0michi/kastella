@@ -22,6 +22,7 @@ export default function EditorPane() {
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
   const writeOnly = useObservable(model.writeOnly);
   const search = useObservable(model.search);
+  const lineNumberVisibility = useObservable(model.lineNumberVisibility);
 
   React.useEffect(() => {
     const onScroll = () => {
@@ -231,46 +232,59 @@ export default function EditorPane() {
     <EditorBar />
     <div id="editor-area" ref={editorRef}>
       <div id="notes" ref={notesRef}>
-        {writeOnly ? null :
-          filtered.map(n => {
-            const id = n.id;
-            let className = '';
+        <table>
+          <tbody>
+            {writeOnly ? null :
+              filtered.map(n => {
+                const id = n.id;
+                let className = 'note';
 
-            if (id == selected) {
-              className += ' selected';
+                if (id == selected) {
+                  className += ' selected';
+                }
+
+                const tagNames = n.tags?.map(t => '#' + model.getTag(t)?.name);
+                let content;
+
+                if (n.type == undefined || n.type == NodeType.Text) {
+                  const textNode = n as TextNode;
+
+                  content = <div key={id} className={className} data-id={id}>
+                    <span className='content'>{textNode.content as string}</span>{' '}
+                    <span className='tags'>{tagNames?.join(' ')}</span>{' '}
+                    <span className='date'>{dateToString(textNode.created)}</span>
+                  </div>;
+                } else if (n.type == NodeType.Image) {
+                  const imageNode = n as ImageNode;
+                  const file = model.getFile(imageNode.fileID);
+
+                  if (file != null) {
+                    content = <div key={id} className={className} data-id={id}>
+                      <Image file={file} />
+                      <span className='tags'>{tagNames?.join(' ')}</span>{' '}
+                      <span className='date'>{dateToString(n.created)}</span></div>;
+                  } else {
+                    content = <div className='error'>{`Failed to read ${imageNode.fileID}`}</div>;
+                  }
+                } else if (n.type == NodeType.Directory) {
+                  const dNode = n as DirectoryNode;
+
+                  content = <div key={id} className={className} data-id={id}>
+                    <span className='content'>[dir] {dNode.name as string}</span>{' '}
+                    <span className='tags'>{tagNames?.join(' ')}</span>{' '}
+                    <span className='date'>{dateToString(dNode.created)}</span></div>;
+                }
+
+                return <tr>
+                  {lineNumberVisibility ? <td className='index'>{n.index}</td> : null}
+                  <td>
+                    {content}
+                  </td>
+                </tr>;
+              })
             }
-
-            const tagNames = n.tags?.map(t => '#' + model.getTag(t)?.name);
-
-            if (n.type == undefined || n.type == NodeType.Text) {
-              const textNode = n as TextNode;
-
-              return <div key={id} className={className} data-id={id}>
-                <span className='content'>{textNode.content as string}</span>{' '}
-                <span className='tags'>{tagNames?.join(' ')}</span>{' '}
-                <span className='date'>{dateToString(textNode.created)}</span></div>;
-            } else if (n.type == NodeType.Image) {
-              const imageNode = n as ImageNode;
-              const file = model.getFile(imageNode.fileID);
-
-              if (file != null) {
-                return <div key={id} className={className} data-id={id}>
-                  <Image file={file} />
-                <span className='tags'>{tagNames?.join(' ')}</span>{' '}
-                  <span className='date'>{dateToString(n.created)}</span></div>;
-              } else {
-                return <div className='error'>{`Failed to read ${imageNode.fileID}`}</div>;
-              }
-            } else if (n.type == NodeType.Directory) {
-              const dNode = n as DirectoryNode;
-
-              return <div key={id} className={className} data-id={id}>
-                <span className='content'>[dir] {dNode.name as string}</span>{' '}
-                <span className='tags'>{tagNames?.join(' ')}</span>{' '}
-                <span className='date'>{dateToString(dNode.created)}</span></div>;
-            }
-          })
-        }</div>
+          </tbody>
+        </table></div>
       <div id="controls">
         <div id='input'>
           <textarea ref={inputRef} rows={1} onChange={e => setInput(e.target.value)}

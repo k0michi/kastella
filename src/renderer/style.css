@@ -117,16 +117,28 @@ body,
   white-space: pre-wrap;
 }
 
-#editor-area #notes>div {
+#editor-area #notes table {
+  border-collapse: collapse;
+}
+
+#editor-area #notes td {
+  padding: 0;
+}
+
+#editor-area #notes td.index {
+  word-break: keep-all;
+}
+
+#editor-area #notes .note {
   padding-left: 8px;
   position: relative;
 }
 
-#editor-area #notes>div.selected {
+#editor-area #notes .note.selected {
   background-color: rgb(40, 76, 87);
 }
 
-#editor-area #notes>div.selected::before {
+#editor-area #notes .note.selected::before {
   content: '';
   position: absolute;
   background-color: rgb(24, 176, 222);
