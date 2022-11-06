@@ -276,7 +276,7 @@ export default function EditorPane() {
                 }
 
                 return <tr>
-                  {lineNumberVisibility ? <td className='index'>{n.index}</td> : null}
+                  {lineNumberVisibility ? <td className='index'>{n.index + 1}</td> : null}
                   <td>
                     {content}
                   </td>

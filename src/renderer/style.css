@@ -126,6 +126,9 @@ body,
 }
 
 #editor-area #notes td.index {
+  color: rgb(117, 117, 117);
+  padding-right: 4px;
+  text-align: right;
   word-break: keep-all;
 }
 
