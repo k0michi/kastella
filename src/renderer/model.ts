@@ -195,6 +195,10 @@ export default class Model {
     let dirs = [];
     let dirID: string | undefined = directoryID;
 
+    if (directoryID == 'trash') {
+      return 'Trash';
+    }
+
     while (dirID != undefined) {
       const found = nodes.find(n => n.id == dirID);
 
