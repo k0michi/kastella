@@ -252,7 +252,6 @@ export default function EditorPane() {
                   content = <div key={id} className={className} data-id={id}>
                     <span className='content'>{textNode.content as string}</span>{' '}
                     <span className='tags'>{tagNames?.join(' ')}</span>{' '}
-                    <span className='date'>{dateToString(textNode.created)}</span>
                   </div>;
                 } else if (n.type == NodeType.Image) {
                   const imageNode = n as ImageNode;
@@ -261,8 +260,8 @@ export default function EditorPane() {
                   if (file != null) {
                     content = <div key={id} className={className} data-id={id}>
                       <Image file={file} />
-                      <span className='tags'>{tagNames?.join(' ')}</span>{' '}
-                      <span className='date'>{dateToString(n.created)}</span></div>;
+                      <span className='tags'>{tagNames?.join(' ')}</span>
+                    </div>;
                   } else {
                     content = <div className='error'>{`Failed to read ${imageNode.fileID}`}</div>;
                   }
@@ -271,8 +270,8 @@ export default function EditorPane() {
 
                   content = <div key={id} className={className} data-id={id}>
                     <span className='content'>[dir] {dNode.name as string}</span>{' '}
-                    <span className='tags'>{tagNames?.join(' ')}</span>{' '}
-                    <span className='date'>{dateToString(dNode.created)}</span></div>;
+                    <span className='tags'>{tagNames?.join(' ')}</span>
+                  </div>;
                 }
 
                 return <tr>
