@@ -2,6 +2,8 @@ import { Observable } from "kyoka";
 import produce from 'immer';
 import { v4 as uuidv4 } from 'uuid';
 
+const LIBRARY_VERSION = 0;
+
 export enum NodeType {
   Text = 'text',
   Image = 'image',
@@ -346,7 +348,8 @@ export default class Model {
     this.savePromise = bridge.writeLibrary(JSON.stringify({
       nodes: this.nodes.get(),
       files: this.files.get(),
-      tags: this.tags.get()
+      tags: this.tags.get(),
+      version: LIBRARY_VERSION
     })).then((() => {
       this.savePromise = null;
       this.saving.set(false);
