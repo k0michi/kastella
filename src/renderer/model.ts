@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { now } from "./utils";
 import { ZonedDateTime, DateTimeFormatter } from '@js-joda/core';
 
-const LIBRARY_VERSION = 0;
+const LIBRARY_VERSION = 1;
 
 export enum NodeType {
   Text = 'text',
@@ -53,6 +53,8 @@ export interface File {
   type: string;
   name?: string;
   url?: string;
+  modified?: ZonedDateTime;
+  accessed: ZonedDateTime;
 }
 
 export interface Tag {
@@ -324,7 +326,7 @@ export default class Model {
     const c = await bridge.readLibrary();
 
     const data = JSON.parse(c, (key, value) => {
-      if (key == 'created' || key == 'modified') {
+      if (key == 'created' || key == 'modified' || key == 'accessed') {
         return ZonedDateTime.parse(value);
       }
 
@@ -351,7 +353,7 @@ export default class Model {
       version: LIBRARY_VERSION
     }, (key, value) => {
       // Replacer is called after toJSON()
-      if (key == 'created' || key == 'modified') {
+      if (key == 'created' || key == 'modified' || key == 'accessed') {
         const dateTime = value as string;
         return ZonedDateTime.parse(dateTime).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
       }

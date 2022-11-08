@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime';
-import { dateToString, now } from './utils';
+import { dateToString, now, nsToZonedDateTime } from './utils';
 import { useModel, useObservable } from 'kyoka';
 import produce from 'immer';
-import Model, { DateView, DirectoryNode, DirectoryView, ImageNode, NodeType, TagView, TextNode } from './model';
+import Model, { DateView, DirectoryNode, DirectoryView, File, ImageNode, NodeType, TagView, TextNode } from './model';
 import EditorBar from './editor-bar';
 import Image from './image';
 import { DateTimeFormatter } from '@js-joda/core';
@@ -81,11 +81,13 @@ export default function EditorPane() {
         const mimeType = mime.getType(filePath);
 
         if (mimeType == 'image/png' || mimeType == 'image/jpeg') {
+          const accessed = await now();
+          const modified = nsToZonedDateTime(await bridge.getMTime(filePath));
           const id = uuidv4();
           await bridge.copyFile(id, filePath);
           const basename = await bridge.basename(filePath);
-          const image = { id, name: basename, type: mimeType };
-          model.addImageNode(image, await now());
+          const image = { id, name: basename, type: mimeType, accessed, modified } as File;
+          model.addImageNode(image, accessed);
         }
       }
     };
