@@ -1,6 +1,8 @@
 import { Observable } from "kyoka";
 import produce from 'immer';
 import { v4 as uuidv4 } from 'uuid';
+import { now } from "./utils";
+import { ZonedDateTime, DateTimeFormatter } from '@js-joda/core';
 
 const LIBRARY_VERSION = 0;
 
@@ -14,8 +16,8 @@ export enum NodeType {
 export interface Node {
   id: string;
   type?: NodeType;
-  created: Date;
-  modified: Date;
+  created: ZonedDateTime;
+  modified: ZonedDateTime;
   tags?: string[];
   index: number;
   parentID?: string;
@@ -108,44 +110,41 @@ export default class Model {
     this.nodes.set(newNodes);
   }
 
-  addTextNode(text: string, parentID?: string, tags?: string[]) {
-    const now = new Date();
+  addTextNode(text: string, date: ZonedDateTime, parentID?: string, tags?: string[]) {
     const id = uuidv4();
 
     if (tags?.length == 0) {
       tags = undefined;
     }
 
-    const node = { type: NodeType.Text, content: text, tags, created: now, modified: now, id, parentID, index: this.getNextIndex() } as TextNode;
+    const node = { type: NodeType.Text, content: text, tags, created: date, modified: date, id, parentID, index: this.getNextIndex() } as TextNode;
     this.addNode(node);
     this.save();
     return node;
   }
 
-  addImageNode(file: File, parentID?: string, tags?: string[]) {
-    const now = new Date();
+  addImageNode(file: File, date: ZonedDateTime, parentID?: string, tags?: string[]) {
     const id = uuidv4()
 
     if (tags?.length == 0) {
       tags = undefined;
     }
 
-    const node = { type: NodeType.Image, fileID: file.id, tags, created: now, modified: now, id, parentID, index: this.getNextIndex() } as ImageNode;
+    const node = { type: NodeType.Image, fileID: file.id, tags, created: date, modified: date, id, parentID, index: this.getNextIndex() } as ImageNode;
     this.addFile(file);
     this.addNode(node);
     this.save();
     return node;
   }
 
-  addDirectoryNode(name: string, parentID?: string, tags?: string[]) {
-    const now = new Date();
+  addDirectoryNode(name: string, date: ZonedDateTime, parentID?: string, tags?: string[]) {
     const id = uuidv4()
 
     if (tags?.length == 0) {
       tags = undefined;
     }
 
-    const node = { type: NodeType.Directory, name: name, tags, created: now, modified: now, id, parentID, index: this.getNextIndex() } as DirectoryNode;
+    const node = { type: NodeType.Directory, name: name, tags, created: date, modified: date, id, parentID, index: this.getNextIndex() } as DirectoryNode;
     this.addNode(node);
     return node;
   }
@@ -281,7 +280,7 @@ export default class Model {
     );
   }
 
-  createDirectory(path: string) {
+  async createDirectory(path: string) {
     const dirs = path.split('/').filter(d => d.length > 0);
     let parentID: string | undefined = undefined;
 
@@ -289,7 +288,7 @@ export default class Model {
       const found = this.findDirectory(parentID, dir);
 
       if (found == null) {
-        parentID = this.addDirectoryNode(dir, parentID).id;
+        parentID = this.addDirectoryNode(dir, await now(), parentID).id;
       } else {
         parentID = found.id;
       }
@@ -326,7 +325,7 @@ export default class Model {
 
     const data = JSON.parse(c, (key, value) => {
       if (key == 'created' || key == 'modified') {
-        return new Date(value);
+        return ZonedDateTime.parse(value);
       }
 
       return value;
@@ -350,6 +349,14 @@ export default class Model {
       files: this.files.get(),
       tags: this.tags.get(),
       version: LIBRARY_VERSION
+    }, (key, value) => {
+      // Replacer is called after toJSON()
+      if (key == 'created' || key == 'modified') {
+        const dateTime = value as string;
+        return ZonedDateTime.parse(dateTime).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+      }
+
+      return value;
     })).then((() => {
       this.savePromise = null;
       this.saving.set(false);

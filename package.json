@@ -12,7 +12,8 @@
     "make": "yarn build && electron-forge make"
   },
   "dependencies": {
-    "date-fns": "^2.29.3",
+    "@js-joda/core": "^5.4.2",
+    "@k0michi/now": "^0.0.1",
     "electron-squirrel-startup": "^1.0.0",
     "immer": "^9.0.15",
     "kyoka": "^0.0.3",

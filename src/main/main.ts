@@ -3,6 +3,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import { now } from '@k0michi/now';
 
 function createWindow() {
   // Create the browser window.
@@ -92,4 +93,13 @@ ipcMain.handle('remove-file', async (e, id: string) => {
 
 ipcMain.handle('basename', (e, filePath: string) => {
   return path.basename(filePath);
+});
+
+ipcMain.handle('get-mtime', async (e, filePath: string) => {
+  const stat = await fs.stat(filePath, { bigint: true });
+  return stat.mtimeNs;
+});
+
+ipcMain.handle('now', (e) => {
+  return now();
 });

@@ -7,6 +7,8 @@ export class Bridge {
   readFile = (id: string): Promise<Uint8Array> => ipcRenderer.invoke('read-file', id);
   removeFile = (id: string): Promise<Uint8Array> => ipcRenderer.invoke('remove-file', id);
   basename = (filePath: string): Promise<string> => ipcRenderer.invoke('basename', filePath);
+  getMTime = (filePath: string): Promise<bigint> => ipcRenderer.invoke('get-mtime', filePath);
+  now = (): Promise<bigint> => ipcRenderer.invoke('now');
 }
 
 contextBridge.exposeInMainWorld('bridge', new Bridge());

@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime';
-import { dateToString } from './utils';
+import { dateToString, now } from './utils';
 import { useModel, useObservable } from 'kyoka';
 import produce from 'immer';
-import { formatISO } from 'date-fns';
 import Model, { DateView, DirectoryNode, DirectoryView, ImageNode, NodeType, TagView, TextNode } from './model';
 import EditorBar from './editor-bar';
 import Image from './image';
+import { DateTimeFormatter } from '@js-joda/core';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -85,7 +85,7 @@ export default function EditorPane() {
           await bridge.copyFile(id, filePath);
           const basename = await bridge.basename(filePath);
           const image = { id, name: basename, type: mimeType };
-          model.addImageNode(image);
+          model.addImageNode(image, await now());
         }
       }
     };
@@ -105,7 +105,7 @@ export default function EditorPane() {
     };
   }, [nodes]);
 
-  function confirm() {
+  async function confirm() {
     if (input.length == 0) {
       return;
     }
@@ -132,7 +132,7 @@ export default function EditorPane() {
       tagIDs.push((view as TagView).tag);
     }
 
-    model.addTextNode(content, parentID, tagIDs);
+    model.addTextNode(content, await now(), parentID, tagIDs);
     setInput('');
   }
 
@@ -154,7 +154,7 @@ export default function EditorPane() {
     }
 
     if (view.type == 'date') {
-      filtered = filtered.filter(n => formatISO(n.created, { representation: 'date' }) == (view as DateView).date);
+      filtered = filtered.filter(n => n.created.format(DateTimeFormatter.ISO_LOCAL_DATE) == (view as DateView).date);
     }
 
     return filtered;

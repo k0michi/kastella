@@ -718,6 +718,82 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@js-joda/core@npm:^5.4.2":
+  version: 5.4.2
+  resolution: "@js-joda/core@npm:5.4.2"
+  checksum: 58ebcfb97fcf2bcd445370a76189a3a9852f7cb6d4e961a832892c43c562b9f1bc4ea71d962ab3532df15734d2ca2d6feb76a33f392dbddbbaf3640a5067b939
+  languageName: node
+  linkType: hard
+
+"@k0michi/now-darwin-arm64@npm:0.0.1":
+  version: 0.0.1
+  resolution: "@k0michi/now-darwin-arm64@npm:0.0.1"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@k0michi/now-darwin-x64@npm:0.0.1":
+  version: 0.0.1
+  resolution: "@k0michi/now-darwin-x64@npm:0.0.1"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@k0michi/now-linux-arm64-gnu@npm:0.0.1":
+  version: 0.0.1
+  resolution: "@k0michi/now-linux-arm64-gnu@npm:0.0.1"
+  conditions: os=linux & cpu=arm64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@k0michi/now-linux-x64-gnu@npm:0.0.1":
+  version: 0.0.1
+  resolution: "@k0michi/now-linux-x64-gnu@npm:0.0.1"
+  conditions: os=linux & cpu=x64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@k0michi/now-win32-arm64-msvc@npm:0.0.1":
+  version: 0.0.1
+  resolution: "@k0michi/now-win32-arm64-msvc@npm:0.0.1"
+  conditions: os=win32 & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@k0michi/now-win32-x64-msvc@npm:0.0.1":
+  version: 0.0.1
+  resolution: "@k0michi/now-win32-x64-msvc@npm:0.0.1"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@k0michi/now@npm:^0.0.1":
+  version: 0.0.1
+  resolution: "@k0michi/now@npm:0.0.1"
+  dependencies:
+    "@k0michi/now-darwin-arm64": 0.0.1
+    "@k0michi/now-darwin-x64": 0.0.1
+    "@k0michi/now-linux-arm64-gnu": 0.0.1
+    "@k0michi/now-linux-x64-gnu": 0.0.1
+    "@k0michi/now-win32-arm64-msvc": 0.0.1
+    "@k0michi/now-win32-x64-msvc": 0.0.1
+  dependenciesMeta:
+    "@k0michi/now-darwin-arm64":
+      optional: true
+    "@k0michi/now-darwin-x64":
+      optional: true
+    "@k0michi/now-linux-arm64-gnu":
+      optional: true
+    "@k0michi/now-linux-x64-gnu":
+      optional: true
+    "@k0michi/now-win32-arm64-msvc":
+      optional: true
+    "@k0michi/now-win32-x64-msvc":
+      optional: true
+  checksum: 15ca0ae6e257e9f4ff305078f4ed02d428ab354b58dc931cdefbc526dfd599be5b7aed78fc55f2a07a832b3bc27bf347a1542a76e8b8b8a2e832003d1c7f6bb9
+  languageName: node
+  linkType: hard
+
 "@malept/cross-spawn-promise@npm:^1.0.0, @malept/cross-spawn-promise@npm:^1.1.0":
   version: 1.1.1
   resolution: "@malept/cross-spawn-promise@npm:1.1.1"
@@ -1660,13 +1736,6 @@ __metadata:
   version: 2.29.1
   resolution: "date-fns@npm:2.29.1"
   checksum: 9d07f77dffc1eb8c213391bde39f2963ffe7c0019d9edde14487882d627224f3a39b963e6e99d0cc58afff220a6a1a7e8864d2789958f4eaa77714de94d4d076
-  languageName: node
-  linkType: hard
-
-"date-fns@npm:^2.29.3":
-  version: 2.29.3
-  resolution: "date-fns@npm:2.29.3"
-  checksum: e01cf5b62af04e05dfff921bb9c9933310ed0e1ae9a81eb8653452e64dc841acf7f6e01e1a5ae5644d0337e9a7f936175fd2cb6819dc122fdd9c5e86c56be484
   languageName: node
   linkType: hard
 
@@ -3237,6 +3306,8 @@ __metadata:
     "@electron-forge/maker-rpm": ^6.0.0-beta.65
     "@electron-forge/maker-squirrel": ^6.0.0-beta.65
     "@electron-forge/maker-zip": ^6.0.0-beta.65
+    "@js-joda/core": ^5.4.2
+    "@k0michi/now": ^0.0.1
     "@types/electron": ^1.6.10
     "@types/mime": ^3.0.1
     "@types/react": ^18.0.15
@@ -3244,7 +3315,6 @@ __metadata:
     "@types/uuid": ^8.3.4
     "@vitejs/plugin-react": ^2.0.0
     concurrently: ^7.3.0
-    date-fns: ^2.29.3
     electron: ^20.0.1
     electron-squirrel-startup: ^1.0.0
     immer: ^9.0.15
