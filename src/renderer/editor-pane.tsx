@@ -23,6 +23,7 @@ export default function EditorPane() {
   const writeOnly = useObservable(model.writeOnly);
   const search = useObservable(model.search);
   const lineNumberVisibility = useObservable(model.lineNumberVisibility);
+  const dateVisibility = useObservable(model.dateVisibility);
 
   React.useEffect(() => {
     const onScroll = () => {
@@ -282,6 +283,7 @@ export default function EditorPane() {
 
                 return <tr>
                   {lineNumberVisibility ? <td className='index'>{n.index + 1}</td> : null}
+                  {dateVisibility ? <td className='date'>{n.created.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)}</td> : null}
                   <td>
                     {content}
                   </td>

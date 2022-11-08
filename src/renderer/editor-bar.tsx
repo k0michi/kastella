@@ -6,6 +6,7 @@ export default function EditorBar() {
   const model = useModel<Model>();
   const writeOnly = useObservable(model.writeOnly);
   const lineNumberVisibility = useObservable(model.lineNumberVisibility);
+  const dateVisibility = useObservable(model.dateVisibility);
   const search = useObservable(model.search);
   const view = useObservable(model.view);
 
@@ -29,10 +30,16 @@ export default function EditorBar() {
         <label htmlFor="write-only">Write-only</label>
       </div>
       <div className='checkbox'>
-        <input checked={lineNumberVisibility} type="checkbox" id="line-number" onChange={e => {
+        <input checked={lineNumberVisibility} type="checkbox" id="line-number-visibility" onChange={e => {
           model.setLineNumberVisibility(e.target.checked);
         }} />
         <label htmlFor="line-number">Line number</label>
+      </div>
+      <div className='checkbox'>
+        <input checked={dateVisibility} type="checkbox" id="date-visibility" onChange={e => {
+          model.setDateVisibility(e.target.checked);
+        }} />
+        <label htmlFor="date-visibility">Date</label>
       </div>
       <textarea rows={1} onChange={e => model.setSearch(e.target.value)} value={search} />
     </div>

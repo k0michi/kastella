@@ -38,6 +38,7 @@ export default function ExplorerPane() {
     let name = null;
 
     if (parentID != null) {
+      // FIXME: This might cause a problem when tree updated
       name = (model.getNode(parentID) as DirectoryNode).name;
     }
 

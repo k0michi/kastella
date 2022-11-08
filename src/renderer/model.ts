@@ -95,6 +95,7 @@ export default class Model {
   saving = new Observable<boolean>(false);
   writeOnly = new Observable<boolean>(true);
   lineNumberVisibility = new Observable<boolean>(true);
+  dateVisibility = new Observable<boolean>(false);
   search = new Observable<string>('');
   savePromise: Promise<void> | null = null;
 
@@ -317,6 +318,10 @@ export default class Model {
 
   setLineNumberVisibility(visibility: boolean) {
     this.lineNumberVisibility.set(visibility);
+  }
+
+  setDateVisibility(visibility: boolean) {
+    this.dateVisibility.set(visibility);
   }
 
 

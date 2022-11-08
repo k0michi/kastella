@@ -129,8 +129,17 @@ body,
   color: rgb(117, 117, 117);
   padding-right: 4px;
   text-align: right;
-  word-break: keep-all;
+  white-space: nowrap;
   vertical-align: top;
+}
+
+#editor-area #notes td.date {
+  color: rgb(120, 120, 120);
+  padding-right: 4px;
+  text-align: right;
+  white-space: nowrap;
+  vertical-align: top;
+  font-style: italic;
 }
 
 #editor-area #notes .note {
@@ -149,11 +158,6 @@ body,
   height: 100%;
   width: 4px;
   left: 0px;
-}
-
-#editor-area .date {
-  color: rgb(120, 120, 120);
-  font-style: italic;
 }
 
 #editor-area img.content {
