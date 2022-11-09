@@ -329,7 +329,7 @@ export default function EditorPane() {
                   </div>;
                 }
 
-                return <tr>
+                return <tr key={n.id}>
                   {lineNumberVisibility ? <td className='index'>{n.index + 1}</td> : null}
                   {dateVisibility ? <td className='date'>{n.created.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)}</td> : null}
                   <td>

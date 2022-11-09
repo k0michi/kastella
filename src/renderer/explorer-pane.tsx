@@ -70,6 +70,7 @@ export default function ExplorerPane() {
           }}>+</div></div>
           <div className="container">
             {directories.map(d => <div
+              key={d.id}
               className={[view.type == 'directory' && (view as DirectoryView).parentID == d.id ? 'selected' : '', 'item'].join(' ')}
               onClick={e => model.changeView({ 'type': 'directory', parentID: d.id } as DirectoryView)}>
               <div style={{ paddingLeft: `${d.depth * 10}px` }}>
@@ -82,6 +83,7 @@ export default function ExplorerPane() {
           <div className="header">TAGS</div>
           <div className="container">
             {tags.map(t => <div
+              key={t.id}
               className={[view.type == 'tag' && (view as TagView).tag == t.id ? 'selected' : '', 'item'].join(' ')}
               onClick={e => model.changeView({ 'type': 'tag', tag: t.id } as TagView)}>
               {t.name}
@@ -92,6 +94,7 @@ export default function ExplorerPane() {
           <div className="header">DATES</div>
           <div className="container">
             {dates.map(d => <div
+              key={d}
               className={[view.type == 'date' && (view as DateView).date == d ? 'selected' : '', 'item'].join(' ')}
               onClick={e => model.changeView({ 'type': 'date', date: d } as DateView)}>{d}</div>)}
           </div>
