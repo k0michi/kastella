@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime';
-import { dateToString, now, nsToZonedDateTime } from './utils';
+import { dateToString, isHTTPURL, now, nsToZonedDateTime } from './utils';
 import { useModel, useObservable } from 'kyoka';
 import produce from 'immer';
-import Model, { DateView, DirectoryNode, DirectoryView, File, ImageNode, NodeType, TagView, TextNode } from './model';
+import Model, { AnchorNode, DateView, DirectoryNode, DirectoryView, File, ImageNode, NodeType, TagView, TextNode } from './model';
 import EditorBar from './editor-bar';
 import Image from './image';
 import { DateTimeFormatter } from '@js-joda/core';
@@ -114,6 +114,7 @@ export default function EditorPane() {
     }
 
     const [content, tags] = splitTags(input);
+
     const tagIDs = tags.map(t => {
       const found = model.findTag(t);
 
@@ -135,8 +136,38 @@ export default function EditorPane() {
       tagIDs.push((view as TagView).tag);
     }
 
-    model.addTextNode(content, await now(), parentID, tagIDs);
     setInput('');
+
+    if (!content.includes(' ') && isHTTPURL(content)) {
+      const accessed = await now();
+      const meta = await bridge.fetchMeta(content);
+      let imageFileID: string | undefined;
+
+      if (meta.imageURL != undefined) {
+        const image = await bridge.fetchFile(meta.imageURL);
+        imageFileID = uuidv4();
+        await bridge.writeFile(imageFileID, image.data, image.type);
+        const imageFile = {
+          id: imageFileID,
+          type: image.type,
+          url: meta.imageURL,
+          modified: image.modified,
+          accessed
+        } as File;
+        model.addFile(imageFile);
+      }
+
+      model.addAnchorNode({
+        contentURL: content,
+        contentType: meta.type,
+        contentTitle: meta.title,
+        contentDescription: meta.description,
+        contentImageFileID: imageFileID,
+        contentModified: meta.modified
+      }, accessed, parentID, tagIDs);
+    } else {
+      model.addTextNode(content, await now(), parentID, tagIDs);
+    }
   }
 
   const filtered = React.useMemo(() => {
@@ -257,7 +288,7 @@ export default function EditorPane() {
                   const textNode = n as TextNode;
 
                   content = <div key={id} className={className} data-id={id}>
-                    <span className='content'>{textNode.content as string}</span>{' '}
+                    <span className='content text-node'>{textNode.content as string}</span>{' '}
                     <span className='tags'>{tagNames?.join(' ')}</span>{' '}
                   </div>;
                 } else if (n.type == NodeType.Image) {
@@ -266,7 +297,9 @@ export default function EditorPane() {
 
                   if (file != null) {
                     content = <div key={id} className={className} data-id={id}>
-                      <Image file={file} />
+                      <div className='content image-node'>
+                        <Image file={file} />
+                      </div>
                       <span className='tags'>{tagNames?.join(' ')}</span>
                     </div>;
                   } else {
@@ -276,7 +309,22 @@ export default function EditorPane() {
                   const dNode = n as DirectoryNode;
 
                   content = <div key={id} className={className} data-id={id}>
-                    <span className='content'>[dir] {dNode.name as string}</span>{' '}
+                    <span className='content directory-node'>[dir] {dNode.name as string}</span>{' '}
+                    <span className='tags'>{tagNames?.join(' ')}</span>
+                  </div>;
+                } else if (n.type == NodeType.Anchor) {
+                  const anchor = n as AnchorNode;
+                  const imageFile = anchor.contentImageFileID != null ? model.getFile(anchor.contentImageFileID) : null;
+
+                  content = <div key={id} className={className} data-id={id}>
+                    <div className='content anchor-node'>
+                      {imageFile != null ? <div className='image'><Image file={imageFile}></Image></div> : null}
+                      <div className='details'>
+                        <div className='url'>{anchor.contentURL}</div>
+                        <div className='title'>{anchor.contentTitle}</div>
+                        <div className='description'>{anchor.contentDescription}</div>
+                      </div>
+                    </div>
                     <span className='tags'>{tagNames?.join(' ')}</span>
                   </div>;
                 }

@@ -4,6 +4,8 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { now } from '@k0michi/now';
+import { fetchFile, fetchMeta } from './fetch.js';
+import * as mime from 'mime';
 
 function createWindow() {
   // Create the browser window.
@@ -102,4 +104,19 @@ ipcMain.handle('get-mtime', async (e, filePath: string) => {
 
 ipcMain.handle('now', (e) => {
   return now();
+});
+
+ipcMain.handle('fetch-meta', async (e, url: string) => {
+  return await fetchMeta(url);
+});
+
+ipcMain.handle('fetch-file', async (e, url: string) => {
+  return await fetchFile(url);
+});
+
+ipcMain.handle('write-file', async (e, id: string, data: Uint8Array, type: string) => {
+  const ext = mime.getExtension(type)
+  await fs.mkdir(path.join(libraryPath, 'files'), { recursive: true });
+  const destPath = path.join(libraryPath, 'files', id + '.' + ext);
+  return await fs.writeFile(destPath, data);
 });

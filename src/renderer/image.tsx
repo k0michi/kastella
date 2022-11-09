@@ -22,7 +22,7 @@ export default function Image(props: ImageProps) {
     };
   }, [url]);
 
-  return <img className='content' src={url}></img>;
+  return <img src={url}></img>;
 }
 
 function uint8ArrayObjectURL(array: Uint8Array, mediaType: string) {

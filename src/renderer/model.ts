@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { now } from "./utils";
 import { ZonedDateTime, DateTimeFormatter } from '@js-joda/core';
 
-const LIBRARY_VERSION = 1;
+const LIBRARY_VERSION = 2;
 
 export enum NodeType {
   Text = 'text',
@@ -15,7 +15,7 @@ export enum NodeType {
 
 export interface Node {
   id: string;
-  type?: NodeType;
+  type: NodeType;
   created: ZonedDateTime;
   modified: ZonedDateTime;
   tags?: string[];
@@ -24,27 +24,28 @@ export interface Node {
 }
 
 export interface TextNode extends Node {
-  type?: NodeType.Text;
+  type: NodeType.Text;
   content: string;
 }
 
 export interface ImageNode extends Node {
-  type?: NodeType.Image;
+  type: NodeType.Image;
   fileID: string;
   description: string;
 }
 
 export interface AnchorNode extends Node {
-  type?: NodeType.Anchor;
-  url: string;
-  title?: string;
-  imageFileID?: string;
-  faviconFileID?: string;
-  description?: string;
+  type: NodeType.Anchor;
+  contentURL: string;
+  contentType: string;
+  contentTitle?: string;
+  contentDescription?: string;
+  contentImageFileID?: string;
+  contentModified?: string;
 }
 
 export interface DirectoryNode extends Node {
-  type?: NodeType.Directory;
+  type: NodeType.Directory;
   name: string;
 }
 
@@ -152,12 +153,43 @@ export default class Model {
     return node;
   }
 
+  addAnchorNode(anchor: {
+    contentURL: string,
+    contentType: string,
+    contentTitle?: string,
+    contentDescription?: string,
+    contentImageFileID?: string,
+    contentModified?: string
+  },
+    date: ZonedDateTime,
+    parentID?: string,
+    tags?: string[]) {
+    const id = uuidv4();
+
+    if (tags?.length == 0) {
+      tags = undefined;
+    }
+
+    const node = { type: NodeType.Anchor, ...anchor, created: date, modified: date, id, parentID, index: this.getNextIndex() } as AnchorNode;
+    this.addNode(node);
+    this.save();
+    return node;
+  }
+
   removeNode(id: string) {
     const foundIndex = this.nodes.get().findIndex(n => n.id == id);
     const found = this.nodes.get()[foundIndex];
 
     if (found.type == NodeType.Image) {
       this.removeFile((found as ImageNode).fileID);
+    }
+
+    if (found.type == NodeType.Anchor) {
+      const fileID = (found as AnchorNode).contentImageFileID;
+
+      if (fileID != null) {
+        this.removeFile(fileID);
+      }
     }
 
     const newNodes = produce(this.nodes.get(), n => {
@@ -358,7 +390,7 @@ export default class Model {
       version: LIBRARY_VERSION
     }, (key, value) => {
       // Replacer is called after toJSON()
-      if (key == 'created' || key == 'modified' || key == 'accessed') {
+      if ((key == 'created' || key == 'modified' || key == 'accessed') && value != undefined) {
         const dateTime = value as string;
         return ZonedDateTime.parse(dateTime).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
       }

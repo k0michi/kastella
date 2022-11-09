@@ -160,16 +160,34 @@ body,
   left: 0px;
 }
 
-#editor-area img.content {
-  width: 256px;
-}
-
 #editor-area textarea {
   width: 100%;
 }
 
 #editor-area .error {
   color: red;
+}
+
+#editor-area .image-node img {
+  width: 256px;
+}
+
+#editor-area .anchor-node {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+
+#editor-area .anchor-node .url {
+  font-family: monospace;
+}
+
+#editor-area .anchor-node .title {
+  font-size: 18px;
+}
+
+#editor-area .anchor-node img {
+  width: 192px;
 }
 
 

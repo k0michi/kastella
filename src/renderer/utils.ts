@@ -13,3 +13,15 @@ export async function now() {
   const nowNs = await bridge.now();
   return nsToZonedDateTime(nowNs);
 }
+
+export function isHTTPURL(string: string) {
+  let url;
+
+  try {
+    url = new URL(string);
+  } catch (e) {
+    return false;
+  }
+
+  return url.protocol == 'http:' || url.protocol == 'https:';
+}
