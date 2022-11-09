@@ -18,7 +18,7 @@ function createWindow() {
   })
 
   if (app.isPackaged) {
-    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'))
+    mainWindow.loadFile(path.join(__dirname, '../../renderer/index.html'))
   } else {
     const url = `http://localhost:5173/`;
     mainWindow.loadURL(url)
