@@ -25,7 +25,7 @@ export default function ExplorerPane() {
     const dateSet = new Set<string>();
 
     for (const note of nodes) {
-      const dateString = ZonedDateTime.parse(note.created).format(DateTimeFormatter.ISO_LOCAL_DATE);
+      const dateString = note.created.asZonedDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE);
       dateSet.add(dateString);
     }
 

@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { ZoneId, ZonedDateTime, Instant, DateTimeFormatter, DateTimeFormatterBuilder, ChronoField, ResolverStyle, IsoChronology } from '@js-joda/core';
+import { ZoneId, ZonedDateTime, Instant, DateTimeFormatter, DateTimeFormatterBuilder, ChronoField, ResolverStyle } from '@js-joda/core';
 
 
 export function dateToString(date: Date) {
@@ -27,6 +27,7 @@ export function isHTTPURL(string: string) {
   return url.protocol == 'http:' || url.protocol == 'https:';
 }
 
+// https://github.com/js-joda/js-joda/blob/main/packages/core/src/format/DateTimeFormatter.js
 export namespace Formatter {
   export const ISO_LOCAL_TIME_WITH_NANO = new DateTimeFormatterBuilder()
     .appendValue(ChronoField.HOUR_OF_DAY, 2)
@@ -46,6 +47,7 @@ export namespace Formatter {
     .append(ISO_LOCAL_TIME_WITH_NANO)
     .toFormatter(ResolverStyle.STRICT);
 
+    // This format emits sub-seconds with 9 digits
     export const ISO_OFFSET_DATE_TIME_WITH_NANO = new DateTimeFormatterBuilder()
     .parseCaseInsensitive()
     .append(ISO_LOCAL_DATE_TIME_WITH_NANO)

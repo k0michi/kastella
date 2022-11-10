@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { now } from "./utils";
 import { ZonedDateTime, DateTimeFormatter } from '@js-joda/core';
 import { Formatter } from './utils'
+import TimeStamp from "./timestamp";
 
 const LIBRARY_VERSION = 3;
 
@@ -17,8 +18,8 @@ export enum NodeType {
 export interface Node {
   id: string;
   type: NodeType;
-  created: string;
-  modified: string;
+  created: TimeStamp;
+  modified: TimeStamp;
   tags?: string[];
   index: number;
   parentID?: string;
@@ -42,8 +43,8 @@ export interface AnchorNode extends Node {
   contentTitle?: string;
   contentDescription?: string;
   contentImageFileID?: string;
-  contentModified?: string;
-  contentAccessed: string;
+  contentModified?: TimeStamp;
+  contentAccessed: TimeStamp;
 }
 
 export interface DirectoryNode extends Node {
@@ -56,8 +57,8 @@ export interface File {
   type: string;
   name?: string;
   url?: string;
-  modified?: string;
-  accessed: string;
+  modified?: TimeStamp;
+  accessed: TimeStamp;
 }
 
 export interface Tag {
@@ -117,28 +118,45 @@ export default class Model {
   }
 
   addTextNode(text: string, date: ZonedDateTime, parentID?: string, tags?: string[]) {
-    const dateString = date.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO);
+    const timeStamp = new TimeStamp(date.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO));
     const id = uuidv4();
 
     if (tags?.length == 0) {
       tags = undefined;
     }
 
-    const node = { type: NodeType.Text, content: text, tags, created: dateString, modified: dateString, id, parentID, index: this.getNextIndex() } as TextNode;
+    const node = {
+      type: NodeType.Text,
+      content: text,
+      tags,
+      created: timeStamp,
+      modified: timeStamp,
+      id, parentID,
+      index: this.getNextIndex()
+    } as TextNode;
     this.addNode(node);
     this.save();
     return node;
   }
 
   addImageNode(file: File, date: ZonedDateTime, parentID?: string, tags?: string[]) {
-    const dateString = date.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO);
+    const timeStamp = new TimeStamp(date.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO));
     const id = uuidv4()
 
     if (tags?.length == 0) {
       tags = undefined;
     }
 
-    const node = { type: NodeType.Image, fileID: file.id, tags, created: dateString, modified: dateString, id, parentID, index: this.getNextIndex() } as ImageNode;
+    const node = {
+      type: NodeType.Image,
+      fileID: file.id,
+      tags,
+      created: timeStamp,
+      modified: timeStamp,
+      id,
+      parentID,
+      index: this.getNextIndex()
+    } as ImageNode;
     this.addFile(file);
     this.addNode(node);
     this.save();
@@ -146,14 +164,22 @@ export default class Model {
   }
 
   addDirectoryNode(name: string, date: ZonedDateTime, parentID?: string, tags?: string[]) {
-    const dateString = date.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO);
+    const timeStamp = new TimeStamp(date.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO));
     const id = uuidv4()
 
     if (tags?.length == 0) {
       tags = undefined;
     }
 
-    const node = { type: NodeType.Directory, name: name, tags, created: dateString, modified: dateString, id, parentID, index: this.getNextIndex() } as DirectoryNode;
+    const node = {
+      type: NodeType.Directory,
+      name: name,
+      tags,
+      created: timeStamp,
+      modified: timeStamp,
+      id, parentID,
+      index: this.getNextIndex()
+    } as DirectoryNode;
     this.addNode(node);
     return node;
   }
@@ -164,20 +190,28 @@ export default class Model {
     contentTitle?: string,
     contentDescription?: string,
     contentImageFileID?: string,
-    contentModified?: string,
-    contentAccessed: string
+    contentModified?: TimeStamp,
+    contentAccessed: TimeStamp
   },
     date: ZonedDateTime,
     parentID?: string,
     tags?: string[]) {
-    const dateString = date.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO);
+    const timeStamp = new TimeStamp(date.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO));
     const id = uuidv4();
 
     if (tags?.length == 0) {
       tags = undefined;
     }
 
-    const node = { type: NodeType.Anchor, ...anchor, created: dateString, modified: dateString, id, parentID, index: this.getNextIndex() } as AnchorNode;
+    const node = {
+      type: NodeType.Anchor,
+      ...anchor,
+      created: timeStamp,
+      modified: timeStamp,
+      id,
+      parentID,
+      index: this.getNextIndex()
+    } as AnchorNode;
     this.addNode(node);
     this.save();
     return node;
@@ -369,7 +403,13 @@ export default class Model {
   async loadLibrary() {
     const c = await bridge.readLibrary();
 
-    const data = JSON.parse(c) as Library;
+    const data = JSON.parse(c, (key, value) => {
+      if (key == 'created' || key == 'modified' || key == 'accessed' || key == 'contentModified' || key == 'contentAccessed') {
+        return new TimeStamp(value);
+      }
+
+      return value;
+    }) as Library;
 
     this.nodes.set(data.nodes ?? []);
     this.files.set(data.files ?? []);

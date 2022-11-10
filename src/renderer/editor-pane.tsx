@@ -8,6 +8,7 @@ import Model, { AnchorNode, DateView, DirectoryNode, DirectoryView, File, ImageN
 import EditorBar from './editor-bar';
 import Image from './image';
 import { DateTimeFormatter, ZonedDateTime } from '@js-joda/core';
+import TimeStamp from './timestamp';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -91,8 +92,8 @@ export default function EditorPane() {
             id,
             name: basename,
             type: mimeType,
-            accessed: accessed.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO),
-            modified: modified.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO)
+            accessed: new TimeStamp(accessed),
+            modified: new TimeStamp(modified)
           } as File;
           model.addImageNode(image, accessed);
         }
@@ -157,8 +158,8 @@ export default function EditorPane() {
           id: imageFileID,
           type: image.type,
           url: meta.imageURL,
-          modified: image.modified,
-          accessed: accessed.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO)
+          modified: image.modified != undefined ? new TimeStamp(image.modified) : undefined,
+          accessed: new TimeStamp(accessed)
         } as File;
         model.addFile(imageFile);
       }
@@ -169,8 +170,8 @@ export default function EditorPane() {
         contentTitle: meta.title,
         contentDescription: meta.description,
         contentImageFileID: imageFileID,
-        contentModified: meta.modified,
-        contentAccessed: accessed.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO)
+        contentModified: meta.modified != undefined ? new TimeStamp(meta.modified) : undefined,
+        contentAccessed: new TimeStamp(accessed)
       }, accessed, parentID, tagIDs);
     } else {
       model.addTextNode(content, await now(), parentID, tagIDs);
@@ -195,7 +196,7 @@ export default function EditorPane() {
     }
 
     if (view.type == 'date') {
-      filtered = filtered.filter(n => ZonedDateTime.parse(n.created).format(DateTimeFormatter.ISO_LOCAL_DATE) == (view as DateView).date);
+      filtered = filtered.filter(n => n.created.asZonedDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE) == (view as DateView).date);
     }
 
     return filtered;
@@ -338,7 +339,7 @@ export default function EditorPane() {
 
                 return <tr key={n.id}>
                   {lineNumberVisibility ? <td className='index'>{n.index + 1}</td> : null}
-                  {dateVisibility ? <td className='date'>{n.created}</td> : null}
+                  {dateVisibility ? <td className='date'>{n.created.asString()}</td> : null}
                   <td>
                     {content}
                   </td>
