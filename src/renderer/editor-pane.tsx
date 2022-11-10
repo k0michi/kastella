@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime';
-import { dateToString, Formatter, isHTTPURL, now, nsToZonedDateTime } from './utils';
+import { isHTTPURL } from './utils';
 import { useModel, useObservable } from 'kyoka';
-import produce from 'immer';
 import Model, { AnchorNode, DateView, DirectoryNode, DirectoryView, File, ImageNode, NodeType, TagView, TextNode } from './model';
 import EditorBar from './editor-bar';
 import Image from './image';
@@ -83,7 +82,7 @@ export default function EditorPane() {
         const mimeType = mime.getType(filePath);
 
         if (mimeType == 'image/png' || mimeType == 'image/jpeg') {
-          const accessed = await now();
+          const accessed = TimeStamp.fromNs(await bridge.now());
           const modified = TimeStamp.fromNs(await bridge.getMTime(filePath));
           const id = uuidv4();
           await bridge.copyFile(id, filePath);
@@ -92,7 +91,7 @@ export default function EditorPane() {
             id,
             name: basename,
             type: mimeType,
-            accessed: new TimeStamp(accessed),
+            accessed,
             modified
           } as File;
           model.addImageNode(image, accessed);
@@ -146,7 +145,7 @@ export default function EditorPane() {
     setInput('');
 
     if (!content.includes(' ') && isHTTPURL(content)) {
-      const accessed = await now();
+      const accessed = TimeStamp.fromNs(await bridge.now());
       const meta = await bridge.fetchMeta(content);
       let imageFileID: string | undefined;
 
@@ -159,7 +158,7 @@ export default function EditorPane() {
           type: image.type,
           url: meta.imageURL,
           modified: image.modified != undefined ? new TimeStamp(image.modified) : undefined,
-          accessed: new TimeStamp(accessed)
+          accessed
         } as File;
         model.addFile(imageFile);
       }
@@ -171,10 +170,10 @@ export default function EditorPane() {
         contentDescription: meta.description,
         contentImageFileID: imageFileID,
         contentModified: meta.modified != undefined ? new TimeStamp(meta.modified) : undefined,
-        contentAccessed: new TimeStamp(accessed)
+        contentAccessed: accessed
       }, accessed, parentID, tagIDs);
     } else {
-      model.addTextNode(content, await now(), parentID, tagIDs);
+      model.addTextNode(content, TimeStamp.fromNs(await bridge.now()), parentID, tagIDs);
     }
   }
 

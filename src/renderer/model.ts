@@ -1,9 +1,6 @@
 import { Observable } from "kyoka";
 import produce from 'immer';
 import { v4 as uuidv4 } from 'uuid';
-import { now } from "./utils";
-import { ZonedDateTime, DateTimeFormatter } from '@js-joda/core';
-import { Formatter } from './utils'
 import TimeStamp from "./timestamp";
 
 const LIBRARY_VERSION = 3;
@@ -117,8 +114,7 @@ export default class Model {
     this.nodes.set(newNodes);
   }
 
-  addTextNode(text: string, date: ZonedDateTime, parentID?: string, tags?: string[]) {
-    const timeStamp = new TimeStamp(date.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO));
+  addTextNode(text: string, timeStamp: TimeStamp, parentID?: string, tags?: string[]) {
     const id = uuidv4();
 
     if (tags?.length == 0) {
@@ -139,8 +135,7 @@ export default class Model {
     return node;
   }
 
-  addImageNode(file: File, date: ZonedDateTime, parentID?: string, tags?: string[]) {
-    const timeStamp = new TimeStamp(date.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO));
+  addImageNode(file: File, timeStamp: TimeStamp, parentID?: string, tags?: string[]) {
     const id = uuidv4()
 
     if (tags?.length == 0) {
@@ -163,8 +158,7 @@ export default class Model {
     return node;
   }
 
-  addDirectoryNode(name: string, date: ZonedDateTime, parentID?: string, tags?: string[]) {
-    const timeStamp = new TimeStamp(date.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO));
+  addDirectoryNode(name: string, timeStamp: TimeStamp, parentID?: string, tags?: string[]) {
     const id = uuidv4()
 
     if (tags?.length == 0) {
@@ -193,10 +187,9 @@ export default class Model {
     contentModified?: TimeStamp,
     contentAccessed: TimeStamp
   },
-    date: ZonedDateTime,
+    timeStamp: TimeStamp,
     parentID?: string,
     tags?: string[]) {
-    const timeStamp = new TimeStamp(date.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO));
     const id = uuidv4();
 
     if (tags?.length == 0) {
@@ -364,7 +357,7 @@ export default class Model {
       const found = this.findDirectory(parentID, dir);
 
       if (found == null) {
-        parentID = this.addDirectoryNode(dir, await now(), parentID).id;
+        parentID = this.addDirectoryNode(dir, TimeStamp.fromNs(await bridge.now()), parentID).id;
       } else {
         parentID = found.id;
       }
