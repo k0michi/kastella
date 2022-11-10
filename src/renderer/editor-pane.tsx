@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime';
-import { dateToString, isHTTPURL, now, nsToZonedDateTime } from './utils';
+import { dateToString, Formatter, isHTTPURL, now, nsToZonedDateTime } from './utils';
 import { useModel, useObservable } from 'kyoka';
 import produce from 'immer';
 import Model, { AnchorNode, DateView, DirectoryNode, DirectoryView, File, ImageNode, NodeType, TagView, TextNode } from './model';
 import EditorBar from './editor-bar';
 import Image from './image';
-import { DateTimeFormatter } from '@js-joda/core';
+import { DateTimeFormatter, ZonedDateTime } from '@js-joda/core';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -87,7 +87,13 @@ export default function EditorPane() {
           const id = uuidv4();
           await bridge.copyFile(id, filePath);
           const basename = await bridge.basename(filePath);
-          const image = { id, name: basename, type: mimeType, accessed, modified } as File;
+          const image = {
+            id,
+            name: basename,
+            type: mimeType,
+            accessed: accessed.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO),
+            modified: modified.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO)
+          } as File;
           model.addImageNode(image, accessed);
         }
       }
@@ -152,7 +158,7 @@ export default function EditorPane() {
           type: image.type,
           url: meta.imageURL,
           modified: image.modified,
-          accessed
+          accessed: accessed.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO)
         } as File;
         model.addFile(imageFile);
       }
@@ -163,7 +169,8 @@ export default function EditorPane() {
         contentTitle: meta.title,
         contentDescription: meta.description,
         contentImageFileID: imageFileID,
-        contentModified: meta.modified
+        contentModified: meta.modified,
+        contentAccessed: accessed.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO)
       }, accessed, parentID, tagIDs);
     } else {
       model.addTextNode(content, await now(), parentID, tagIDs);
@@ -188,7 +195,7 @@ export default function EditorPane() {
     }
 
     if (view.type == 'date') {
-      filtered = filtered.filter(n => n.created.format(DateTimeFormatter.ISO_LOCAL_DATE) == (view as DateView).date);
+      filtered = filtered.filter(n => ZonedDateTime.parse(n.created).format(DateTimeFormatter.ISO_LOCAL_DATE) == (view as DateView).date);
     }
 
     return filtered;
@@ -331,7 +338,7 @@ export default function EditorPane() {
 
                 return <tr key={n.id}>
                   {lineNumberVisibility ? <td className='index'>{n.index + 1}</td> : null}
-                  {dateVisibility ? <td className='date'>{n.created.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)}</td> : null}
+                  {dateVisibility ? <td className='date'>{n.created}</td> : null}
                   <td>
                     {content}
                   </td>

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useModel, useObservable } from 'kyoka';
 import { formatISO } from 'date-fns';
 import Model, { DateView, DirectoryNode, DirectoryView, Node, NodeType, TagView } from './model';
-import { DateTimeFormatter } from '@js-joda/core';
+import { DateTimeFormatter, ZonedDateTime } from '@js-joda/core';
 
 interface TreeNode {
   name?: string;
@@ -25,7 +25,7 @@ export default function ExplorerPane() {
     const dateSet = new Set<string>();
 
     for (const note of nodes) {
-      const dateString = note.created.format(DateTimeFormatter.ISO_LOCAL_DATE);
+      const dateString = ZonedDateTime.parse(note.created).format(DateTimeFormatter.ISO_LOCAL_DATE);
       dateSet.add(dateString);
     }
 
