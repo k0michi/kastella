@@ -1,4 +1,4 @@
-import { ZonedDateTime } from "@js-joda/core";
+import { Instant, ZonedDateTime, ZoneId } from "@js-joda/core";
 import { Formatter } from "./utils";
 
 export default class TimeStamp {
@@ -42,5 +42,9 @@ export default class TimeStamp {
 
   toJSON() {
     return this._timeStamp;
+  }
+
+  static fromNs(ns: bigint) {
+    return new TimeStamp(ZonedDateTime.ofInstant(Instant.ofEpochMicro(Number(ns) / 1000), ZoneId.SYSTEM));
   }
 }
