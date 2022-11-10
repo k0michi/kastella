@@ -3,8 +3,15 @@ import produce from 'immer';
 import { v4 as uuidv4 } from 'uuid';
 import TimeStamp from "./timestamp";
 import { round } from "./utils";
+import { validateLibrary } from "./validate";
 
 const LIBRARY_VERSION = 3;
+
+export interface Library {
+  nodes: Node[];
+  files: File[];
+  tags: Tag[];
+}
 
 export enum NodeType {
   Text = 'text',
@@ -31,7 +38,7 @@ export interface TextNode extends Node {
 export interface ImageNode extends Node {
   type: NodeType.Image;
   fileID: string;
-  description: string;
+  description?: string;
 }
 
 export interface AnchorNode extends Node {
@@ -62,12 +69,6 @@ export interface File {
 export interface Tag {
   id: string;
   name: string;
-}
-
-export interface Library {
-  nodes: Node[];
-  files: File[];
-  tags: Tag[];
 }
 
 export interface View {
@@ -410,6 +411,8 @@ export default class Model {
 
       return value;
     }) as Library;
+
+    validateLibrary(data);
 
     this.nodes.set(data.nodes ?? []);
     this.files.set(data.files ?? []);
