@@ -7,6 +7,8 @@ import { now } from '@k0michi/now';
 import { fetchFile, fetchMeta } from './fetch.js';
 import * as mime from 'mime';
 
+let libraryPath = path.join(app.getPath('userData'), 'library');
+
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -20,6 +22,8 @@ function createWindow() {
   if (app.isPackaged) {
     mainWindow.loadFile(path.join(__dirname, '../../renderer/index.html'))
   } else {
+    // For development
+    libraryPath = './library';
     const url = `http://localhost:5173/`;
     mainWindow.loadURL(url)
   }
@@ -50,8 +54,6 @@ app.on('window-all-closed', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
-
-const libraryPath = path.join(app.getPath('userData'), 'library');
 
 ipcMain.handle('read-library', async e => {
   const filePath = path.join(libraryPath, 'data.json');
