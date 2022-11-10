@@ -107,6 +107,7 @@ export default class Model {
   search = new Observable<string>('');
   savePromise: Promise<void> | null = null;
   status = new Observable<Status | undefined>(undefined);
+  intersecting = new Observable<Set<string>>(new Set());
 
   constructor() {
   }
@@ -396,6 +397,18 @@ export default class Model {
 
   setDateVisibility(visibility: boolean) {
     this.dateVisibility.set(visibility);
+  }
+
+  addIntersecting(id: string) {
+    const newVisibleNodes = new Set(this.intersecting.get());
+    newVisibleNodes.add(id);
+    this.intersecting.set(newVisibleNodes);
+  }
+
+  removeIntersecting(id: string) {
+    const newVisibleNodes = new Set(this.intersecting.get());
+    newVisibleNodes.delete(id);
+    this.intersecting.set(newVisibleNodes);
   }
 
 

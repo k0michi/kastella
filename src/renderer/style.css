@@ -142,6 +142,10 @@ body,
   font-style: italic;
 }
 
+#editor-area #notes tr.invisible {
+  height: 16px;
+}
+
 #editor-area #notes .note {
   padding-left: 8px;
   position: relative;

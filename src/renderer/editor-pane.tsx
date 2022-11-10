@@ -24,13 +24,13 @@ export default function EditorPane() {
   const search = useObservable(model.search);
   const lineNumberVisibility = useObservable(model.lineNumberVisibility);
   const dateVisibility = useObservable(model.dateVisibility);
+  const intersecting = useObservable(model.intersecting);
 
   React.useEffect(() => {
     const onScroll = () => {
-      // FIXME
-      const clientHeight = document.documentElement.clientHeight;
-      const scrollHeight = document.documentElement.scrollHeight;
-      const scrollTop = document.documentElement.scrollTop;
+      const clientHeight = editorRef.current!.clientHeight;
+      const scrollHeight = editorRef.current!.scrollHeight;
+      const scrollTop = editorRef.current!.scrollTop;
       const atBottom = scrollHeight - clientHeight - scrollTop <= 0;
       setAtBottom(atBottom);
     }
@@ -273,6 +273,45 @@ export default function EditorPane() {
     }
   }, [selected]);
 
+  React.useEffect(() => {
+    const iObserver = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          model.addIntersecting((e.target as HTMLElement).dataset['id']!);
+        } else {
+          model.removeIntersecting((e.target as HTMLElement).dataset['id']!);
+        }
+      }
+    }, {
+      root: editorRef.current,
+      rootMargin: '1024px 0px 1024px 0px'
+    });
+
+    const observerOptions = {
+      childList: true,
+      subtree: true
+    }
+
+    const observer = new MutationObserver((mutationList) => {
+      for (const m of mutationList) {
+        for (const n of m.addedNodes) {
+          if (n.nodeType == Node.ELEMENT_NODE && (n as HTMLElement).dataset['id'] != null) {
+            iObserver.observe(n as Element);
+          }
+        }
+
+        for (const n of m.removedNodes) {
+          if (n.nodeType == Node.ELEMENT_NODE && (n as HTMLElement).dataset['id'] != null) {
+            iObserver.unobserve(n as Element);
+            model.removeIntersecting((n as HTMLElement).dataset['id']!);
+          }
+        }
+      }
+    });
+
+    observer.observe(editorRef.current!, observerOptions);
+  }, []);
+
   return <div id='editor-pane'>
     <EditorBar />
     <div id="editor-area" ref={editorRef}>
@@ -289,54 +328,57 @@ export default function EditorPane() {
                 }
 
                 const tagNames = n.tags?.map(t => '#' + model.getTag(t)?.name);
+                const visible = intersecting.has(n.id);
                 let content;
 
-                if (n.type == undefined || n.type == NodeType.Text) {
-                  const textNode = n as TextNode;
+                if (visible) {
+                  if (n.type == undefined || n.type == NodeType.Text) {
+                    const textNode = n as TextNode;
 
-                  content = <div key={id} className={className} data-id={id}>
-                    <span className='content text-node'>{textNode.content as string}</span>{' '}
-                    <span className='tags'>{tagNames?.join(' ')}</span>{' '}
-                  </div>;
-                } else if (n.type == NodeType.Image) {
-                  const imageNode = n as ImageNode;
-                  const file = model.getFile(imageNode.fileID);
+                    content = <div className={className}>
+                      <span className='content text-node'>{textNode.content as string}</span>{' '}
+                      <span className='tags'>{tagNames?.join(' ')}</span>{' '}
+                    </div>;
+                  } else if (n.type == NodeType.Image) {
+                    const imageNode = n as ImageNode;
+                    const file = model.getFile(imageNode.fileID);
 
-                  if (file != null) {
-                    content = <div key={id} className={className} data-id={id}>
-                      <div className='content image-node'>
-                        <Image file={file} />
+                    if (file != null) {
+                      content = <div className={className}>
+                        <div className='content image-node'>
+                          <Image file={file} />
+                        </div>
+                        <span className='tags'>{tagNames?.join(' ')}</span>
+                      </div>;
+                    } else {
+                      content = <div className='error'>{`Failed to read ${imageNode.fileID}`}</div>;
+                    }
+                  } else if (n.type == NodeType.Directory) {
+                    const dNode = n as DirectoryNode;
+
+                    content = <div className={className}>
+                      <span className='content directory-node'>[dir] {dNode.name as string}</span>{' '}
+                      <span className='tags'>{tagNames?.join(' ')}</span>
+                    </div>;
+                  } else if (n.type == NodeType.Anchor) {
+                    const anchor = n as AnchorNode;
+                    const imageFile = anchor.contentImageFileID != null ? model.getFile(anchor.contentImageFileID) : null;
+
+                    content = <div className={className}>
+                      <div className='content anchor-node'>
+                        {imageFile != null ? <div className='image'><Image file={imageFile}></Image></div> : null}
+                        <div className='details'>
+                          <div className='url'>{anchor.contentURL}</div>
+                          <div className='title'>{anchor.contentTitle}</div>
+                          <div className='description'>{anchor.contentDescription}</div>
+                        </div>
                       </div>
                       <span className='tags'>{tagNames?.join(' ')}</span>
                     </div>;
-                  } else {
-                    content = <div className='error'>{`Failed to read ${imageNode.fileID}`}</div>;
                   }
-                } else if (n.type == NodeType.Directory) {
-                  const dNode = n as DirectoryNode;
-
-                  content = <div key={id} className={className} data-id={id}>
-                    <span className='content directory-node'>[dir] {dNode.name as string}</span>{' '}
-                    <span className='tags'>{tagNames?.join(' ')}</span>
-                  </div>;
-                } else if (n.type == NodeType.Anchor) {
-                  const anchor = n as AnchorNode;
-                  const imageFile = anchor.contentImageFileID != null ? model.getFile(anchor.contentImageFileID) : null;
-
-                  content = <div key={id} className={className} data-id={id}>
-                    <div className='content anchor-node'>
-                      {imageFile != null ? <div className='image'><Image file={imageFile}></Image></div> : null}
-                      <div className='details'>
-                        <div className='url'>{anchor.contentURL}</div>
-                        <div className='title'>{anchor.contentTitle}</div>
-                        <div className='description'>{anchor.contentDescription}</div>
-                      </div>
-                    </div>
-                    <span className='tags'>{tagNames?.join(' ')}</span>
-                  </div>;
                 }
 
-                return <tr key={n.id}>
+                return <tr key={n.id} data-id={id} className={visible ? 'visible' : 'invisible'}>
                   {lineNumberVisibility ? <td className='index'>{n.index + 1}</td> : null}
                   {dateVisibility ? <td className='date'>{n.created.asString()}</td> : null}
                   <td>
