@@ -1,6 +1,7 @@
 import { Instant, ZonedDateTime, ZoneId } from "@js-joda/core";
 import { Formatter } from "./utils";
 
+// Immutable class to store date string
 export default class TimeStamp {
   private _timeStamp: string;
 

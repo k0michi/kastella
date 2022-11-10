@@ -84,7 +84,7 @@ export default function EditorPane() {
 
         if (mimeType == 'image/png' || mimeType == 'image/jpeg') {
           const accessed = await now();
-          const modified = nsToZonedDateTime(await bridge.getMTime(filePath));
+          const modified = TimeStamp.fromNs(await bridge.getMTime(filePath));
           const id = uuidv4();
           await bridge.copyFile(id, filePath);
           const basename = await bridge.basename(filePath);
@@ -93,7 +93,7 @@ export default function EditorPane() {
             name: basename,
             type: mimeType,
             accessed: new TimeStamp(accessed),
-            modified: new TimeStamp(modified)
+            modified
           } as File;
           model.addImageNode(image, accessed);
         }
