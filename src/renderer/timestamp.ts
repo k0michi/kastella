@@ -1,12 +1,15 @@
 import { Instant, ZonedDateTime, ZoneId } from "@js-joda/core";
 import { Formatter } from "./utils";
 
-// Immutable class to store date string
+// Immutable class to store a date string
 export default class TimeStamp {
   private _timeStamp: string;
 
+  // Store date.toISOString()
   constructor(date: Date);
+  // Store zonedDateTime.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO)
   constructor(zonedDateTime: ZonedDateTime);
+  // Store dateString if it is a valid date string
   constructor(dateString: string);
   constructor(...args: any[]) {
     if (args.length == 1 && args[0] instanceof Date) {
@@ -14,7 +17,6 @@ export default class TimeStamp {
       this._timeStamp = date.toISOString();
     } else if (args.length == 1 && args[0] instanceof ZonedDateTime) {
       const zonedDateTime = args[0] as ZonedDateTime;
-      // ZonedDateTime is stringified using ISO_OFFSET_DATE_TIME_WITH_NANO
       this._timeStamp = zonedDateTime.format(Formatter.ISO_OFFSET_DATE_TIME_WITH_NANO);
     } else if (args.length == 1 && typeof args[0] == 'string') {
       const string = args[0];
@@ -45,6 +47,7 @@ export default class TimeStamp {
     return this._timeStamp;
   }
 
+  // Construct from nanoseconds from the UNIX Epoch
   static fromNs(ns: bigint) {
     return new TimeStamp(ZonedDateTime.ofInstant(Instant.ofEpochMicro(Number(ns) / 1000), ZoneId.SYSTEM));
   }
