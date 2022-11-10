@@ -2,6 +2,7 @@ import { Observable } from "kyoka";
 import produce from 'immer';
 import { v4 as uuidv4 } from 'uuid';
 import TimeStamp from "./timestamp";
+import { round } from "./utils";
 
 const LIBRARY_VERSION = 3;
 
@@ -88,6 +89,11 @@ export interface DateView extends View {
   date: string;
 }
 
+export interface Status {
+  id: string;
+  message: string;
+}
+
 export default class Model {
   nodes = new Observable<Node[]>([]);
   files = new Observable<File[]>([]);
@@ -99,6 +105,7 @@ export default class Model {
   dateVisibility = new Observable<boolean>(false);
   search = new Observable<string>('');
   savePromise: Promise<void> | null = null;
+  status = new Observable<Status | undefined>(undefined);
 
   constructor() {
   }
@@ -411,11 +418,12 @@ export default class Model {
 
   async save() {
     if (this.savePromise != null) {
-      console.log('saving')
       await this.savePromise;
     }
 
     this.saving.set(true);
+    this.setStatus('Saving...');
+    const start = performance.now();
 
     this.savePromise = bridge.writeLibrary(JSON.stringify({
       nodes: this.nodes.get(),
@@ -426,5 +434,28 @@ export default class Model {
       this.savePromise = null;
       this.saving.set(false);
     }).bind(this));
+
+    const end = performance.now();
+    const elapsed = end - start;
+    const statusID = this.setStatus(`Saved! (${round(elapsed, 2)} ms)`);
+
+    setTimeout((() => {
+      if (this.status.get()?.id == statusID) {
+        this.clearStatus();
+      }
+    }).bind(this), 5 * 1000);
+  }
+
+
+  // Status
+
+  setStatus(message: string) {
+    const id = uuidv4();
+    this.status.set({ id, message });
+    return id;
+  }
+
+  clearStatus() {
+    this.status.set(undefined)
   }
 }

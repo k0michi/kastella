@@ -4,9 +4,9 @@ import Model from './model';
 
 export default function StatusBar() {
   const model = useModel<Model>();
-  const saving = useObservable(model.saving);
+  const status = useObservable(model.status);
 
   return (
-    <div id="status-bar">{saving ? 'Saving...' : ''}</div>
+    <div id="status-bar">{status?.message}</div>
   );
 }

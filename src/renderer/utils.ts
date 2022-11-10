@@ -17,6 +17,10 @@ export function isHTTPURL(string: string) {
   return url.protocol == 'http:' || url.protocol == 'https:';
 }
 
+export function round(value: number, digit: number) {
+  return Math.round(value * 10 ** digit) / 10 ** digit;
+}
+
 // https://github.com/js-joda/js-joda/blob/main/packages/core/src/format/DateTimeFormatter.js
 export namespace Formatter {
   export const ISO_LOCAL_TIME_WITH_NANO = new DateTimeFormatterBuilder()
@@ -30,15 +34,15 @@ export namespace Formatter {
     .appendFraction(ChronoField.NANO_OF_SECOND, 9, 9, true)
     .toFormatter(ResolverStyle.STRICT);
 
-    export const ISO_LOCAL_DATE_TIME_WITH_NANO = new DateTimeFormatterBuilder()
+  export const ISO_LOCAL_DATE_TIME_WITH_NANO = new DateTimeFormatterBuilder()
     .parseCaseInsensitive()
     .append(DateTimeFormatter.ISO_LOCAL_DATE)
     .appendLiteral('T')
     .append(ISO_LOCAL_TIME_WITH_NANO)
     .toFormatter(ResolverStyle.STRICT);
 
-    // This format emits sub-seconds with 9 digits
-    export const ISO_OFFSET_DATE_TIME_WITH_NANO = new DateTimeFormatterBuilder()
+  // This format emits sub-seconds with 9 digits
+  export const ISO_OFFSET_DATE_TIME_WITH_NANO = new DateTimeFormatterBuilder()
     .parseCaseInsensitive()
     .append(ISO_LOCAL_DATE_TIME_WITH_NANO)
     .appendOffsetId()
