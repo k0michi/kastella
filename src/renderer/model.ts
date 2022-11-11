@@ -1,7 +1,7 @@
 import { Observable } from "kyoka";
 import produce from 'immer';
 import { v4 as uuidv4 } from 'uuid';
-import TimeStamp from "./timestamp";
+import Timestamp from "./timestamp";
 import { round } from "./utils";
 import { validateLibrary } from "./validate";
 
@@ -23,8 +23,8 @@ export enum NodeType {
 export interface Node {
   id: string;
   type: NodeType;
-  created: TimeStamp;
-  modified: TimeStamp;
+  created: Timestamp;
+  modified: Timestamp;
   tags?: string[];
   index: number;
   parentID?: string;
@@ -48,8 +48,8 @@ export interface AnchorNode extends Node {
   contentTitle?: string;
   contentDescription?: string;
   contentImageFileID?: string;
-  contentModified?: TimeStamp;
-  contentAccessed: TimeStamp;
+  contentModified?: Timestamp;
+  contentAccessed: Timestamp;
 }
 
 export interface DirectoryNode extends Node {
@@ -62,8 +62,8 @@ export interface File {
   type: string;
   name?: string;
   url?: string;
-  modified?: TimeStamp;
-  accessed: TimeStamp;
+  modified?: Timestamp;
+  accessed: Timestamp;
 }
 
 export interface Tag {
@@ -123,7 +123,7 @@ export default class Model {
     this.nodes.set(newNodes);
   }
 
-  addTextNode(text: string, timeStamp: TimeStamp, parentID?: string, tags?: string[]) {
+  addTextNode(text: string, timeStamp: Timestamp, parentID?: string, tags?: string[]) {
     const id = uuidv4();
 
     if (tags?.length == 0) {
@@ -144,7 +144,7 @@ export default class Model {
     return node;
   }
 
-  addImageNode(file: File, timeStamp: TimeStamp, parentID?: string, tags?: string[]) {
+  addImageNode(file: File, timeStamp: Timestamp, parentID?: string, tags?: string[]) {
     const id = uuidv4()
 
     if (tags?.length == 0) {
@@ -167,7 +167,7 @@ export default class Model {
     return node;
   }
 
-  addDirectoryNode(name: string, timeStamp: TimeStamp, parentID?: string, tags?: string[]) {
+  addDirectoryNode(name: string, timeStamp: Timestamp, parentID?: string, tags?: string[]) {
     const id = uuidv4()
 
     if (tags?.length == 0) {
@@ -193,10 +193,10 @@ export default class Model {
     contentTitle?: string,
     contentDescription?: string,
     contentImageFileID?: string,
-    contentModified?: TimeStamp,
-    contentAccessed: TimeStamp
+    contentModified?: Timestamp,
+    contentAccessed: Timestamp
   },
-    timeStamp: TimeStamp,
+    timeStamp: Timestamp,
     parentID?: string,
     tags?: string[]) {
     const id = uuidv4();
@@ -366,7 +366,7 @@ export default class Model {
       const found = this.findDirectory(parentID, dir);
 
       if (found == null) {
-        parentID = this.addDirectoryNode(dir, TimeStamp.fromNs(await bridge.now()), parentID).id;
+        parentID = this.addDirectoryNode(dir, Timestamp.fromNs(await bridge.now()), parentID).id;
       } else {
         parentID = found.id;
       }
@@ -419,7 +419,7 @@ export default class Model {
 
     const data = JSON.parse(c, (key, value) => {
       if (key == 'created' || key == 'modified' || key == 'accessed' || key == 'contentModified' || key == 'contentAccessed') {
-        return new TimeStamp(value);
+        return new Timestamp(value);
       }
 
       return value;

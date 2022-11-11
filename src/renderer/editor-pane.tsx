@@ -7,7 +7,7 @@ import Model, { AnchorNode, DateView, DirectoryNode, DirectoryView, File, ImageN
 import EditorBar from './editor-bar';
 import Image from './image';
 import { DateTimeFormatter, ZonedDateTime } from '@js-joda/core';
-import TimeStamp from './timestamp';
+import Timestamp from './timestamp';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -82,8 +82,8 @@ export default function EditorPane() {
         const mimeType = mime.getType(filePath);
 
         if (mimeType == 'image/png' || mimeType == 'image/jpeg') {
-          const accessed = TimeStamp.fromNs(await bridge.now());
-          const modified = TimeStamp.fromNs(await bridge.getMTime(filePath));
+          const accessed = Timestamp.fromNs(await bridge.now());
+          const modified = Timestamp.fromNs(await bridge.getMTime(filePath));
           const id = uuidv4();
           await bridge.copyFile(id, filePath);
           const basename = await bridge.basename(filePath);
@@ -145,7 +145,7 @@ export default function EditorPane() {
     setInput('');
 
     if (!content.includes(' ') && isHTTPURL(content)) {
-      const accessed = TimeStamp.fromNs(await bridge.now());
+      const accessed = Timestamp.fromNs(await bridge.now());
       const meta = await bridge.fetchMeta(content);
       let imageFileID: string | undefined;
 
@@ -157,7 +157,7 @@ export default function EditorPane() {
           id: imageFileID,
           type: image.type,
           url: meta.imageURL,
-          modified: image.modified != undefined ? new TimeStamp(image.modified) : undefined,
+          modified: image.modified != undefined ? new Timestamp(image.modified) : undefined,
           accessed
         } as File;
         model.addFile(imageFile);
@@ -169,11 +169,11 @@ export default function EditorPane() {
         contentTitle: meta.title,
         contentDescription: meta.description,
         contentImageFileID: imageFileID,
-        contentModified: meta.modified != undefined ? new TimeStamp(meta.modified) : undefined,
+        contentModified: meta.modified != undefined ? new Timestamp(meta.modified) : undefined,
         contentAccessed: accessed
       }, accessed, parentID, tagIDs);
     } else {
-      model.addTextNode(content, TimeStamp.fromNs(await bridge.now()), parentID, tagIDs);
+      model.addTextNode(content, Timestamp.fromNs(await bridge.now()), parentID, tagIDs);
     }
   }
 

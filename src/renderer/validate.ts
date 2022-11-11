@@ -1,5 +1,5 @@
 import { AnchorNode, DirectoryNode, File, ImageNode, Library, Node, NodeType, Tag, TextNode } from "./model";
-import TimeStamp from "./timestamp";
+import Timestamp from "./timestamp";
 
 export function validateLibrary(library: Library) {
   assert(typeof library == 'object');
@@ -26,8 +26,8 @@ function validateNode(node: Node) {
   assert(typeof node === 'object');
   assert(typeof node.id === 'string');
   assert(typeof node.type === 'string');
-  assert(node.created instanceof TimeStamp);
-  assert(node.modified instanceof TimeStamp);
+  assert(node.created instanceof Timestamp);
+  assert(node.modified instanceof Timestamp);
   assert(node.tags === undefined || Array.isArray(node.tags));
 
   if (Array.isArray(node.tags)) {
@@ -60,8 +60,8 @@ function validateNode(node: Node) {
     assert(contentTitle === undefined || typeof contentTitle === 'string');
     assert(contentDescription === undefined || typeof contentDescription === 'string');
     assert(contentImageFileID === undefined || typeof contentImageFileID === 'string');
-    assert(contentModified === undefined || contentModified instanceof TimeStamp);
-    assert(contentAccessed instanceof TimeStamp);
+    assert(contentModified === undefined || contentModified instanceof Timestamp);
+    assert(contentAccessed instanceof Timestamp);
   } else if (node.type === NodeType.Directory) {
     const { name } = node as DirectoryNode;
     assert(typeof name === 'string');
@@ -74,8 +74,8 @@ function validateFile(file: File) {
   assert(typeof file.type === 'string');
   assert(file.name === undefined || typeof file.name === 'string');
   assert(file.url === undefined || typeof file.url === 'string');
-  assert(file.modified === undefined || file.modified instanceof TimeStamp);
-  assert(file.accessed instanceof TimeStamp);
+  assert(file.modified === undefined || file.modified instanceof Timestamp);
+  assert(file.accessed instanceof Timestamp);
 }
 
 function validateTag(tag: Tag) {

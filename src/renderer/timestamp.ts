@@ -2,7 +2,7 @@ import { Instant, ZonedDateTime, ZoneId } from "@js-joda/core";
 import { Formatter } from "./utils";
 
 // Immutable class to store a date string
-export default class TimeStamp {
+export default class Timestamp {
   private _timeStamp: string;
 
   // Store date.toISOString()
@@ -49,6 +49,6 @@ export default class TimeStamp {
 
   // Construct from nanoseconds from the UNIX Epoch
   static fromNs(ns: bigint) {
-    return new TimeStamp(ZonedDateTime.ofInstant(Instant.ofEpochMicro(Number(ns) / 1000), ZoneId.SYSTEM));
+    return new Timestamp(ZonedDateTime.ofInstant(Instant.ofEpochMicro(Number(ns) / 1000), ZoneId.SYSTEM));
   }
 }
