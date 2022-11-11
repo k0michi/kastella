@@ -71,22 +71,28 @@ export interface Tag {
   name: string;
 }
 
+export enum ViewType {
+  Directory = 'directory',
+  Tag = 'tag',
+  Date = 'date'
+}
+
 export interface View {
-  type: 'directory' | 'tag' | 'date';
+  type: ViewType;
 }
 
 export interface DirectoryView extends View {
-  type: 'directory';
+  type: ViewType.Directory;
   parentID?: string;
 }
 
 export interface TagView extends View {
-  type: 'tag';
+  type: ViewType.Tag;
   tag: string;
 }
 
 export interface DateView extends View {
-  type: 'date';
+  type: ViewType.Date;
   date: string;
 }
 
@@ -103,7 +109,7 @@ export default class Model {
   nodes = new Observable<Node[]>([]);
   files = new Observable<File[]>([]);
   tags = new Observable<Tag[]>([]);
-  view = new Observable<View>({ type: 'directory' });
+  view = new Observable<View>({ type: ViewType.Directory });
   saving = new Observable<boolean>(false);
   writeOnly = new Observable<boolean>(true);
   lineNumberVisibility = new Observable<boolean>(true);

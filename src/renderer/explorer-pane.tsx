@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useModel, useObservable } from 'kyoka';
 import { formatISO } from 'date-fns';
-import Model, { DateView, DirectoryNode, DirectoryView, Node, NodeType, ReservedID, TagView } from './model';
+import Model, { DateView, DirectoryNode, DirectoryView, Node, NodeType, ReservedID, TagView, ViewType } from './model';
 import { DateTimeFormatter, ZonedDateTime } from '@js-joda/core';
 
 interface TreeNode {
@@ -71,8 +71,8 @@ export default function ExplorerPane() {
           <div className="container">
             {directories.map(d => <div
               key={d.id}
-              className={[view.type == 'directory' && (view as DirectoryView).parentID == d.id ? 'selected' : '', 'item'].join(' ')}
-              onClick={e => model.changeView({ 'type': 'directory', parentID: d.id } as DirectoryView)}>
+              className={[view.type == ViewType.Directory && (view as DirectoryView).parentID == d.id ? 'selected' : '', 'item'].join(' ')}
+              onClick={e => model.changeView({ 'type': ViewType.Directory, parentID: d.id } as DirectoryView)}>
               <div style={{ paddingLeft: `${d.depth * 10}px` }}>
                 {d.name ?? '/'}
               </div>

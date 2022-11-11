@@ -1,6 +1,6 @@
 import { useModel, useObservable } from 'kyoka';
 import * as React from 'react';
-import Model, { DateView, DirectoryView, TagView, View } from './model';
+import Model, { DateView, DirectoryView, TagView, View, ViewType } from './model';
 
 export default function EditorBar() {
   const model = useModel<Model>();
@@ -13,11 +13,11 @@ export default function EditorBar() {
   return <div id='editor-bar'>
     <div className='editor-bar-section'>
       {
-        view.type == 'directory' ?
+        view.type == ViewType.Directory ?
           `${model.getPath((view as DirectoryView).parentID!)}`
-          : view.type == 'tag' ?
+          : view.type == ViewType.Tag ?
             `#${model.getTag((view as TagView).tag)?.name}`
-            : view.type == 'date' ?
+            : view.type == ViewType.Date ?
               `@${(view as DateView).date}`
               : null
       }

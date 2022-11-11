@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime';
 import { isHTTPURL } from './utils';
 import { useModel, useObservable } from 'kyoka';
-import Model, { AnchorNode, DateView, DirectoryNode, DirectoryView, File, ImageNode, NodeType, ReservedID, TagView, TextNode } from './model';
+import Model, { AnchorNode, DateView, DirectoryNode, DirectoryView, File, ImageNode, NodeType, ReservedID, TagView, TextNode, ViewType } from './model';
 import EditorBar from './editor-bar';
 import Image from './image';
 import { DateTimeFormatter, ZonedDateTime } from '@js-joda/core';
@@ -134,11 +134,11 @@ export default function EditorPane() {
     const view = model.view.get();
     let parentID = undefined;
 
-    if (view != null && view.type == 'directory') {
+    if (view != null && view.type == ViewType.Directory) {
       parentID = (view as DirectoryView).parentID;
     }
 
-    if (view != null && view.type == 'tag') {
+    if (view != null && view.type == ViewType.Tag) {
       tagIDs.push((view as TagView).tag);
     }
 
@@ -184,17 +184,17 @@ export default function EditorPane() {
       filtered = filtered.filter(n => (n.type == undefined || n.type == NodeType.Text) && ((n as TextNode).content as string).includes(search));
     }
 
-    if (view.type == 'directory') {
+    if (view.type == ViewType.Directory) {
       filtered = filtered.filter(n => n.parentID == (view as DirectoryView).parentID);
     } else {
       filtered = filtered.filter(n => n.parentID != ReservedID.Trash);
     }
 
-    if (view.type == 'tag') {
+    if (view.type == ViewType.Tag) {
       filtered = filtered.filter(n => n.tags?.includes((view as TagView).tag));
     }
 
-    if (view.type == 'date') {
+    if (view.type == ViewType.Date) {
       filtered = filtered.filter(n => n.created.asZonedDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE) == (view as DateView).date);
     }
 
@@ -229,7 +229,7 @@ export default function EditorPane() {
             inputRef.current?.focus();
           }
         } else if (e.key == 'Backspace' && selected != undefined) {
-          if (view.type == 'directory' && (view as DirectoryView).parentID == ReservedID.Trash) {
+          if (view.type == ViewType.Directory && (view as DirectoryView).parentID == ReservedID.Trash) {
             model.removeNode(selected);
           } else {
             model.setParent(selected, ReservedID.Trash);
