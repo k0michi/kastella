@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useModel, useObservable } from 'kyoka';
-import { formatISO } from 'date-fns';
 import Model, { DateView, DirectoryNode, DirectoryView, Node, NodeType, ReservedID, TagView, ViewType } from './model';
 import { DateTimeFormatter, ZonedDateTime } from '@js-joda/core';
 

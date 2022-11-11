@@ -6,7 +6,7 @@ import { useModel, useObservable } from 'kyoka';
 import Model, { AnchorNode, DateView, DirectoryNode, DirectoryView, File, ImageNode, NodeType, ReservedID, TagView, TextNode, ViewType } from './model';
 import EditorBar from './editor-bar';
 import Image from './image';
-import { DateTimeFormatter, ZonedDateTime } from '@js-joda/core';
+import { DateTimeFormatter } from '@js-joda/core';
 import Timestamp from './timestamp';
 
 export default function EditorPane() {
