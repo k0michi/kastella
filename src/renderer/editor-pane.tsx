@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime';
 import { isHTTPURL } from './utils';
 import { useModel, useObservable } from 'kyoka';
-import Model, { AnchorNode, DateView, DirectoryNode, DirectoryView, File, ImageNode, NodeType, TagView, TextNode } from './model';
+import Model, { AnchorNode, DateView, DirectoryNode, DirectoryView, File, ImageNode, NodeType, ReservedID, TagView, TextNode } from './model';
 import EditorBar from './editor-bar';
 import Image from './image';
 import { DateTimeFormatter, ZonedDateTime } from '@js-joda/core';
@@ -187,7 +187,7 @@ export default function EditorPane() {
     if (view.type == 'directory') {
       filtered = filtered.filter(n => n.parentID == (view as DirectoryView).parentID);
     } else {
-      filtered = filtered.filter(n => n.parentID != 'trash');
+      filtered = filtered.filter(n => n.parentID != ReservedID.Trash);
     }
 
     if (view.type == 'tag') {
@@ -229,10 +229,10 @@ export default function EditorPane() {
             inputRef.current?.focus();
           }
         } else if (e.key == 'Backspace' && selected != undefined) {
-          if (view.type == 'directory' && (view as DirectoryView).parentID == 'trash') {
+          if (view.type == 'directory' && (view as DirectoryView).parentID == ReservedID.Trash) {
             model.removeNode(selected);
           } else {
-            model.setParent(selected, 'trash');
+            model.setParent(selected, ReservedID.Trash);
           }
 
           setSelected(undefined);

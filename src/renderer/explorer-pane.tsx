@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useModel, useObservable } from 'kyoka';
 import { formatISO } from 'date-fns';
-import Model, { DateView, DirectoryNode, DirectoryView, Node, NodeType, TagView } from './model';
+import Model, { DateView, DirectoryNode, DirectoryView, Node, NodeType, ReservedID, TagView } from './model';
 import { DateTimeFormatter, ZonedDateTime } from '@js-joda/core';
 
 interface TreeNode {
@@ -58,7 +58,7 @@ export default function ExplorerPane() {
   }
 
   const directories = mapToArray(createTree(undefined)).flat(Infinity) as TreeNode[];
-  directories.push({ name: 'Trash', id: 'trash', depth: 0, children: [] });
+  directories.push({ name: 'Trash', id: ReservedID.Trash, depth: 0, children: [] });
 
   return (
     <>

@@ -95,6 +95,10 @@ export interface Status {
   message: string;
 }
 
+export enum ReservedID {
+  Trash = 'trash'
+}
+
 export default class Model {
   nodes = new Observable<Node[]>([]);
   files = new Observable<File[]>([]);
@@ -275,7 +279,7 @@ export default class Model {
     let dirs = [];
     let dirID: string | undefined = directoryID;
 
-    if (directoryID == 'trash') {
+    if (directoryID == ReservedID.Trash) {
       return 'Trash';
     }
 
