@@ -269,7 +269,12 @@ export default function EditorPane() {
             model.setParent(selected, ReservedID.Trash);
           }
 
-          setSelected(undefined);
+          const foundIndex = filtered.findIndex(n => n.id == selected);
+          const nextNode = filtered[foundIndex + 1];
+
+          if (nextNode != null && foundIndex != -1) {
+            setSelected(nextNode.id);
+          }
         }
       }
     };
