@@ -8,6 +8,7 @@ import { fetchFile, fetchMeta } from './fetch.js';
 import * as mime from 'mime';
 
 let libraryPath = path.join(app.getPath('userData'), 'library');
+const devURL = `http://localhost:5173/`;
 
 function createWindow() {
   // Create the browser window.
@@ -24,13 +25,14 @@ function createWindow() {
   } else {
     // For development
     libraryPath = './library';
-    const url = `http://localhost:5173/`;
-    mainWindow.loadURL(url)
+    mainWindow.loadURL(devURL)
   }
 
   function handleNavigate(e: Event, url: string) {
-    e.preventDefault();
-    shell.openExternal(url);
+    if (url != devURL) {
+      e.preventDefault();
+      shell.openExternal(url);
+    }
   }
 
   mainWindow.webContents.on('will-navigate', handleNavigate);
