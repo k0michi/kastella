@@ -178,12 +178,18 @@ body,
 
 #editor-area .image-node img {
   width: 256px;
+  display: block;
 }
 
 #editor-area .anchor-node {
   display: flex;
   flex-direction: row;
   gap: 12px;
+}
+
+#editor-area .anchor-node .image {
+  display: flex;
+  align-items: center;
 }
 
 #editor-area .anchor-node .url {
@@ -196,6 +202,7 @@ body,
 
 #editor-area .anchor-node img {
   width: 192px;
+  display: block;
 }
 
 
