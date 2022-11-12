@@ -245,8 +245,16 @@ export default class Model {
       }
     }
 
-    const newNodes = produce(this.nodes.get(), n => {
-      n.splice(n.findIndex(n => n.id == id), 1);
+    const index = found.index;
+
+    const newNodes = produce(this.nodes.get(), nodes => {
+      nodes.splice(nodes.findIndex(n => n.id == id), 1);
+
+      for (const n of nodes) {
+        if (n.index > index) {
+          n.index--;
+        }
+      }
     });
 
     this.nodes.set(newNodes);
