@@ -49,6 +49,8 @@ export default class Timestamp {
 
   // Construct from nanoseconds from the UNIX Epoch
   static fromNs(ns: bigint) {
-    return new Timestamp(ZonedDateTime.ofInstant(Instant.ofEpochMicro(Number(ns) / 1000), ZoneId.SYSTEM));
+    let t = ZonedDateTime.ofInstant(Instant.ofEpochSecond(Number(ns / 1_000_000_000n)), ZoneId.SYSTEM);
+    t = t.plusNanos(Number(ns % 1_000_000_000n));
+    return new Timestamp(t);
   }
 }

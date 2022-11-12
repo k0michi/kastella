@@ -47,4 +47,52 @@ export namespace Formatter {
     .append(ISO_LOCAL_DATE_TIME_WITH_NANO)
     .appendOffsetId()
     .toFormatter(ResolverStyle.STRICT);
+
+  export const ISO_LOCAL_TIME_WITH_MICRO = new DateTimeFormatterBuilder()
+    .appendValue(ChronoField.HOUR_OF_DAY, 2)
+    .appendLiteral(':')
+    .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+    .optionalStart()
+    .appendLiteral(':')
+    .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+    .optionalStart()
+    .appendFraction(ChronoField.NANO_OF_SECOND, 6, 6, true)
+    .toFormatter(ResolverStyle.STRICT);
+
+  export const ISO_LOCAL_DATE_TIME_WITH_MICRO = new DateTimeFormatterBuilder()
+    .parseCaseInsensitive()
+    .append(DateTimeFormatter.ISO_LOCAL_DATE)
+    .appendLiteral('T')
+    .append(ISO_LOCAL_TIME_WITH_MICRO)
+    .toFormatter(ResolverStyle.STRICT);
+
+  export const ISO_OFFSET_DATE_TIME_WITH_MICRO = new DateTimeFormatterBuilder()
+    .parseCaseInsensitive()
+    .append(ISO_LOCAL_DATE_TIME_WITH_MICRO)
+    .appendOffsetId()
+    .toFormatter(ResolverStyle.STRICT);
+
+  export const ISO_LOCAL_TIME_WITH_MILLI = new DateTimeFormatterBuilder()
+    .appendValue(ChronoField.HOUR_OF_DAY, 2)
+    .appendLiteral(':')
+    .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+    .optionalStart()
+    .appendLiteral(':')
+    .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+    .optionalStart()
+    .appendFraction(ChronoField.NANO_OF_SECOND, 3, 3, true)
+    .toFormatter(ResolverStyle.STRICT);
+
+  export const ISO_LOCAL_DATE_TIME_WITH_MILLI = new DateTimeFormatterBuilder()
+    .parseCaseInsensitive()
+    .append(DateTimeFormatter.ISO_LOCAL_DATE)
+    .appendLiteral('T')
+    .append(ISO_LOCAL_TIME_WITH_MILLI)
+    .toFormatter(ResolverStyle.STRICT);
+
+  export const ISO_OFFSET_DATE_TIME_WITH_MILLI = new DateTimeFormatterBuilder()
+    .parseCaseInsensitive()
+    .append(ISO_LOCAL_DATE_TIME_WITH_MILLI)
+    .appendOffsetId()
+    .toFormatter(ResolverStyle.STRICT);
 }
