@@ -311,6 +311,17 @@ export default class Model {
     return '/' + dirs.join('/');
   }
 
+  swapIndex(id1: string, id2: string) {
+    this.nodes.set(produce(this.nodes.get(), nodes => {
+      const n1 = nodes.find(n => n.id == id1)!;
+      const n2 = nodes.find(n => n.id == id2)!;
+      const temp = n1.index;
+      n1.index = n2.index;
+      n2.index = temp;
+    }));
+  }
+
+
   // Files
 
   addFile(file: File) {

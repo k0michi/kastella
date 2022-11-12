@@ -178,7 +178,9 @@ export default function EditorPane() {
   }
 
   const filtered = React.useMemo(() => {
-    let filtered = nodes;
+    let filtered = nodes.slice();
+
+    filtered.sort((a, b) => a.index - b.index);
 
     if (search.length > 0) {
       filtered = filtered.filter(n => (n.type == undefined || n.type == NodeType.Text) && ((n as TextNode).content as string).includes(search));
@@ -204,7 +206,31 @@ export default function EditorPane() {
   React.useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (!e.isComposing) {
-        if (e.key == 'ArrowUp') {
+        if (e.key == 'ArrowUp' && e.metaKey) {
+          e.preventDefault();
+
+          if (selected != null) {
+            const selectedNode = model.getNode(selected);
+            const foundIndex = filtered.findIndex(n => n.id == selected);
+            const prevNode = filtered[foundIndex - 1];
+
+            if (selectedNode != null && prevNode != null && foundIndex != -1) {
+              model.swapIndex(selectedNode.id, prevNode.id);
+            }
+          }
+        } else if (e.key == 'ArrowDown' && e.metaKey) {
+          e.preventDefault();
+
+          if (selected != null) {
+            const selectedNode = model.getNode(selected);
+            const foundIndex = filtered.findIndex(n => n.id == selected);
+            const prevNode = filtered[foundIndex + 1];
+
+            if (selectedNode != null && prevNode != null && foundIndex != -1) {
+              model.swapIndex(selectedNode.id, prevNode.id);
+            }
+          }
+        } else if (e.key == 'ArrowUp') {
           e.preventDefault();
 
           if (selected == null) {
@@ -219,6 +245,7 @@ export default function EditorPane() {
           }
         } else if (e.key == 'ArrowDown') {
           e.preventDefault();
+
           const foundIndex = filtered.findIndex(n => n.id == selected);
           const next = filtered[foundIndex + 1];
 
