@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime';
-import { isHTTPURL } from './utils';
+import { findStringIgnoreCase, isHTTPURL } from './utils';
 import { useModel, useObservable } from 'kyoka';
 import Model, { AnchorNode, DateView, DirectoryNode, DirectoryView, File, ImageNode, Node, NodeType, ReservedID, TagView, TextNode, ViewType } from './model.js';
 import EditorBar from './editor-bar';
@@ -183,7 +183,14 @@ export default function EditorPane() {
     filtered.sort((a, b) => a.index - b.index);
 
     if (search.length > 0) {
-      filtered = filtered.filter(n => (n.type == undefined || n.type == NodeType.Text) && ((n as TextNode).content as string).includes(search));
+      filtered = filtered.filter(n =>
+        n.type == NodeType.Text && findStringIgnoreCase((n as TextNode).content, search) ||
+        (n.type == NodeType.Anchor &&
+          findStringIgnoreCase((n as AnchorNode).contentTitle, search) ||
+          findStringIgnoreCase((n as AnchorNode).contentDescription, search) ||
+          findStringIgnoreCase((n as AnchorNode).contentURL, search)
+        )
+      );
     }
 
     if (view.type == ViewType.Directory) {

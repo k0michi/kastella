@@ -21,6 +21,14 @@ export function round(value: number, digit: number) {
   return Math.round(value * 10 ** digit) / 10 ** digit;
 }
 
+export function findStringIgnoreCase(string: string | null | undefined, search: string) {
+  if (string == undefined) {
+    return false;
+  }
+
+  return string.toLowerCase().includes(search.toLowerCase());
+}
+
 // https://github.com/js-joda/js-joda/blob/main/packages/core/src/format/DateTimeFormatter.js
 export namespace Formatter {
   export const ISO_LOCAL_TIME_WITH_NANO = new DateTimeFormatterBuilder()
