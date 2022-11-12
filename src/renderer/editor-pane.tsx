@@ -206,7 +206,7 @@ export default function EditorPane() {
   React.useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (!e.isComposing) {
-        if (e.key == 'ArrowUp' && e.metaKey) {
+        if (e.key == 'ArrowUp' && e.altKey) {
           e.preventDefault();
 
           if (selected != null) {
@@ -218,7 +218,7 @@ export default function EditorPane() {
               model.swapIndex(selectedNode.id, prevNode.id);
             }
           }
-        } else if (e.key == 'ArrowDown' && e.metaKey) {
+        } else if (e.key == 'ArrowDown' && e.altKey) {
           e.preventDefault();
 
           if (selected != null) {
