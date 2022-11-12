@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime';
 import { isHTTPURL } from './utils';
 import { useModel, useObservable } from 'kyoka';
-import Model, { AnchorNode, DateView, DirectoryNode, DirectoryView, File, ImageNode, NodeType, ReservedID, TagView, TextNode, ViewType } from './model';
+import Model, { AnchorNode, DateView, DirectoryNode, DirectoryView, File, ImageNode, Node, NodeType, ReservedID, TagView, TextNode, ViewType } from './model.js';
 import EditorBar from './editor-bar';
 import Image from './image';
 import { DateTimeFormatter } from '@js-joda/core';
@@ -206,7 +206,15 @@ export default function EditorPane() {
   React.useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (!e.isComposing) {
-        if (e.key == 'ArrowUp' && e.altKey) {
+        if (e.key == 'ArrowUp' && e.metaKey) {
+          e.preventDefault();
+
+          setSelected(filtered[0].id);
+        } else if (e.key == 'ArrowDown' && e.metaKey) {
+          e.preventDefault();
+
+          setSelected(undefined);
+        } else if (e.key == 'ArrowUp' && e.altKey) {
           e.preventDefault();
 
           if (selected != null) {
@@ -253,7 +261,6 @@ export default function EditorPane() {
             setTimeout(() => setSelected(next.id));
           } else {
             setSelected(undefined);
-            inputRef.current?.focus();
           }
         } else if (e.key == 'Backspace' && selected != undefined) {
           if (view.type == ViewType.Directory && (view as DirectoryView).parentID == ReservedID.Trash) {
@@ -297,6 +304,8 @@ export default function EditorPane() {
 
     if (selected != null) {
       inputRef.current?.blur();
+    } else {
+      inputRef.current?.focus();
     }
   }, [selected]);
 
@@ -322,13 +331,13 @@ export default function EditorPane() {
     const observer = new MutationObserver((mutationList) => {
       for (const m of mutationList) {
         for (const n of m.addedNodes) {
-          if (n.nodeType == Node.ELEMENT_NODE && (n as HTMLElement).dataset['id'] != null) {
+          if (n.nodeType == window.Node.ELEMENT_NODE && (n as HTMLElement).dataset['id'] != null) {
             iObserver.observe(n as Element);
           }
         }
 
         for (const n of m.removedNodes) {
-          if (n.nodeType == Node.ELEMENT_NODE && (n as HTMLElement).dataset['id'] != null) {
+          if (n.nodeType == window.Node.ELEMENT_NODE && (n as HTMLElement).dataset['id'] != null) {
             iObserver.unobserve(n as Element);
             model.removeIntersecting((n as HTMLElement).dataset['id']!);
           }
