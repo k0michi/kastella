@@ -487,6 +487,8 @@ function getAncestorID(element: HTMLElement | null): string | null {
   return getAncestorID(element.parentElement);
 }
 
+const TEXT_LIMIT = 120;
+
 function formatFetchedText(string: string) {
-  return string.replaceAll(/\n+/g, '\n');
+  return string.replaceAll(/\n+/g, '\n').substring(0, TEXT_LIMIT);
 }
