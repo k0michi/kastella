@@ -404,6 +404,7 @@ export default function EditorPane() {
                   } else if (n.type == NodeType.Anchor) {
                     const anchor = n as AnchorNode;
                     const imageFile = anchor.contentImageFileID != null ? model.getFile(anchor.contentImageFileID) : null;
+                    const description = anchor.contentDescription;
 
                     content = <div className={className}>
                       <div className='content anchor-node'>
@@ -411,7 +412,11 @@ export default function EditorPane() {
                         <div className='details'>
                           <div className='url'>{anchor.contentURL}</div>
                           <div className='title'>{anchor.contentTitle}</div>
-                          <div className='description'>{anchor.contentDescription}</div>
+                          {
+                            description != undefined ?
+                              <div className='description'>{formatFetchedText(description)}</div>
+                              : null
+                          }
                         </div>
                       </div>
                       <span className='tags'>{tagNames?.join(' ')}</span>
@@ -473,4 +478,8 @@ function getAncestorID(element: HTMLElement | null): string | null {
   }
 
   return getAncestorID(element.parentElement);
+}
+
+function formatFetchedText(string: string) {
+  return string.replaceAll(/\n+/g, '\n');
 }
