@@ -6,6 +6,7 @@ export default defineConfig({
   base: './',
   plugins: [react()],
   build: {
-    outDir: 'dist/renderer'
-  }
+    outDir: 'dist/renderer',
+    target: 'es2021'
+  },
 });
