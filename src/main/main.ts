@@ -1,6 +1,6 @@
 // Modules to control application life and create native browser window
 
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, Event, ipcMain, shell } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { now } from '@k0michi/now';
@@ -27,6 +27,14 @@ function createWindow() {
     const url = `http://localhost:5173/`;
     mainWindow.loadURL(url)
   }
+
+  function handleNavigate(e: Event, url: string) {
+    e.preventDefault();
+    shell.openExternal(url);
+  }
+
+  mainWindow.webContents.on('will-navigate', handleNavigate);
+  mainWindow.webContents.on('new-window', handleNavigate);
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
