@@ -82,7 +82,7 @@ export default function EditorPane() {
         const filePath = f.path;
         const mimeType = mime.getType(filePath);
 
-        if (mimeType == 'image/png' || mimeType == 'image/jpeg') {
+        if (mimeType == 'image/png' || mimeType == 'image/jpeg' || mimeType == 'image/gif') {
           const accessed = Timestamp.fromNs(await bridge.now());
           const modified = Timestamp.fromNs(await bridge.getMTime(filePath));
           const id = uuidv4();
