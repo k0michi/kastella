@@ -100,6 +100,11 @@ ipcMain.handle('read-file', async (e, id: string) => {
   return await fs.readFile(found);
 });
 
+ipcMain.handle('read-text-file', async (e, id: string) => {
+  const found = await findFile(id);
+  return await fs.readFile(found, 'utf-8');
+});
+
 ipcMain.handle('remove-file', async (e, id: string) => {
   const found = await findFile(id);
   return await fs.rm(found);

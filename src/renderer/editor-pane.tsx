@@ -3,11 +3,12 @@ import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime';
 import { findStringIgnoreCase, isHTTPURL } from './utils';
 import { useModel, useObservable } from 'kyoka';
-import Model, { AnchorNode, DateView, DirectoryNode, DirectoryView, File, ImageNode, Node, NodeType, ReservedID, TagView, TextNode, ViewType } from './model.js';
+import Model, { AnchorNode, DateView, DirectoryNode, DirectoryView, File, ImageNode, Node, NodeType, ReservedID, TagView, TextEmbedNode, TextNode, ViewType } from './model.js';
 import EditorBar from './editor-bar';
 import Image from './image';
 import { DateTimeFormatter } from '@js-joda/core';
 import Timestamp from './timestamp';
+import TextEmbed from './text-embed';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -95,6 +96,22 @@ export default function EditorPane() {
             modified
           } as File;
           model.addImageNode(image, accessed);
+        }
+
+        if (mimeType == 'text/plain') {
+          const accessed = Timestamp.fromNs(await bridge.now());
+          const modified = Timestamp.fromNs(await bridge.getMTime(filePath));
+          const id = uuidv4();
+          await bridge.copyFile(id, filePath);
+          const basename = await bridge.basename(filePath);
+          const image = {
+            id,
+            name: basename,
+            type: mimeType,
+            accessed,
+            modified
+          } as File;
+          model.addTextEmbedNode(image, accessed);
         }
       }
     };
@@ -428,6 +445,20 @@ export default function EditorPane() {
                       </div>
                       <span className='tags'>{tagNames?.join(' ')}</span>
                     </div>;
+                  } else if (n.type == NodeType.TextEmbed) {
+                    const textEmbedNode = n as TextEmbedNode;
+                    const file = model.getFile(textEmbedNode.fileID);
+
+                    if (file != null) {
+                      content = <div className={className}>
+                        <div className='content text-embed-node'>
+                          <TextEmbed file={file} />
+                        </div>
+                        <span className='tags'>{tagNames?.join(' ')}</span>
+                      </div>;
+                    } else {
+                      content = <div className='error'>{`Failed to read ${textEmbedNode.fileID}`}</div>;
+                    }
                   }
                 }
 

@@ -5,7 +5,7 @@ import Timestamp from "./timestamp";
 import { round } from "./utils";
 import { validateLibrary } from "./validate";
 
-const LIBRARY_VERSION = 3;
+const LIBRARY_VERSION = 4;
 
 export interface Library {
   nodes: Node[];
@@ -18,6 +18,7 @@ export enum NodeType {
   Image = 'image',
   Anchor = 'anchor',
   Directory = 'directory',
+  TextEmbed = 'text-embed',
 }
 
 export interface Node {
@@ -55,6 +56,12 @@ export interface AnchorNode extends Node {
 export interface DirectoryNode extends Node {
   type: NodeType.Directory;
   name: string;
+}
+
+export interface TextEmbedNode extends Node {
+  type: NodeType.TextEmbed;
+  fileID: string;
+  description?: string;
 }
 
 export interface File {
@@ -171,6 +178,29 @@ export default class Model {
       parentID,
       index: this.getNextIndex()
     } as ImageNode;
+    this.addFile(file);
+    this.addNode(node);
+    this.save();
+    return node;
+  }
+
+  addTextEmbedNode(file: File, timeStamp: Timestamp, parentID?: string, tags?: string[]) {
+    const id = uuidv4()
+
+    if (tags?.length == 0) {
+      tags = undefined;
+    }
+
+    const node = {
+      type: NodeType.TextEmbed,
+      fileID: file.id,
+      tags,
+      created: timeStamp,
+      modified: timeStamp,
+      id,
+      parentID,
+      index: this.getNextIndex()
+    } as TextEmbedNode;
     this.addFile(file);
     this.addNode(node);
     this.save();
