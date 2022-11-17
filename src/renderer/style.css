@@ -138,6 +138,7 @@ body,
   color: rgb(117, 117, 117);
   position: relative;
   width: 16px;
+  cursor: grab;
 }
 
 #editor-area #notes td.grip svg {
