@@ -402,6 +402,23 @@ export default class Model {
     return this.tags.get().find(t => t.id == id);
   }
 
+  appendTag(id: string, tagID: string) {
+    const foundIndex = this.nodes.get().findIndex(n => n.id == id);
+
+    const newNodes = produce(this.nodes.get(), n => {
+      const node = n[foundIndex];
+
+      if (node.tags == undefined) {
+        node.tags = [tagID];
+      } else {
+        node.tags.push(tagID);
+      }
+    });
+
+    this.nodes.set(newNodes);
+    this.save();
+  }
+
   removeTag(id: string) {
     // TODO
   }

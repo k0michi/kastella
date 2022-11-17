@@ -71,28 +71,26 @@ export default function ExplorerPane() {
           <div className="container">
             {directories.map(d => <div
               key={d.id}
-              className={
-                [
-                  view.type == ViewType.Directory && (view as DirectoryView).parentID == d.id ? 'selected' : '',
-                  draggedOver == d.id ? 'dragged' : '',
-                  'item'
-                ].join(' ')}
-              onClick={e => model.changeView({ 'type': ViewType.Directory, parentID: d.id } as DirectoryView)}>
-              <div
-                onDragOver={e => {
-                  setDraggedOver(d.id);
-                }}
-                onDragLeave={e => {
-                  setDraggedOver(false);
-                }}
-                onDrop={e => {
-                  const id = e.dataTransfer.getData('text/plain');
-                  model.setParent(id, d.id);
-                  setDraggedOver(false);
-                }}
-                style={{ paddingLeft: `${d.depth * 10}px` }}>
-                {d.name ?? '/'}
-              </div>
+              className={[
+                view.type == ViewType.Directory && (view as DirectoryView).parentID == d.id ? 'selected' : '',
+                draggedOver == d.id ? 'dragged' : '',
+                'item'
+              ].join(' ')}
+              onDragOver={e => {
+                setDraggedOver(d.id);
+              }}
+              onDragLeave={e => {
+                setDraggedOver(false);
+              }}
+              onDrop={e => {
+                const id = e.dataTransfer.getData('text/plain');
+                model.setParent(id, d.id);
+                setDraggedOver(false);
+              }}
+              style={{ paddingLeft: `${d.depth * 10}px` }}
+              onClick={e => model.changeView({ 'type': ViewType.Directory, parentID: d.id } as DirectoryView)}
+            >
+              {d.name ?? '/'}
             </div>)}
           </div>
         </div>
@@ -101,7 +99,22 @@ export default function ExplorerPane() {
           <div className="container">
             {tags.map(t => <div
               key={t.id}
-              className={[view.type == 'tag' && (view as TagView).tag == t.id ? 'selected' : '', 'item'].join(' ')}
+              className={[
+                view.type == 'tag' && (view as TagView).tag == t.id ? 'selected' : '',
+                draggedOver == t.id ? 'dragged' : '',
+                'item'
+              ].join(' ')}
+              onDragOver={e => {
+                setDraggedOver(t.id);
+              }}
+              onDragLeave={e => {
+                setDraggedOver(false);
+              }}
+              onDrop={e => {
+                const id = e.dataTransfer.getData('text/plain');
+                model.appendTag(id, t.id);
+                setDraggedOver(false);
+              }}
               onClick={e => model.changeView({ 'type': 'tag', tag: t.id } as TagView)}>
               {t.name}
             </div>)}
