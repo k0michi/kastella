@@ -443,7 +443,7 @@ export default function EditorPane() {
                         {imageFile != null ? <div className='image'><Image file={imageFile}></Image></div> : null}
                         <div className='details'>
                           <div className='url'>{decodeURI(anchor.contentURL)}</div>
-                          <div className='title'><a href={anchor.contentURL}>{anchor.contentTitle}</a></div>
+                          <div className='title'><a draggable={false} href={anchor.contentURL}>{anchor.contentTitle}</a></div>
                           {
                             description != undefined ?
                               <div className='description'>{formatFetchedText(description)}</div>
