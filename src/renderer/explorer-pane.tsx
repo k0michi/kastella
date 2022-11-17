@@ -19,6 +19,7 @@ export default function ExplorerPane() {
   const [directoryPath, setDirectoryPath] = React.useState<string>();
   const [validPath, setValidPath] = React.useState<boolean>(false);
   const [dates, setDates] = React.useState<string[]>([]);
+  const [draggedOver, setDraggedOver] = React.useState<string | undefined | boolean>(false);
 
   React.useEffect(() => {
     const dateSet = new Set<string>();
@@ -70,12 +71,24 @@ export default function ExplorerPane() {
           <div className="container">
             {directories.map(d => <div
               key={d.id}
-              className={[view.type == ViewType.Directory && (view as DirectoryView).parentID == d.id ? 'selected' : '', 'item'].join(' ')}
+              className={
+                [
+                  view.type == ViewType.Directory && (view as DirectoryView).parentID == d.id ? 'selected' : '',
+                  draggedOver == d.id ? 'dragged' : '',
+                  'item'
+                ].join(' ')}
               onClick={e => model.changeView({ 'type': ViewType.Directory, parentID: d.id } as DirectoryView)}>
               <div
+                onDragOver={e => {
+                  setDraggedOver(d.id);
+                }}
+                onDragLeave={e => {
+                  setDraggedOver(false);
+                }}
                 onDrop={e => {
                   const id = e.dataTransfer.getData('text/plain');
                   model.setParent(id, d.id);
+                  setDraggedOver(false);
                 }}
                 style={{ paddingLeft: `${d.depth * 10}px` }}>
                 {d.name ?? '/'}

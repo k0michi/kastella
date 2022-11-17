@@ -265,11 +265,16 @@ body,
 #explorer-pane .item {
   cursor: default;
   padding: 1px 4px;
+  border-radius: 3px;
+  border: 1px solid transparent;
 }
 
 #explorer-pane .selected {
   background-color: rgb(63, 123, 200);
-  border-radius: 3px;
+}
+
+#explorer-pane .dragged {
+  border: 1px solid rgb(102, 159, 232);
 }
 
 
