@@ -72,7 +72,12 @@ export default function ExplorerPane() {
               key={d.id}
               className={[view.type == ViewType.Directory && (view as DirectoryView).parentID == d.id ? 'selected' : '', 'item'].join(' ')}
               onClick={e => model.changeView({ 'type': ViewType.Directory, parentID: d.id } as DirectoryView)}>
-              <div style={{ paddingLeft: `${d.depth * 10}px` }}>
+              <div
+                onDrop={e => {
+                  const id = e.dataTransfer.getData('text/plain');
+                  model.setParent(id, d.id);
+                }}
+                style={{ paddingLeft: `${d.depth * 10}px` }}>
                 {d.name ?? '/'}
               </div>
             </div>)}

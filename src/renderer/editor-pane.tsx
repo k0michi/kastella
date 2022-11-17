@@ -471,7 +471,12 @@ export default function EditorPane() {
                 }
 
                 return <tr key={n.id} data-id={id} className={visible ? 'visible' : 'invisible'}>
-                  <td className='grip' draggable>{n.id == hovered ? <IconGripVertical width={16} /> : null}</td>
+                  <td className='grip' draggable
+                    onDragStart={e => {
+                      e.dataTransfer.setData('text/plain', n.id);
+                      e.dataTransfer.effectAllowed = 'move';
+                    }}
+                  >{n.id == hovered ? <IconGripVertical width={16} /> : null}</td>
                   {lineNumberVisibility ? <td className='index'>{n.index + 1}</td> : null}
                   {dateVisibility ? <td className='date'>{n.created.asString()}</td> : null}
                   <td>
