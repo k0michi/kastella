@@ -43,6 +43,7 @@ pre {
   flex-direction: row;
   flex: 1 1 0;
   overflow-y: hidden;
+  overflow-x: hidden;
 }
 
 html,
@@ -58,6 +59,9 @@ body,
   display: flex;
   flex-direction: column;
   font-size: 14px;
+  overflow-y: auto;
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 #editor-pane textarea {
@@ -117,6 +121,7 @@ body,
   flex: 1 1 0;
   padding: 12px;
   overflow-y: auto;
+  overflow-x: auto;
   font-size: 14px;
   line-height: 1.75;
 }
@@ -138,6 +143,7 @@ body,
   color: rgb(117, 117, 117);
   position: relative;
   width: 16px;
+  min-width: 16px;
 }
 
 #editor-area #notes td.grip svg {
