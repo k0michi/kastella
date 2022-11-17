@@ -477,6 +477,8 @@ export default function EditorPane() {
                 return <tr key={n.id} data-id={id} className={visible ? 'visible' : 'invisible'}>
                   <td className='grip' draggable
                     onDragStart={e => {
+                      const parent = (e.target as HTMLElement).parentElement!;
+                      e.dataTransfer.setDragImage(parent, 0, 0);
                       e.dataTransfer.setData('text/plain', n.id);
                       e.dataTransfer.effectAllowed = 'move';
                     }}
