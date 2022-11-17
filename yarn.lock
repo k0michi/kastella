@@ -912,6 +912,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tabler/icons@npm:^1.111.0":
+  version: 1.111.0
+  resolution: "@tabler/icons@npm:1.111.0"
+  peerDependencies:
+    react: ^16.x || 17.x || 18.x
+    react-dom: ^16.x || 17.x || 18.x
+  peerDependenciesMeta:
+    react:
+      optional: true
+    react-dom:
+      optional: true
+  checksum: 9c7e4ac325f732aac610a8d3aeb7afbeb0f7d99ee37c89153ee82dc208189ec1abd215af97be5edd1a309b73d5889b746c6c9ea29ba8b965394a2c0b9455e17e
+  languageName: node
+  linkType: hard
+
 "@tootallnate/once@npm:2":
   version: 2.0.0
   resolution: "@tootallnate/once@npm:2.0.0"
@@ -3700,6 +3715,7 @@ __metadata:
     "@js-joda/locale": ^4.8.6
     "@js-joda/timezone": ^2.15.0
     "@k0michi/now": ^0.0.1
+    "@tabler/icons": ^1.111.0
     "@types/charset": ^1.0.2
     "@types/content-type": ^1.1.5
     "@types/electron": ^1.6.10

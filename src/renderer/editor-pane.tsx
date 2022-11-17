@@ -9,6 +9,7 @@ import Image from './image';
 import { DateTimeFormatter } from '@js-joda/core';
 import Timestamp from './timestamp';
 import TextEmbed from './text-embed';
+import { IconGripVertical } from '@tabler/icons';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -26,6 +27,7 @@ export default function EditorPane() {
   const lineNumberVisibility = useObservable(model.lineNumberVisibility);
   const dateVisibility = useObservable(model.dateVisibility);
   const intersecting = useObservable(model.intersecting);
+  const [hovered, setHovered] = React.useState<string>();
 
   React.useEffect(() => {
     const onScroll = () => {
@@ -382,7 +384,13 @@ export default function EditorPane() {
     <div id="editor-area" ref={editorRef}>
       <div id="notes" ref={notesRef}>
         <table>
-          <tbody>
+          <tbody onMouseMove={e => {
+            const id = getAncestorID(e.target as HTMLElement);
+
+            if (hovered != id) {
+              setHovered(id ?? undefined);
+            }
+          }}>
             {writeOnly ? null :
               filtered.map(n => {
                 const id = n.id;
@@ -463,6 +471,7 @@ export default function EditorPane() {
                 }
 
                 return <tr key={n.id} data-id={id} className={visible ? 'visible' : 'invisible'}>
+                  <td className='grip' draggable>{n.id == hovered ? <IconGripVertical width={16} /> : null}</td>
                   {lineNumberVisibility ? <td className='index'>{n.index + 1}</td> : null}
                   {dateVisibility ? <td className='date'>{n.created.asString()}</td> : null}
                   <td>

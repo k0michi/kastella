@@ -131,6 +131,17 @@ body,
 
 #editor-area #notes td {
   padding: 0;
+  vertical-align: top;
+}
+
+#editor-area #notes td.grip {
+  color: rgb(117, 117, 117);
+  position: relative;
+  width: 16px;
+}
+
+#editor-area #notes td.grip svg {
+  position: absolute;
 }
 
 #editor-area #notes td.index {
@@ -138,15 +149,13 @@ body,
   padding-right: 4px;
   text-align: right;
   white-space: nowrap;
-  vertical-align: top;
 }
 
 #editor-area #notes td.date {
-  color: rgb(120, 120, 120);
+  color: rgb(117, 117, 117);
   padding-right: 4px;
   text-align: right;
   white-space: nowrap;
-  vertical-align: top;
   font-style: italic;
 }
 
