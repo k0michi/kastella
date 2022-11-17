@@ -384,13 +384,17 @@ export default function EditorPane() {
     <div id="editor-area" ref={editorRef}>
       <div id="notes" ref={notesRef}>
         <table>
-          <tbody onMouseMove={e => {
-            const id = getAncestorID(e.target as HTMLElement);
+          <tbody
+            onMouseLeave={e => {
+              setHovered(undefined);
+            }}
+            onMouseMove={e => {
+              const id = getAncestorID(e.target as HTMLElement);
 
-            if (hovered != id) {
-              setHovered(id ?? undefined);
-            }
-          }}>
+              if (hovered != id) {
+                setHovered(id ?? undefined);
+              }
+            }}>
             {writeOnly ? null :
               filtered.map(n => {
                 const id = n.id;
