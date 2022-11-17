@@ -307,7 +307,7 @@ export default class Model {
     return this.nodes.get().length;
   }
 
-  setParent(id: string, parentID: string) {
+  setParent(id: string, parentID: string | undefined) {
     const foundIndex = this.nodes.get().findIndex(n => n.id == id);
 
     const newNodes = produce(this.nodes.get(), n => {
