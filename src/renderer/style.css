@@ -156,6 +156,7 @@ body,
   padding-right: 4px;
   text-align: right;
   white-space: nowrap;
+  font-family: monospace;
 }
 
 #editor-area #notes td.date {
