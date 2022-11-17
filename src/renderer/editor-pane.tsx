@@ -475,14 +475,17 @@ export default function EditorPane() {
                 }
 
                 return <tr key={n.id} data-id={id} className={visible ? 'visible' : 'invisible'}>
-                  <td className='grip' draggable
-                    onDragStart={e => {
-                      const parent = (e.target as HTMLElement).parentElement!;
-                      e.dataTransfer.setDragImage(parent, 0, 0);
-                      e.dataTransfer.setData('text/plain', n.id);
-                      e.dataTransfer.effectAllowed = 'move';
-                    }}
-                  >{n.id == hovered ? <IconGripVertical width={16} /> : null}</td>
+                  <td className='grip'>{n.id == hovered ?
+                    <div draggable
+                      onDragStart={e => {
+                        const parent = (e.target as HTMLElement).parentElement?.parentElement!;
+                        e.dataTransfer.setDragImage(parent, 0, 0);
+                        e.dataTransfer.setData('text/plain', n.id);
+                        e.dataTransfer.effectAllowed = 'move';
+                      }}>
+                      <IconGripVertical width={16} />
+                    </div>
+                    : null}</td>
                   {lineNumberVisibility ? <td className='index'>{n.index + 1}</td> : null}
                   {dateVisibility ? <td className='date'>{n.created.asString()}</td> : null}
                   <td>
