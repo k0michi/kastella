@@ -411,7 +411,9 @@ export default class Model {
       if (node.tags == undefined) {
         node.tags = [tagID];
       } else {
-        node.tags.push(tagID);
+        if (!node.tags.includes(tagID)) {
+          node.tags.push(tagID);
+        }
       }
     });
 
