@@ -10,6 +10,8 @@ interface TreeNode {
   depth: number;
 }
 
+type TreeNodeArray = (TreeNode | TreeNodeArray)[];
+
 export default function ExplorerPane() {
   const model = useModel<Model>();
   const nodes = useObservable(model.nodes);
@@ -34,7 +36,7 @@ export default function ExplorerPane() {
     setDates(dates);
   }, [nodes]);
 
-  function createTree(parentID: string | undefined, depth = 0) {
+  function createTree(parentID: string | undefined, depth = 0): TreeNodeArray {
     let name = null;
 
     if (parentID != null) {
@@ -43,21 +45,19 @@ export default function ExplorerPane() {
     }
 
     const treeNode = { name, id: parentID, children: [], depth } as TreeNode;
+    const children: TreeNodeArray = [];
 
     for (const child of model.getChildNodes(parentID)) {
       if (child.type == NodeType.Directory) {
-        treeNode.children.push(createTree(child.id, depth + 1));
+        children.push(createTree(child.id, depth + 1));
       }
     }
 
-    return treeNode;
+    return [treeNode, children];
   }
 
-  function mapToArray(node: TreeNode): any {
-    return [node, node.children.map(n => mapToArray(n))];
-  }
-
-  const directories = mapToArray(createTree(undefined)).flat(Infinity) as TreeNode[];
+  // Temporal fix for "Type instantiation is excessively deep and possibly infinite."
+  const directories = (createTree(undefined) as any[]).flat(Infinity) as TreeNode[];
   directories.push({ name: 'Trash', id: ReservedID.Trash, depth: 0, children: [] });
 
   return (
