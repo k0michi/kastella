@@ -122,6 +122,7 @@ export interface Status {
 }
 
 export enum ReservedID {
+  Root = 'root',
   Trash = 'trash'
 }
 
@@ -129,7 +130,7 @@ export default class Model {
   nodes = new Observable<Node[]>([]);
   files = new Observable<File[]>([]);
   tags = new Observable<Tag[]>([]);
-  view = new Observable<View>({ type: ViewType.Directory });
+  view = new Observable<View | undefined>(undefined);
   saving = new Observable<boolean>(false);
   writeOnly = new Observable<boolean>(true);
   lineNumberVisibility = new Observable<boolean>(true);
@@ -140,6 +141,7 @@ export default class Model {
   intersecting = new Observable<Set<string>>(new Set());
 
   constructor() {
+    this.changeView({ type: ViewType.Directory });
   }
 
 
@@ -309,14 +311,14 @@ export default class Model {
       return {
         type: NodeType.Directory,
         pseudo: true,
-        id: 'root',
+        id: ReservedID.Root,
         name: '/'
       } as PseudoDirectoryNode;
     } else if (id === 'trash') {
       return {
         type: NodeType.Directory,
         pseudo: true,
-        id: 'trash',
+        id: ReservedID.Trash,
         name: 'Trash'
       } as PseudoDirectoryNode;
     }
@@ -347,27 +349,25 @@ export default class Model {
     this.save();
   }
 
-  getPath(directoryID: string) {
+  getPath(directoryID?: string): string {
     const nodes = this.nodes.get();
-    let dirs = [];
     let dirID: string | undefined = directoryID;
+
+    if (directoryID === undefined || directoryID == ReservedID.Root) {
+      return '/';
+    }
 
     if (directoryID == ReservedID.Trash) {
       return 'Trash';
     }
 
-    while (dirID != undefined) {
-      const found = nodes.find(n => n.id == dirID);
+    const found = nodes.find(n => n.id == dirID);
 
-      if (found == undefined) {
-        throw new Error();
-      }
-
-      dirs.unshift((found as DirectoryNode).name);
-      dirID = found.parentID;
+    if (found == undefined) {
+      throw new Error(`Node ${dirID} not found`);
     }
 
-    return '/' + dirs.join('/');
+    return this.getPath(found.parentID) + (found as DirectoryNode).name + '/';
   }
 
   swapIndex(id1: string, id2: string) {
@@ -487,6 +487,12 @@ export default class Model {
   // Views
 
   changeView(view: View) {
+    if (view.type == 'directory') {
+      if ((view as DirectoryView).parentID === undefined) {
+        (view as DirectoryView).parentID = ReservedID.Root;
+      }
+    }
+
     this.view.set(view);
   }
 

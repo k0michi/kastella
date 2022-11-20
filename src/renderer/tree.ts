@@ -7,8 +7,8 @@ export interface Depth {
 export type NestedNodeArray = (((Node | PseudoNode) & Depth) | NestedNodeArray)[];
 
 export function createTree(model: Model, parentID: string | undefined, depth = 0): NestedNodeArray {
-  const node = model.getNode(parentID) as (DirectoryNode | PseudoDirectoryNode) & Depth;
-  node.depth = depth;
+  let node = model.getNode(parentID) as (DirectoryNode | PseudoDirectoryNode) & Depth;
+  node = { ...node, depth };
   const children: NestedNodeArray = [];
 
   for (const child of model.getChildNodes(parentID)) {

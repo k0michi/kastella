@@ -212,17 +212,17 @@ export default function EditorPane() {
       );
     }
 
-    if (view.type == ViewType.Directory) {
+    if (view?.type == ViewType.Directory) {
       filtered = filtered.filter(n => n.parentID == (view as DirectoryView).parentID);
     } else {
       filtered = filtered.filter(n => n.parentID != ReservedID.Trash);
     }
 
-    if (view.type == ViewType.Tag) {
+    if (view?.type == ViewType.Tag) {
       filtered = filtered.filter(n => n.tags?.includes((view as TagView).tag));
     }
 
-    if (view.type == ViewType.Date) {
+    if (view?.type == ViewType.Date) {
       filtered = filtered.filter(n => n.created.asZonedDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE) == (view as DateView).date);
     }
 
@@ -289,7 +289,7 @@ export default function EditorPane() {
             setSelected(undefined);
           }
         } else if (e.key == 'Backspace' && selected != undefined) {
-          if (view.type == ViewType.Directory && (view as DirectoryView).parentID == ReservedID.Trash) {
+          if (view?.type == ViewType.Directory && (view as DirectoryView).parentID == ReservedID.Trash) {
             model.removeNode(selected);
           } else {
             model.setParent(selected, ReservedID.Trash);
