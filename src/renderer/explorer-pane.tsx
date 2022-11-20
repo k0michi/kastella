@@ -2,26 +2,7 @@ import * as React from 'react';
 import { useModel, useObservable } from 'kyoka';
 import Model, { DateView, DirectoryNode, DirectoryView, Node, NodeType, PseudoDirectoryNode, PseudoNode, ReservedID, TagView, ViewType } from './model';
 import { DateTimeFormatter, ZonedDateTime } from '@js-joda/core';
-
-interface Depth {
-  depth: number;
-}
-
-type NodeArray = (((Node | PseudoNode) & Depth) | NodeArray)[];
-
-function createTree(model: Model, parentID: string | undefined, depth = 0): NodeArray {
-  const node = model.getNode(parentID) as (DirectoryNode | PseudoDirectoryNode) & Depth;
-  node.depth = depth;
-  const children: NodeArray = [];
-
-  for (const child of model.getChildNodes(parentID)) {
-    if (child.type == NodeType.Directory) {
-      children.push(createTree(model, child.id, depth + 1));
-    }
-  }
-
-  return [node, children];
-}
+import { createTree, Depth } from './tree';
 
 export default function ExplorerPane() {
   const model = useModel<Model>();
