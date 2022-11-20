@@ -22,8 +22,8 @@ export enum NodeType {
 }
 
 export interface Node {
-  id: string;
   type: NodeType;
+  id: string;
   created: Timestamp;
   modified: Timestamp;
   tags?: string[];
@@ -62,6 +62,19 @@ export interface TextEmbedNode extends Node {
   type: NodeType.TextEmbed;
   fileID: string;
   description?: string;
+}
+
+export interface PseudoNode {
+  type: NodeType;
+  pseudo: true;
+  id: string;
+  tags?: string[];
+  parentID?: string;
+}
+
+export interface PseudoDirectoryNode extends PseudoNode {
+  type: NodeType.Directory;
+  name: string;
 }
 
 export interface File {
@@ -291,7 +304,23 @@ export default class Model {
     this.save();
   }
 
-  getNode(id: string) {
+  getNode(id?: string) {
+    if (id === undefined) {
+      return {
+        type: NodeType.Directory,
+        pseudo: true,
+        id: 'root',
+        name: '/'
+      } as PseudoDirectoryNode;
+    } else if (id === 'trash') {
+      return {
+        type: NodeType.Directory,
+        pseudo: true,
+        id: 'trash',
+        name: 'Trash'
+      } as PseudoDirectoryNode;
+    }
+
     return this.nodes.get().find(n => n.id == id);
   }
 

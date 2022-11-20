@@ -1,16 +1,27 @@
 import * as React from 'react';
 import { useModel, useObservable } from 'kyoka';
-import Model, { DateView, DirectoryNode, DirectoryView, Node, NodeType, ReservedID, TagView, ViewType } from './model';
+import Model, { DateView, DirectoryNode, DirectoryView, Node, NodeType, PseudoDirectoryNode, PseudoNode, ReservedID, TagView, ViewType } from './model';
 import { DateTimeFormatter, ZonedDateTime } from '@js-joda/core';
 
-interface TreeNode {
-  name?: string;
-  id?: string
-  children: TreeNode[];
+interface Depth {
   depth: number;
 }
 
-type TreeNodeArray = (TreeNode | TreeNodeArray)[];
+type NodeArray = (((Node | PseudoNode) & Depth) | NodeArray)[];
+
+function createTree(model: Model, parentID: string | undefined, depth = 0): NodeArray {
+  const node = model.getNode(parentID) as (DirectoryNode | PseudoDirectoryNode) & Depth;
+  node.depth = depth;
+  const children: NodeArray = [];
+
+  for (const child of model.getChildNodes(parentID)) {
+    if (child.type == NodeType.Directory) {
+      children.push(createTree(model, child.id, depth + 1));
+    }
+  }
+
+  return [node, children];
+}
 
 export default function ExplorerPane() {
   const model = useModel<Model>();
@@ -36,29 +47,9 @@ export default function ExplorerPane() {
     setDates(dates);
   }, [nodes]);
 
-  function createTree(parentID: string | undefined, depth = 0): TreeNodeArray {
-    let name = null;
-
-    if (parentID != null) {
-      // FIXME: This might cause a problem when tree updated
-      name = (model.getNode(parentID) as DirectoryNode).name;
-    }
-
-    const treeNode = { name, id: parentID, children: [], depth } as TreeNode;
-    const children: TreeNodeArray = [];
-
-    for (const child of model.getChildNodes(parentID)) {
-      if (child.type == NodeType.Directory) {
-        children.push(createTree(child.id, depth + 1));
-      }
-    }
-
-    return [treeNode, children];
-  }
-
   // Temporal fix for "Type instantiation is excessively deep and possibly infinite."
-  const directories = (createTree(undefined) as any[]).flat(Infinity) as TreeNode[];
-  directories.push({ name: 'Trash', id: ReservedID.Trash, depth: 0, children: [] });
+  const directories = (createTree(model, undefined) as any[]).flat(Infinity) as ((Node | PseudoNode) & Depth)[];
+  directories.push({ depth: 0, ...model.getNode('trash')! });
 
   return (
     <>
@@ -90,7 +81,7 @@ export default function ExplorerPane() {
               style={{ paddingLeft: `${d.depth * 10}px` }}
               onClick={e => model.changeView({ 'type': ViewType.Directory, parentID: d.id } as DirectoryView)}
             >
-              {d.name ?? '/'}
+              {(d as ((DirectoryNode | PseudoDirectoryNode) & Depth)).name}
             </div>)}
           </div>
         </div>
