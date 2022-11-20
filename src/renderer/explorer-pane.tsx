@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useModel, useObservable } from 'kyoka';
 import Model, { DateView, DirectoryNode, DirectoryView, Node, NodeType, PseudoDirectoryNode, PseudoNode, ReservedID, TagView, ViewType } from './model';
 import { DateTimeFormatter, ZonedDateTime } from '@js-joda/core';
-import { createTree, Depth } from './tree';
+import { createTree, Depth, flatten } from './tree';
 
 export default function ExplorerPane() {
   const model = useModel<Model>();
@@ -29,7 +29,7 @@ export default function ExplorerPane() {
   }, [nodes]);
 
   // Temporal fix for "Type instantiation is excessively deep and possibly infinite."
-  const directories = (createTree(model, undefined) as any[]).flat(Infinity) as ((Node | PseudoNode) & Depth)[];
+  const directories = flatten(createTree(model, undefined));
   directories.push({ depth: 0, ...model.getNode('trash')! });
 
   return (

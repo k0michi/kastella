@@ -19,3 +19,7 @@ export function createTree(model: Model, parentID: string | undefined, depth = 0
 
   return [node, children];
 }
+
+export function flatten(array: NestedNodeArray) {
+  return (array as any[]).flat(Infinity) as ((Node | PseudoNode) & Depth)[];
+}
