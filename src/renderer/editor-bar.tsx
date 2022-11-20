@@ -13,11 +13,11 @@ export default function EditorBar() {
   return <div id='editor-bar'>
     <div className='editor-bar-section'>
       {
-        view.type == ViewType.Directory ?
+        view?.type == ViewType.Directory ?
           `${model.getPath((view as DirectoryView).parentID!)}`
-          : view.type == ViewType.Tag ?
+          : view?.type == ViewType.Tag ?
             `#${model.getTag((view as TagView).tag)?.name}`
-            : view.type == ViewType.Date ?
+            : view?.type == ViewType.Date ?
               `@${(view as DateView).date}`
               : null
       }
