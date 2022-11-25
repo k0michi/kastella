@@ -216,8 +216,9 @@ body,
   left: 0px;
 }
 
-#editor-area textarea {
+#editor-area #notes textarea {
   width: 100%;
+  padding-left: 8px;
 }
 
 #editor-area .error {

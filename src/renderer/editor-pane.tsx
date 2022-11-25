@@ -214,7 +214,7 @@ export default function EditorPane() {
     }
 
     if (view?.type == ViewType.Directory) {
-      let parent =  (view as DirectoryView).parentID;
+      let parent = (view as DirectoryView).parentID;
 
       if (parent == ReservedID.Root) {
         parent = undefined;
@@ -386,6 +386,10 @@ export default function EditorPane() {
     observer.observe(editorRef.current!, observerOptions);
   }, []);
 
+  const last = filtered.at(-1);
+  const lastIndex = last != null ? last.index + 1 : 1;
+  const lastIndexDigits = Math.ceil(Math.log10(lastIndex));
+
   return <div id='editor-pane'>
     <EditorBar />
     <div id="editor-area" ref={editorRef}>
@@ -511,22 +515,25 @@ export default function EditorPane() {
                 </tr>;
               })
             }
+            <tr>
+              <td className='grip'></td>
+              {lineNumberVisibility ? <td className='index'>{'-'.repeat(lastIndexDigits)}</td> : null}
+              {dateVisibility ? <td className='date'></td> : null}
+              <td>
+                <textarea ref={inputRef} rows={1} onChange={e => setInput(e.target.value)}
+                  onFocus={e => {
+                    setSelected(undefined);
+                  }}
+                  onKeyDown={e => {
+                    if (e.key == 'Enter' && !e.nativeEvent.isComposing) {
+                      e.preventDefault();
+                      confirm();
+                    }
+                  }} value={input} />
+              </td>
+            </tr>
           </tbody>
         </table></div>
-      <div id="controls">
-        <div id='input'>
-          <textarea ref={inputRef} rows={1} onChange={e => setInput(e.target.value)}
-            onFocus={e => {
-              setSelected(undefined);
-            }}
-            onKeyDown={e => {
-              if (e.key == 'Enter' && !e.nativeEvent.isComposing) {
-                e.preventDefault();
-                confirm();
-              }
-            }} value={input} />
-        </div>
-      </div>
     </div>
   </div>;
 }
