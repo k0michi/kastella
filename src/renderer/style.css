@@ -184,6 +184,7 @@ body,
   text-align: right;
   white-space: nowrap;
   font-family: monospace;
+  user-select: none;
 }
 
 #editor-area #notes td.date {
