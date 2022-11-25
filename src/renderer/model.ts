@@ -154,6 +154,10 @@ export default class Model {
   // Nodes
 
   addNode(node: Node) {
+    if (node.parentID == ReservedID.Root) {
+      node.parentID = undefined;
+    }
+
     const newNodes = produce(this.nodes.get(), n => {
       n.push(node);
     });

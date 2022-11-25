@@ -214,7 +214,13 @@ export default function EditorPane() {
     }
 
     if (view?.type == ViewType.Directory) {
-      filtered = filtered.filter(n => n.parentID == (view as DirectoryView).parentID);
+      let parent =  (view as DirectoryView).parentID;
+
+      if (parent == ReservedID.Root) {
+        parent = undefined;
+      }
+
+      filtered = filtered.filter(n => n.parentID == parent);
     } else {
       filtered = filtered.filter(n => n.parentID != ReservedID.Trash);
     }
