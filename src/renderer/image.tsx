@@ -17,7 +17,7 @@ export default function Image(props: ImageProps) {
   React.useEffect(() => {
     return () => {
       if (url != undefined) {
-        URL.revokeObjectURL(props.file.id);
+        URL.revokeObjectURL(url);
       }
     };
   }, [url]);
