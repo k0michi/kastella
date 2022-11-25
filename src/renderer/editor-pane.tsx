@@ -489,7 +489,7 @@ export default function EditorPane() {
 
                     content = <div className={className}>
                       <div className='content math-node' dangerouslySetInnerHTML={{
-                        __html: Katex.renderToString(mathNode.expression)
+                        __html: Katex.renderToString(mathNode.expression, { displayMode: true })
                       }}>
                       </div>
                       <span className='tags'>{tagNames?.join(' ')}</span>

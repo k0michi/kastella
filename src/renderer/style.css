@@ -254,6 +254,15 @@ body,
   display: block;
 }
 
+#editor-area .math-node .katex-display {
+  margin: 0;
+  padding: .25em 0;
+}
+
+#editor-area .math-node .katex-display > .katex > .katex-html {
+  width: fit-content;
+}
+
 
 /* Explorer pane */
 
@@ -371,6 +380,7 @@ input[type="text"].invalid {
   background-color: rgb(63, 114, 226);
   color: rgb(255, 255, 255);
 }
+
 
 /* Math Block Dialog */
 
