@@ -5,7 +5,7 @@ import Timestamp from "./timestamp";
 import { round } from "./utils";
 import { validateLibrary } from "./validate";
 
-const LIBRARY_VERSION = 4;
+const LIBRARY_VERSION = 5;
 
 export interface Library {
   nodes: Node[];
@@ -19,6 +19,7 @@ export enum NodeType {
   Anchor = 'anchor',
   Directory = 'directory',
   TextEmbed = 'text-embed',
+  Math = 'math',
 }
 
 export interface Node {
@@ -62,6 +63,11 @@ export interface TextEmbedNode extends Node {
   type: NodeType.TextEmbed;
   fileID: string;
   description?: string;
+}
+
+export interface MathNode extends Node {
+  type: NodeType.Math;
+  expression: string;
 }
 
 export interface PseudoNode {
@@ -153,6 +159,7 @@ export default class Model {
     });
 
     this.nodes.set(newNodes);
+    this.save();
   }
 
   addTextNode(text: string, timeStamp: Timestamp, parentID?: string, tags?: string[]) {
@@ -172,7 +179,6 @@ export default class Model {
       index: this.getNextIndex()
     } as TextNode;
     this.addNode(node);
-    this.save();
     return node;
   }
 
@@ -195,7 +201,6 @@ export default class Model {
     } as ImageNode;
     this.addFile(file);
     this.addNode(node);
-    this.save();
     return node;
   }
 
@@ -218,7 +223,6 @@ export default class Model {
     } as TextEmbedNode;
     this.addFile(file);
     this.addNode(node);
-    this.save();
     return node;
   }
 
@@ -270,7 +274,26 @@ export default class Model {
       index: this.getNextIndex()
     } as AnchorNode;
     this.addNode(node);
-    this.save();
+    return node;
+  }
+
+  addMathNode(exp: string, timeStamp: Timestamp, parentID?: string, tags?: string[]) {
+    const id = uuidv4()
+
+    if (tags?.length == 0) {
+      tags = undefined;
+    }
+
+    const node = {
+      type: NodeType.Math,
+      expression: exp,
+      tags,
+      created: timeStamp,
+      modified: timeStamp,
+      id, parentID,
+      index: this.getNextIndex()
+    } as MathNode;
+    this.addNode(node);
     return node;
   }
 
@@ -378,6 +401,7 @@ export default class Model {
       n1.index = n2.index;
       n2.index = temp;
     }));
+    this.save();
   }
 
 
@@ -479,7 +503,6 @@ export default class Model {
       }
     }
 
-    this.save();
     return parentID;
   }
 

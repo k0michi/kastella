@@ -1015,6 +1015,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/katex@npm:^0.14.0":
+  version: 0.14.0
+  resolution: "@types/katex@npm:0.14.0"
+  checksum: 330e0d0337ba48c87f5b793965fbad673653789bf6e50dfe8d726a7b0cbefd37195055e31503aae629814aa79447e4f23a4b87ad1ac565c0d9a9d9978836f39b
+  languageName: node
+  linkType: hard
+
 "@types/keyv@npm:*, @types/keyv@npm:^3.1.1":
   version: 3.1.4
   resolution: "@types/keyv@npm:3.1.4"
@@ -1781,6 +1788,13 @@ __metadata:
   version: 5.1.0
   resolution: "commander@npm:5.1.0"
   checksum: 0b7fec1712fbcc6230fcb161d8d73b4730fa91a21dc089515489402ad78810547683f058e2a9835929c212fead1d6a6ade70db28bbb03edbc2829a9ab7d69447
+  languageName: node
+  linkType: hard
+
+"commander@npm:^8.0.0":
+  version: 8.3.0
+  resolution: "commander@npm:8.3.0"
+  checksum: 0f82321821fc27b83bd409510bb9deeebcfa799ff0bf5d102128b500b7af22872c0c92cb6a0ebc5a4cf19c6b550fba9cedfa7329d18c6442a625f851377bacf0
   languageName: node
   linkType: hard
 
@@ -3720,6 +3734,7 @@ __metadata:
     "@types/content-type": ^1.1.5
     "@types/electron": ^1.6.10
     "@types/jsdom": ^20.0.1
+    "@types/katex": ^0.14.0
     "@types/mime": ^3.0.1
     "@types/node-fetch": ^2.6.2
     "@types/react": ^18.0.15
@@ -3735,6 +3750,7 @@ __metadata:
     electron-squirrel-startup: ^1.0.0
     immer: ^9.0.15
     jsdom: ^20.0.2
+    katex: ^0.16.3
     kyoka: ^0.0.3
     mime: ^3.0.0
     node-fetch: 2
@@ -3745,6 +3761,17 @@ __metadata:
     vite: ^3.0.0
   languageName: unknown
   linkType: soft
+
+"katex@npm:^0.16.3":
+  version: 0.16.3
+  resolution: "katex@npm:0.16.3"
+  dependencies:
+    commander: ^8.0.0
+  bin:
+    katex: cli.js
+  checksum: 3ee588b6420da2b8d087c524502163f52340c4b0bf9ccddb2603d90d66eb637d088696ddf97316eb88d3bb41340784c4270e1824dcf7311110ed4cb2bc5458db
+  languageName: node
+  linkType: hard
 
 "keyv@npm:^3.0.0":
   version: 3.1.0

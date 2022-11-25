@@ -6,6 +6,8 @@ import ExplorerPane from './explorer-pane';
 import Model from './model';
 import StatusBar from './status-bar';
 import './style.css';
+import 'katex/dist/katex.css'
+import ToolBar from './tool-bar';
 
 const model = new Model();
 model.loadLibrary();
@@ -13,6 +15,7 @@ model.loadLibrary();
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <ModelProvider model={model}>
     <>
+      <ToolBar />
       <div id="main">
         <ExplorerPane />
         <EditorPane />

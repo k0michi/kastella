@@ -3,13 +3,14 @@ import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime';
 import { findStringIgnoreCase, isHTTPURL } from './utils';
 import { useModel, useObservable } from 'kyoka';
-import Model, { AnchorNode, DateView, DirectoryNode, DirectoryView, File, ImageNode, Node, NodeType, ReservedID, TagView, TextEmbedNode, TextNode, ViewType } from './model.js';
+import Model, { AnchorNode, DateView, DirectoryNode, DirectoryView, File, ImageNode, MathNode, Node, NodeType, ReservedID, TagView, TextEmbedNode, TextNode, ViewType } from './model.js';
 import EditorBar from './editor-bar';
 import Image from './image';
 import { DateTimeFormatter } from '@js-joda/core';
 import Timestamp from './timestamp';
 import TextEmbed from './text-embed';
 import { IconGripVertical } from '@tabler/icons';
+import Katex from 'katex';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -471,6 +472,16 @@ export default function EditorPane() {
                     } else {
                       content = <div className='error'>{`Failed to read ${textEmbedNode.fileID}`}</div>;
                     }
+                  } else if (n.type == NodeType.Math) {
+                    const mathNode = n as MathNode;
+
+                    content = <div className={className}>
+                      <div className='content math-node' dangerouslySetInnerHTML={{
+                        __html: Katex.renderToString(mathNode.expression)
+                      }}>
+                      </div>
+                      <span className='tags'>{tagNames?.join(' ')}</span>
+                    </div>;
                   }
                 }
 
