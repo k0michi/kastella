@@ -348,6 +348,8 @@ export default function EditorPane() {
   }, [selected]);
 
   React.useEffect(() => {
+    const MARGIN_Y = 2 ** 14;
+
     const iObserver = new IntersectionObserver((entries) => {
       for (const e of entries) {
         if (e.isIntersecting) {
@@ -358,7 +360,7 @@ export default function EditorPane() {
       }
     }, {
       root: editorRef.current,
-      rootMargin: '1024px 0px 1024px 0px'
+      rootMargin: `${MARGIN_Y}px 0px ${MARGIN_Y}px 0px`
     });
 
     const observerOptions = {
