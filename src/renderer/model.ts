@@ -510,6 +510,21 @@ export default class Model {
     return parentID;
   }
 
+  // Returns true if target is a descendant of parent
+  isDescendantOf(target: string, parent: (string | undefined)) {
+    let d: (string | undefined) = target;
+
+    while (d != undefined) {
+      d = (this.getNode(d) as DirectoryNode).parentID;
+
+      if (d == parent) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
 
   // Views
 

@@ -56,7 +56,11 @@ export default function ExplorerPane() {
               }}
               onDrop={e => {
                 const id = e.dataTransfer.getData('text/plain');
-                model.setParent(id, d.id);
+
+                if (!model.isDescendantOf(d.id!, id)) {
+                  model.setParent(id, d.id);
+                }
+
                 setDraggedOver(false);
               }}
               style={{ paddingLeft: `${d.depth * 10}px` }}
