@@ -230,6 +230,7 @@ body,
 
 #editor-area .tags {
   margin-left: 4px;
+  color: gray;
 }
 
 #editor-area .image-node img {
