@@ -62,7 +62,7 @@ export default function ExplorerPane() {
 
                 setDraggedOver(false);
               }}
-              style={{ paddingLeft: `${d.depth * 10}px` }}
+              style={{ paddingLeft: `${d.depth * 12 + 4}px` }}
               onClick={e => model.changeView({ 'type': ViewType.Directory, parentID: d.id } as DirectoryView)}
             >
               {(d as ((DirectoryNode | PseudoDirectoryNode) & Depth)).name}
