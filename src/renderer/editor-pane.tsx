@@ -426,8 +426,8 @@ export default function EditorPane() {
                     const textNode = n as TextNode;
 
                     content = <div className={className}>
-                      <span className='content text-node'>{textNode.content as string}</span>{' '}
-                      <span className='tags'>{tagNames?.join(' ')}</span>{' '}
+                      <span className='content text-node'>{textNode.content as string}</span>
+                      <span className='tags'>{tagNames?.join(' ')}</span>
                     </div>;
                   } else if (n.type == NodeType.Image) {
                     const imageNode = n as ImageNode;
@@ -447,7 +447,7 @@ export default function EditorPane() {
                     const dNode = n as DirectoryNode;
 
                     content = <div className={className}>
-                      <span className='content directory-node'>[dir] {dNode.name as string}</span>{' '}
+                      <span className='content directory-node'>[dir] {dNode.name as string}</span>
                       <span className='tags'>{tagNames?.join(' ')}</span>
                     </div>;
                   } else if (n.type == NodeType.Anchor) {

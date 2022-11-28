@@ -226,6 +226,10 @@ body,
   color: red;
 }
 
+#editor-area .tags {
+  margin-left: 4px;
+}
+
 #editor-area .image-node img {
   width: 256px;
   display: block;
