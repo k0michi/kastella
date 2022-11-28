@@ -73,7 +73,7 @@ export interface MathNode extends Node {
 export interface PseudoNode {
   type: NodeType;
   pseudo: true;
-  id: string;
+  id: string | undefined;
   tags?: string[];
   parentID?: string;
 }
@@ -127,9 +127,9 @@ export interface Status {
   message: string;
 }
 
-export enum ReservedID {
-  Root = 'root',
-  Trash = 'trash'
+export namespace ReservedID {
+  export const Root = undefined;
+  export const Trash = 'trash';
 }
 
 export default class Model {
@@ -380,7 +380,7 @@ export default class Model {
     const nodes = this.nodes.get();
     let dirID: string | undefined = directoryID;
 
-    if (directoryID === undefined || directoryID == ReservedID.Root) {
+    if (directoryID == ReservedID.Root) {
       return '/';
     }
 
@@ -514,12 +514,6 @@ export default class Model {
   // Views
 
   changeView(view: View) {
-    if (view.type == 'directory') {
-      if ((view as DirectoryView).parentID === undefined) {
-        (view as DirectoryView).parentID = ReservedID.Root;
-      }
-    }
-
     this.view.set(view);
   }
 
@@ -549,6 +543,26 @@ export default class Model {
     const newVisibleNodes = new Set(this.intersecting.get());
     newVisibleNodes.delete(id);
     this.intersecting.set(newVisibleNodes);
+  }
+
+  getViewDirectory() {
+    const view = this.view.get();
+
+    if (view != null && view.type == ViewType.Directory) {
+      return (view as DirectoryView).parentID;
+    }
+
+    return undefined;
+  }
+
+  getViewTags() {
+    const view = this.view.get();
+
+    if (view != null && view.type == ViewType.Tag) {
+      return [(view as TagView).tag];
+    }
+
+    return [];
   }
 
 

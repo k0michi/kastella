@@ -98,7 +98,11 @@ export default function EditorPane() {
             accessed,
             modified
           } as File;
-          model.addImageNode(image, accessed);
+
+          const parentID = model.getViewDirectory();
+          const tagIDs = model.getViewTags();
+          
+          model.addImageNode(image, accessed, parentID, tagIDs);
         }
 
         if (mimeType == 'text/plain') {
@@ -114,7 +118,11 @@ export default function EditorPane() {
             accessed,
             modified
           } as File;
-          model.addTextEmbedNode(image, accessed);
+
+          const parentID = model.getViewDirectory();
+          const tagIDs = model.getViewTags();
+
+          model.addTextEmbedNode(image, accessed, parentID, tagIDs);
         }
       }
     };
@@ -141,7 +149,7 @@ export default function EditorPane() {
 
     const [content, tags] = splitTags(input);
 
-    const tagIDs = tags.map(t => {
+    let tagIDs = tags.map(t => {
       const found = model.findTag(t);
 
       if (found == null) {
@@ -151,16 +159,8 @@ export default function EditorPane() {
       return found.id;
     });
 
-    const view = model.view.get();
-    let parentID = undefined;
-
-    if (view != null && view.type == ViewType.Directory) {
-      parentID = (view as DirectoryView).parentID;
-    }
-
-    if (view != null && view.type == ViewType.Tag) {
-      tagIDs.push((view as TagView).tag);
-    }
+    const parentID = model.getViewDirectory();
+    tagIDs = tagIDs.concat(model.getViewTags());
 
     setInput('');
 
@@ -256,7 +256,7 @@ export default function EditorPane() {
             const prevNode = filtered[foundIndex - 1];
 
             if (selectedNode != null && prevNode != null && foundIndex != -1) {
-              model.swapIndex(selectedNode.id, prevNode.id);
+              model.swapIndex(selectedNode.id!, prevNode.id);
             }
           }
         } else if (e.key == 'ArrowDown' && e.altKey) {
@@ -268,7 +268,7 @@ export default function EditorPane() {
             const prevNode = filtered[foundIndex + 1];
 
             if (selectedNode != null && prevNode != null && foundIndex != -1) {
-              model.swapIndex(selectedNode.id, prevNode.id);
+              model.swapIndex(selectedNode.id!, prevNode.id);
             }
           }
         } else if (e.key == 'ArrowUp') {

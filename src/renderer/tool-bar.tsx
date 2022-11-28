@@ -51,17 +51,10 @@ export default function ToolBar() {
             <div className='right'><button className='highlighted' onClick={async e => {
               if (!(rendered instanceof Error)) {
                 const now = Timestamp.fromNs(await bridge.now());
-                const view = model.view.get();
-                let parentID = undefined;
-                const tagIDs = []
+                let tagIDs: string[] = [];
 
-                if (view != null && view.type == ViewType.Directory) {
-                  parentID = (view as DirectoryView).parentID;
-                }
-
-                if (view != null && view.type == ViewType.Tag) {
-                  tagIDs.push((view as TagView).tag);
-                }
+                const parentID = model.getViewDirectory();
+                tagIDs = tagIDs.concat(model.getViewTags());
 
                 model.addMathNode(exp, now, parentID, tagIDs);
               }
