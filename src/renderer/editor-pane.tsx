@@ -426,8 +426,8 @@ export default function EditorPane() {
                     const textNode = n as TextNode;
 
                     content = <div className={className}>
-                      <span className='content text-node'>{textNode.content as string}</span>
-                      <span className='tags'>{tagNames?.join(' ')}</span>
+                      <div className='content text-node'>{textNode.content as string}</div>
+                      <div className='tags'>{tagNames?.join(' ')}</div>
                     </div>;
                   } else if (n.type == NodeType.Image) {
                     const imageNode = n as ImageNode;
@@ -438,7 +438,7 @@ export default function EditorPane() {
                         <div className='content image-node'>
                           <Image file={file} />
                         </div>
-                        <span className='tags'>{tagNames?.join(' ')}</span>
+                        <div className='tags'>{tagNames?.join(' ')}</div>
                       </div>;
                     } else {
                       content = <div className='error'>{`Failed to read ${imageNode.fileID}`}</div>;
@@ -447,8 +447,8 @@ export default function EditorPane() {
                     const dNode = n as DirectoryNode;
 
                     content = <div className={className}>
-                      <span className='content directory-node'>[dir] {dNode.name as string}</span>
-                      <span className='tags'>{tagNames?.join(' ')}</span>
+                      <div className='content directory-node'>[dir] {dNode.name as string}</div>
+                      <div className='tags'>{tagNames?.join(' ')}</div>
                     </div>;
                   } else if (n.type == NodeType.Anchor) {
                     const anchor = n as AnchorNode;
@@ -468,7 +468,7 @@ export default function EditorPane() {
                           }
                         </div>
                       </div>
-                      <span className='tags'>{tagNames?.join(' ')}</span>
+                      <div className='tags'>{tagNames?.join(' ')}</div>
                     </div>;
                   } else if (n.type == NodeType.TextEmbed) {
                     const textEmbedNode = n as TextEmbedNode;
@@ -479,7 +479,7 @@ export default function EditorPane() {
                         <div className='content text-embed-node'>
                           <TextEmbed file={file} />
                         </div>
-                        <span className='tags'>{tagNames?.join(' ')}</span>
+                        <div className='tags'>{tagNames?.join(' ')}</div>
                       </div>;
                     } else {
                       content = <div className='error'>{`Failed to read ${textEmbedNode.fileID}`}</div>;
@@ -492,7 +492,7 @@ export default function EditorPane() {
                         __html: Katex.renderToString(mathNode.expression, { displayMode: true })
                       }}>
                       </div>
-                      <span className='tags'>{tagNames?.join(' ')}</span>
+                      <div className='tags'>{tagNames?.join(' ')}</div>
                     </div>;
                   }
                 }
