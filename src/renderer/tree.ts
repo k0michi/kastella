@@ -21,5 +21,6 @@ export function createTree(model: Model, parentID: string | undefined, depth = 0
 }
 
 export function flatten(array: NestedNodeArray) {
+  // Temporal fix for "Type instantiation is excessively deep and possibly infinite."
   return (array as any[]).flat(Infinity) as ((Node | PseudoNode) & Depth)[];
 }

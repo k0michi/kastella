@@ -28,7 +28,6 @@ export default function ExplorerPane() {
     setDates(dates);
   }, [nodes]);
 
-  // Temporal fix for "Type instantiation is excessively deep and possibly infinite."
   const directories = flatten(createTree(model, undefined));
   directories.push({ depth: 0, ...model.getNode('trash')! });
 
