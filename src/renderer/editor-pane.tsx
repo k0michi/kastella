@@ -170,17 +170,21 @@ export default function EditorPane() {
       let imageFileID: string | undefined;
 
       if (meta.imageURL != undefined) {
-        const image = await bridge.fetchFile(meta.imageURL);
-        imageFileID = uuidv4();
-        await bridge.writeFile(imageFileID, image.data, image.type);
-        const imageFile = {
-          id: imageFileID,
-          type: image.type,
-          url: meta.imageURL,
-          modified: image.modified != undefined ? new Timestamp(image.modified) : undefined,
-          accessed
-        } as File;
-        model.addFile(imageFile);
+        try {
+          const image = await bridge.fetchFile(meta.imageURL);
+          imageFileID = uuidv4();
+          await bridge.writeFile(imageFileID, image.data, image.type);
+          const imageFile = {
+            id: imageFileID,
+            type: image.type,
+            url: meta.imageURL,
+            modified: image.modified != undefined ? new Timestamp(image.modified) : undefined,
+            accessed
+          } as File;
+          model.addFile(imageFile);
+        } catch (e) {
+          // Fetch error
+        }
       }
 
       model.addAnchorNode({
