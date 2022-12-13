@@ -1,5 +1,4 @@
-import { Instant, ZonedDateTime, ZoneId } from "@js-joda/core";
-import { Formatter } from "./utils";
+import { Instant, ZonedDateTime, ZoneId, DateTimeFormatter, DateTimeFormatterBuilder, ChronoField, ResolverStyle } from "@js-joda/core";
 
 // Immutable class to store a date string
 export default class Timestamp {
@@ -53,4 +52,80 @@ export default class Timestamp {
     t = t.plusNanos(Number(ns % 1_000_000_000n));
     return new Timestamp(t);
   }
+}
+
+// https://github.com/js-joda/js-joda/blob/main/packages/core/src/format/DateTimeFormatter.js
+export namespace Formatter {
+  export const ISO_LOCAL_TIME_WITH_NANO = new DateTimeFormatterBuilder()
+    .appendValue(ChronoField.HOUR_OF_DAY, 2)
+    .appendLiteral(':')
+    .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+    .optionalStart()
+    .appendLiteral(':')
+    .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+    .optionalStart()
+    .appendFraction(ChronoField.NANO_OF_SECOND, 9, 9, true)
+    .toFormatter(ResolverStyle.STRICT);
+
+  export const ISO_LOCAL_DATE_TIME_WITH_NANO = new DateTimeFormatterBuilder()
+    .parseCaseInsensitive()
+    .append(DateTimeFormatter.ISO_LOCAL_DATE)
+    .appendLiteral('T')
+    .append(ISO_LOCAL_TIME_WITH_NANO)
+    .toFormatter(ResolverStyle.STRICT);
+
+  // This format emits sub-seconds with 9 digits
+  export const ISO_OFFSET_DATE_TIME_WITH_NANO = new DateTimeFormatterBuilder()
+    .parseCaseInsensitive()
+    .append(ISO_LOCAL_DATE_TIME_WITH_NANO)
+    .appendOffsetId()
+    .toFormatter(ResolverStyle.STRICT);
+
+  export const ISO_LOCAL_TIME_WITH_MICRO = new DateTimeFormatterBuilder()
+    .appendValue(ChronoField.HOUR_OF_DAY, 2)
+    .appendLiteral(':')
+    .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+    .optionalStart()
+    .appendLiteral(':')
+    .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+    .optionalStart()
+    .appendFraction(ChronoField.NANO_OF_SECOND, 6, 6, true)
+    .toFormatter(ResolverStyle.STRICT);
+
+  export const ISO_LOCAL_DATE_TIME_WITH_MICRO = new DateTimeFormatterBuilder()
+    .parseCaseInsensitive()
+    .append(DateTimeFormatter.ISO_LOCAL_DATE)
+    .appendLiteral('T')
+    .append(ISO_LOCAL_TIME_WITH_MICRO)
+    .toFormatter(ResolverStyle.STRICT);
+
+  export const ISO_OFFSET_DATE_TIME_WITH_MICRO = new DateTimeFormatterBuilder()
+    .parseCaseInsensitive()
+    .append(ISO_LOCAL_DATE_TIME_WITH_MICRO)
+    .appendOffsetId()
+    .toFormatter(ResolverStyle.STRICT);
+
+  export const ISO_LOCAL_TIME_WITH_MILLI = new DateTimeFormatterBuilder()
+    .appendValue(ChronoField.HOUR_OF_DAY, 2)
+    .appendLiteral(':')
+    .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+    .optionalStart()
+    .appendLiteral(':')
+    .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+    .optionalStart()
+    .appendFraction(ChronoField.NANO_OF_SECOND, 3, 3, true)
+    .toFormatter(ResolverStyle.STRICT);
+
+  export const ISO_LOCAL_DATE_TIME_WITH_MILLI = new DateTimeFormatterBuilder()
+    .parseCaseInsensitive()
+    .append(DateTimeFormatter.ISO_LOCAL_DATE)
+    .appendLiteral('T')
+    .append(ISO_LOCAL_TIME_WITH_MILLI)
+    .toFormatter(ResolverStyle.STRICT);
+
+  export const ISO_OFFSET_DATE_TIME_WITH_MILLI = new DateTimeFormatterBuilder()
+    .parseCaseInsensitive()
+    .append(ISO_LOCAL_DATE_TIME_WITH_MILLI)
+    .appendOffsetId()
+    .toFormatter(ResolverStyle.STRICT);
 }
