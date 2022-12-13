@@ -28,7 +28,7 @@ export default function ExplorerPane() {
     setDates(dates);
   }, [nodes]);
 
-  const directories = flatten(createTree(model, undefined));
+  const directories = flatten(createTree(model, undefined, n => n.type == NodeType.Directory));
   directories.push({ depth: 0, ...model.getNode('trash')! });
 
   return (

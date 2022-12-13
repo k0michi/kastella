@@ -11,6 +11,7 @@ import Timestamp from './timestamp';
 import TextEmbed from './text-embed';
 import { IconGripVertical } from '@tabler/icons';
 import Katex from 'katex';
+import { createTree, createTreeFromArray, Depth, flatten } from './tree';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -101,7 +102,7 @@ export default function EditorPane() {
 
           const parentID = model.getViewDirectory();
           const tagIDs = model.getViewTags();
-          
+
           model.addImageNode(image, accessed, parentID, tagIDs);
         }
 
@@ -237,7 +238,8 @@ export default function EditorPane() {
       filtered = filtered.filter(n => n.created.asZonedDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE) == (view as DateView).date);
     }
 
-    return filtered;
+    const flattened = flatten(createTreeFromArray(model, filtered)) as (Node & Depth)[];
+    return flattened;
   }, [nodes, view, search]);
 
   React.useEffect(() => {
@@ -257,10 +259,19 @@ export default function EditorPane() {
           if (selected != null) {
             const selectedNode = model.getNode(selected);
             const foundIndex = filtered.findIndex(n => n.id == selected);
-            const prevNode = filtered[foundIndex - 1];
+            const node = filtered[foundIndex];
 
-            if (selectedNode != null && prevNode != null && foundIndex != -1) {
-              model.swapIndex(selectedNode.id!, prevNode.id);
+            for (let i = foundIndex - 1; i >= 0; i--) {
+              const n = filtered[i];
+
+              if (n.depth < node.depth) {
+                break;
+              }
+
+              if (n.depth == node.depth) {
+                model.swapIndex(selectedNode!.id!, n.id);
+                break;
+              }
             }
           }
         } else if (e.key == 'ArrowDown' && e.altKey) {
@@ -269,10 +280,19 @@ export default function EditorPane() {
           if (selected != null) {
             const selectedNode = model.getNode(selected);
             const foundIndex = filtered.findIndex(n => n.id == selected);
-            const prevNode = filtered[foundIndex + 1];
+            const node = filtered[foundIndex];
 
-            if (selectedNode != null && prevNode != null && foundIndex != -1) {
-              model.swapIndex(selectedNode.id!, prevNode.id);
+            for (let i = foundIndex +1; i < filtered.length; i++) {
+              const n = filtered[i];
+
+              if (n.depth < node.depth) {
+                break;
+              }
+
+              if (n.depth == node.depth) {
+                model.swapIndex(selectedNode!.id!, n.id);
+                break;
+              }
             }
           }
         } else if (e.key == 'ArrowUp') {
@@ -300,6 +320,8 @@ export default function EditorPane() {
             setSelected(undefined);
           }
         } else if (e.key == 'Backspace' && selected != undefined) {
+          e.preventDefault();
+
           if (view?.type == ViewType.Directory && (view as DirectoryView).parentID == ReservedID.Trash) {
             model.removeNode(selected);
           } else {
@@ -311,6 +333,39 @@ export default function EditorPane() {
 
           if (nextNode != null && foundIndex != -1) {
             setSelected(nextNode.id);
+          }
+        } else if (e.key == 'Tab' && e.shiftKey && selected != undefined) {
+          e.preventDefault();
+          const foundIndex = filtered.findIndex(n => n.id == selected);
+
+          if (foundIndex == -1) {
+            return;
+          }
+
+          const node = filtered[foundIndex];
+          const parent = model.getNode(node.parentID);
+          model.setParent(node.id, parent?.parentID);
+        } else if (e.key == 'Tab' && selected != undefined) {
+          e.preventDefault();
+          const foundIndex = filtered.findIndex(n => n.id == selected);
+
+          if (foundIndex == -1) {
+            return;
+          }
+
+          const node = filtered[foundIndex];
+
+          for (let i = foundIndex - 1; i >= 0; i--) {
+            const n = filtered[i];
+
+            if (n.depth < node.depth) {
+              break;
+            }
+
+            if (n.depth == node.depth) {
+              model.setParent(selected, n.id);
+              break;
+            }
           }
         }
       }
@@ -427,14 +482,14 @@ export default function EditorPane() {
 
                 if (visible) {
                   if (n.type == undefined || n.type == NodeType.Text) {
-                    const textNode = n as TextNode;
+                    const textNode = n as Node as TextNode;
 
                     content = <div className={className}>
                       <div className='content text-node'>{textNode.content as string}</div>
                       <div className='tags'>{tagNames?.join(' ')}</div>
                     </div>;
                   } else if (n.type == NodeType.Image) {
-                    const imageNode = n as ImageNode;
+                    const imageNode = n as Node as ImageNode;
                     const file = model.getFile(imageNode.fileID);
 
                     if (file != null) {
@@ -448,14 +503,14 @@ export default function EditorPane() {
                       content = <div className='error'>{`Failed to read ${imageNode.fileID}`}</div>;
                     }
                   } else if (n.type == NodeType.Directory) {
-                    const dNode = n as DirectoryNode;
+                    const dNode = n as Node as DirectoryNode;
 
                     content = <div className={className}>
                       <div className='content directory-node'>[dir] {dNode.name as string}</div>
                       <div className='tags'>{tagNames?.join(' ')}</div>
                     </div>;
                   } else if (n.type == NodeType.Anchor) {
-                    const anchor = n as AnchorNode;
+                    const anchor = n as Node as AnchorNode;
                     const imageFile = anchor.contentImageFileID != null ? model.getFile(anchor.contentImageFileID) : null;
                     const description = anchor.contentDescription;
 
@@ -475,7 +530,7 @@ export default function EditorPane() {
                       <div className='tags'>{tagNames?.join(' ')}</div>
                     </div>;
                   } else if (n.type == NodeType.TextEmbed) {
-                    const textEmbedNode = n as TextEmbedNode;
+                    const textEmbedNode = n as Node as TextEmbedNode;
                     const file = model.getFile(textEmbedNode.fileID);
 
                     if (file != null) {
@@ -489,7 +544,7 @@ export default function EditorPane() {
                       content = <div className='error'>{`Failed to read ${textEmbedNode.fileID}`}</div>;
                     }
                   } else if (n.type == NodeType.Math) {
-                    const mathNode = n as MathNode;
+                    const mathNode = n as Node as MathNode;
 
                     content = <div className={className}>
                       <div className='content math-node' dangerouslySetInnerHTML={{
@@ -515,7 +570,7 @@ export default function EditorPane() {
                     : null}</td>
                   {lineNumberVisibility ? <td className='index'>{n.index + 1}</td> : null}
                   {dateVisibility ? <td className='date'>{n.created.asString()}</td> : null}
-                  <td>
+                  <td style={{ paddingLeft: `${n.depth * 16}px` }}>
                     {content}
                   </td>
                 </tr>;

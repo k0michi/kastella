@@ -6,18 +6,28 @@ export interface Depth {
 
 export type NestedNodeArray = (((Node | PseudoNode) & Depth) | NestedNodeArray)[];
 
-export function createTree(model: Model, parentID: string | undefined, depth = 0): NestedNodeArray {
-  let node = model.getNode(parentID) as (DirectoryNode | PseudoDirectoryNode) & Depth;
+export function createTree(model: Model, parentID: string | undefined, filter = (node: Node) => true, depth = 0): NestedNodeArray {
+  let node = model.getNode(parentID) as (Node | PseudoDirectoryNode) & Depth;
   node = { ...node, depth };
   const children: NestedNodeArray = [];
 
   for (const child of model.getChildNodes(parentID)) {
-    if (child.type == NodeType.Directory) {
-      children.push(createTree(model, child.id, depth + 1));
+    if (filter(child)) {
+      children.push(createTree(model, child.id, filter, depth + 1));
     }
   }
 
   return [node, children];
+}
+
+export function createTreeFromArray(model: Model, nodes: Node[], depth = 0): NestedNodeArray {
+  const children: NestedNodeArray = [];
+
+  for (const child of nodes) {
+    children.push(createTree(model, child.id, () => true, depth + 1));
+  }
+
+  return children;
 }
 
 export function flatten(array: NestedNodeArray) {
