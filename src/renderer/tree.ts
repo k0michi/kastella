@@ -20,11 +20,11 @@ export function createTree(model: Model, parentID: string | undefined, filter = 
   return [node, children];
 }
 
-export function createTreeFromArray(model: Model, nodes: Node[], depth = 0): NestedNodeArray {
+export function createTreeFromArray(model: Model, nodes: Node[]): NestedNodeArray {
   const children: NestedNodeArray = [];
 
   for (const child of nodes) {
-    children.push(createTree(model, child.id, () => true, depth + 1));
+    children.push(createTree(model, child.id, () => true, 0));
   }
 
   return children;

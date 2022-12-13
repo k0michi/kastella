@@ -159,6 +159,11 @@ body,
 
 #editor-area #notes table {
   border-collapse: collapse;
+  width: 100%;
+}
+
+#editor-area #notes tr.invisible {
+  height: 16px;
 }
 
 #editor-area #notes td {
@@ -185,6 +190,7 @@ body,
   white-space: nowrap;
   font-family: monospace;
   user-select: none;
+  width: 0px;
 }
 
 #editor-area #notes td.date {
@@ -193,10 +199,6 @@ body,
   text-align: right;
   white-space: nowrap;
   font-style: italic;
-}
-
-#editor-area #notes tr.invisible {
-  height: 16px;
 }
 
 #editor-area #notes .note {
