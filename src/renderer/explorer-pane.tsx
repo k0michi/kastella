@@ -57,7 +57,7 @@ export default function ExplorerPane() {
                 const id = e.dataTransfer.getData('text/plain');
 
                 if (!model.isDescendantOf(d.id!, id)) {
-                  model.setParent(id, d.id);
+                  model.moveNode(id, d.id);
                 }
 
                 setDraggedOver(false);

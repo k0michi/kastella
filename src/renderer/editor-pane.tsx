@@ -325,7 +325,7 @@ export default function EditorPane() {
           if (view?.type == ViewType.Directory && (view as DirectoryView).parentID == ReservedID.Trash) {
             model.removeNode(selected);
           } else {
-            model.setParent(selected, ReservedID.Trash);
+            model.moveNode(selected, ReservedID.Trash);
           }
 
           const foundIndex = filtered.findIndex(n => n.id == selected);
@@ -344,7 +344,7 @@ export default function EditorPane() {
 
           const node = filtered[foundIndex];
           const parent = model.getNode(node.parentID);
-          model.setParent(node.id, parent?.parentID);
+          model.moveNode(node.id, parent?.parentID);
         } else if (e.key == 'Tab' && selected != undefined) {
           e.preventDefault();
           const foundIndex = filtered.findIndex(n => n.id == selected);
@@ -363,7 +363,7 @@ export default function EditorPane() {
             }
 
             if (n.depth == node.depth) {
-              model.setParent(selected, n.id);
+              model.moveNode(selected, n.id);
               break;
             }
           }

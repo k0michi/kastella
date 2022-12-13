@@ -365,8 +365,15 @@ export default class Model {
     return this.nodes.get().length;
   }
 
-  setParent(id: string, parentID: string | undefined) {
+  moveNode(id: string, parentID: string | undefined) {
     const foundIndex = this.nodes.get().findIndex(n => n.id == id);
+    const node = this.nodes.get()[foundIndex];
+
+    if (node.type == NodeType.Directory) {
+      if (this.getChildDirectories(parentID).some(d => (d as DirectoryNode).name == (node as DirectoryNode).name)) {
+        throw new Error(`Directory ${(node as DirectoryNode).name} already exists`);
+      }
+    }
 
     const newNodes = produce(this.nodes.get(), n => {
       n[foundIndex].parentID = parentID;
