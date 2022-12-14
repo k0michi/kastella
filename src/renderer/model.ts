@@ -3,7 +3,7 @@ import produce from 'immer';
 import { v4 as uuidv4 } from 'uuid';
 import Timestamp from "./timestamp";
 import { round } from "./utils";
-import { validateLibrary } from "./validate";
+// import { validateLibrary } from "./validate";
 
 const LIBRARY_VERSION = 5;
 
@@ -601,7 +601,7 @@ export default class Model {
       return value;
     }) as Library;
 
-    validateLibrary(data);
+    // validateLibrary(data);
 
     this.nodes.set(data.nodes ?? []);
     this.files.set(data.files ?? []);

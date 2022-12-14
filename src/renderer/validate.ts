@@ -1,6 +1,7 @@
 import { AnchorNode, DirectoryNode, File, ImageNode, Library, Node, NodeType, Tag, TextNode } from "./model";
 import Timestamp from "./timestamp";
 
+/* Obsolete
 export function validateLibrary(library: Library) {
   assert(typeof library == 'object');
   assert(Array.isArray(library.nodes));
@@ -89,3 +90,4 @@ function assert(condition: boolean) {
     throw new Error('Validation failed');
   }
 }
+*/
