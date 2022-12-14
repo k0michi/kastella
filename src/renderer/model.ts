@@ -136,6 +136,7 @@ export default class Model {
   nodes = new Observable<Node[]>([]); // mutable
   files = new Observable<File[]>([]); // mutable
   tags = new Observable<Tag[]>([]); // mutable
+  nodeMap = new Map<string, Node>();
 
   view = new Observable<View | undefined>(undefined);
   saving = new Observable<boolean>(false);
@@ -160,6 +161,8 @@ export default class Model {
     }
 
     this.nodes.get().push(node);
+    this.nodeMap.set(node.id, node);
+
     this.nodes.set(this.nodes.get()); // Explicitly update
     this.save();
   }
@@ -319,6 +322,7 @@ export default class Model {
 
     const nodes = this.nodes.get();
     nodes.splice(nodes.findIndex(n => n.id == id), 1);
+    this.nodeMap.delete(id);
 
     for (const n of nodes) {
       if (n.index > index) {
@@ -332,6 +336,7 @@ export default class Model {
 
   getNode(id?: string) {
     if (id === undefined) {
+      // TODO: Make this singleton
       return {
         type: NodeType.Directory,
         pseudo: true,
@@ -347,7 +352,7 @@ export default class Model {
       } as PseudoDirectoryNode;
     }
 
-    return this.nodes.get().find(n => n.id == id);
+    return this.nodeMap.get(id);
   }
 
   getChildNodes(parentID: string | undefined) {
@@ -591,6 +596,12 @@ export default class Model {
     }) as Library;
 
     // validateLibrary(data);
+
+    this.nodeMap.clear();
+
+    for (const n of data.nodes) {
+      this.nodeMap.set(n.id, n);
+    }
 
     this.nodes.set(data.nodes ?? []);
     this.files.set(data.files ?? []);
