@@ -20,7 +20,7 @@ export default function EditorPane() {
   const view = useObservable(model.view);
   const [input, setInput] = React.useState<string>('');
   const editorRef = React.useRef<HTMLDivElement>(null);
-  const notesRef = React.useRef<HTMLDivElement>(null);
+  const nodesRef = React.useRef<HTMLDivElement>(null);
   const [atBottom, setAtBottom] = React.useState(true);
   const [selected, setSelected] = React.useState<string>();
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
@@ -70,7 +70,7 @@ export default function EditorPane() {
       }
     });
 
-    resizeObserver.observe(notesRef.current!);
+    resizeObserver.observe(nodesRef.current!);
 
     return () => {
       resizeObserver.disconnect();
@@ -383,7 +383,7 @@ export default function EditorPane() {
   }, [view]);
 
   React.useEffect(() => {
-    const node = notesRef.current?.querySelector(`[data-id="${selected}"]`);
+    const node = nodesRef.current?.querySelector(`[data-id="${selected}"]`);
     const editorArea = editorRef.current;
 
     if (node != null && editorArea != null) {
@@ -454,7 +454,7 @@ export default function EditorPane() {
   return <div id='editor-pane'>
     <EditorBar />
     <div id="editor-area" ref={editorRef}>
-      <div id="notes" ref={notesRef}>
+      <div id="nodes" ref={nodesRef}>
         <table>
           <tbody
             onMouseLeave={e => {
@@ -470,7 +470,7 @@ export default function EditorPane() {
             {writeOnly ? null :
               filtered.map(n => {
                 const id = n.id;
-                let className = 'note';
+                let className = 'node';
 
                 if (id == selected) {
                   className += ' selected';

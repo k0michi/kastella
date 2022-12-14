@@ -18,8 +18,8 @@ export default function ExplorerPane() {
   React.useEffect(() => {
     const dateSet = new Set<string>();
 
-    for (const note of nodes) {
-      const dateString = note.created.asZonedDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE);
+    for (const node of nodes) {
+      const dateString = node.created.asZonedDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE);
       dateSet.add(dateString);
     }
 

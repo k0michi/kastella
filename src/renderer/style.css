@@ -153,37 +153,37 @@ body,
   line-height: 1.75;
 }
 
-#editor-area #notes {
+#editor-area #nodes {
   white-space: pre-wrap;
 }
 
-#editor-area #notes table {
+#editor-area #nodes table {
   border-collapse: collapse;
   width: 100%;
 }
 
-#editor-area #notes tr.invisible {
+#editor-area #nodes tr.invisible {
   height: 16px;
 }
 
-#editor-area #notes td {
+#editor-area #nodes td {
   padding: 0;
   vertical-align: top;
 }
 
-#editor-area #notes td.grip {
+#editor-area #nodes td.grip {
   color: rgb(117, 117, 117);
   position: relative;
   width: 16px;
   min-width: 16px;
 }
 
-#editor-area #notes td.grip svg {
+#editor-area #nodes td.grip svg {
   position: absolute;
   cursor: grab;
 }
 
-#editor-area #notes td.index {
+#editor-area #nodes td.index {
   color: rgb(117, 117, 117);
   padding-right: 4px;
   text-align: right;
@@ -193,7 +193,7 @@ body,
   width: 0px;
 }
 
-#editor-area #notes td.date {
+#editor-area #nodes td.date {
   color: rgb(117, 117, 117);
   padding-right: 4px;
   text-align: right;
@@ -201,18 +201,18 @@ body,
   font-style: italic;
 }
 
-#editor-area #notes .note {
+#editor-area #nodes .node {
   padding-left: 8px;
   position: relative;
   display: flex;
   flex-direction: row;
 }
 
-#editor-area #notes .note.selected {
+#editor-area #nodes .node.selected {
   background-color: rgb(40, 76, 87);
 }
 
-#editor-area #notes .note.selected::before {
+#editor-area #nodes .node.selected::before {
   content: '';
   position: absolute;
   background-color: rgb(24, 176, 222);
@@ -221,7 +221,7 @@ body,
   left: 0px;
 }
 
-#editor-area #notes textarea {
+#editor-area #nodes textarea {
   width: 100%;
   padding-left: 8px;
 }
