@@ -133,9 +133,10 @@ export namespace ReservedID {
 }
 
 export default class Model {
-  nodes = new Observable<Node[]>([]);
-  files = new Observable<File[]>([]);
-  tags = new Observable<Tag[]>([]);
+  nodes = new Observable<Node[]>([]); // mutable
+  files = new Observable<File[]>([]); // mutable
+  tags = new Observable<Tag[]>([]); // mutable
+
   view = new Observable<View | undefined>(undefined);
   saving = new Observable<boolean>(false);
   writeOnly = new Observable<boolean>(true);
@@ -158,11 +159,8 @@ export default class Model {
       node.parentID = undefined;
     }
 
-    const newNodes = produce(this.nodes.get(), n => {
-      n.push(node);
-    });
-
-    this.nodes.set(newNodes);
+    this.nodes.get().push(node);
+    this.nodes.set(this.nodes.get()); // Explicitly update
     this.save();
   }
 
@@ -319,17 +317,16 @@ export default class Model {
 
     const index = found.index;
 
-    const newNodes = produce(this.nodes.get(), nodes => {
-      nodes.splice(nodes.findIndex(n => n.id == id), 1);
+    const nodes = this.nodes.get();
+    nodes.splice(nodes.findIndex(n => n.id == id), 1);
 
-      for (const n of nodes) {
-        if (n.index > index) {
-          n.index--;
-        }
+    for (const n of nodes) {
+      if (n.index > index) {
+        n.index--;
       }
-    });
+    }
 
-    this.nodes.set(newNodes);
+    this.nodes.set(this.nodes.get());
     this.save();
   }
 
@@ -375,11 +372,9 @@ export default class Model {
       }
     }
 
-    const newNodes = produce(this.nodes.get(), n => {
-      n[foundIndex].parentID = parentID;
-    });
+    this.nodes.get()[foundIndex].parentID = parentID;
 
-    this.nodes.set(newNodes);
+    this.nodes.set(this.nodes.get());
     this.save();
   }
 
@@ -405,13 +400,14 @@ export default class Model {
   }
 
   swapIndex(id1: string, id2: string) {
-    this.nodes.set(produce(this.nodes.get(), nodes => {
-      const n1 = nodes.find(n => n.id == id1)!;
-      const n2 = nodes.find(n => n.id == id2)!;
-      const temp = n1.index;
-      n1.index = n2.index;
-      n2.index = temp;
-    }));
+    const nodes = this.nodes.get();
+    const n1 = nodes.find(n => n.id == id1)!;
+    const n2 = nodes.find(n => n.id == id2)!;
+    const temp = n1.index;
+    n1.index = n2.index;
+    n2.index = temp;
+
+    this.nodes.set(this.nodes.get());
     this.save();
   }
 
@@ -419,22 +415,19 @@ export default class Model {
   // Files
 
   addFile(file: File) {
-    const newFiles = produce(this.files.get(), f => {
-      f.push(file);
-    });
+    this.files.get().push(file);
 
-    this.files.set(newFiles);
+    this.files.set(this.files.get());
   }
 
   removeFile(fileID: string) {
     const found = this.files.get().findIndex(f => f.id == fileID);
     bridge.removeFile(this.files.get()[found].id);
 
-    const newFiles = produce(this.files.get(), f => {
-      f.splice(f.findIndex(f => f.id == fileID), 1);
-    });
+    const files = this.files.get();
+    files.splice(files.findIndex(f => f.id == fileID), 1);
 
-    this.files.set(newFiles);
+    this.files.set(this.files.get());
     this.save();
   }
 
@@ -449,11 +442,9 @@ export default class Model {
   createTag(name: string) {
     const id = uuidv4();
 
-    const newTags = produce(this.tags.get(), t => {
-      t.push({ id, name });
-    });
+    this.tags.get().push({ id, name });
 
-    this.tags.set(newTags);
+    this.tags.set(this.tags.get());
     this.save();
     return id;
   }
@@ -469,19 +460,17 @@ export default class Model {
   appendTag(id: string, tagID: string) {
     const foundIndex = this.nodes.get().findIndex(n => n.id == id);
 
-    const newNodes = produce(this.nodes.get(), n => {
-      const node = n[foundIndex];
+    const node = this.nodes.get()[foundIndex];
 
-      if (node.tags == undefined) {
-        node.tags = [tagID];
-      } else {
-        if (!node.tags.includes(tagID)) {
-          node.tags.push(tagID);
-        }
+    if (node.tags == undefined) {
+      node.tags = [tagID];
+    } else {
+      if (!node.tags.includes(tagID)) {
+        node.tags.push(tagID);
       }
-    });
+    }
 
-    this.nodes.set(newNodes);
+    this.nodes.set(this.nodes.get());
     this.save();
   }
 

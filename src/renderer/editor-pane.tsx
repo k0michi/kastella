@@ -141,7 +141,7 @@ export default function EditorPane() {
       document.removeEventListener('drop', onDrop);
       document.removeEventListener('dragover', onDragover);
     };
-  }, [nodes]);
+  }, [model.nodes.getSnapShot()]);
 
   async function confirm() {
     if (input.length == 0) {
@@ -240,7 +240,7 @@ export default function EditorPane() {
 
     const flattened = flatten(createTreeFromArray(model, filtered)) as (Node & Depth)[];
     return flattened;
-  }, [nodes, view, search]);
+  }, [model.nodes.getSnapShot(), view, search]);
 
   React.useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
