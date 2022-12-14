@@ -7,6 +7,7 @@ import Model from './model';
 import StatusBar from './status-bar';
 import './style.css';
 import 'katex/dist/katex.css'
+import 'modern-normalize/modern-normalize.css';
 import ToolBar from './tool-bar';
 
 const model = new Model();
