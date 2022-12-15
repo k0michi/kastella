@@ -1,36 +1,29 @@
-import Model, { DateView, DirectoryNode, DirectoryView, Node, NodeType, PseudoDirectoryNode, PseudoNode, ReservedID, TagView, ViewType } from './model';
+import Model, { DateView, DirectoryNode, DirectoryView, Node, NodeType, ReservedID, TagView, ViewType } from './model';
 
 export interface Depth {
   depth: number;
 }
 
-export type NestedNodeArray = (((Node | PseudoNode) & Depth) | NestedNodeArray)[];
+export function* visit(node: Node[] | Node, filter = (node: Node) => true): Generator<Node> {
+  let children;
 
-export function createTree(model: Model, parentID: string | undefined, filter = (node: Node) => true, depth = 0): NestedNodeArray {
-  let node = model.getNode(parentID) as (Node | PseudoDirectoryNode) & Depth;
-  node = { ...node, depth };
-  const children: NestedNodeArray = [];
+  if (!Array.isArray(node)) {
+    children = node.children;
 
-  for (const child of model.getChildNodes(parentID)) {
+    if (filter(node)) {
+      yield node;
+    }
+  } else {
+    children = node;
+  }
+
+  for (const child of children) {
     if (filter(child)) {
-      children.push(createTree(model, child.id, filter, depth + 1));
+      yield* visit(child, filter);
     }
   }
-
-  return [node, children];
 }
 
-export function createTreeFromArray(model: Model, nodes: Node[]): NestedNodeArray {
-  const children: NestedNodeArray = [];
-
-  for (const child of nodes) {
-    children.push(createTree(model, child.id, () => true, 0));
-  }
-
-  return children;
-}
-
-export function flatten(array: NestedNodeArray) {
-  // Temporal fix for "Type instantiation is excessively deep and possibly infinite."
-  return (array as any[]).flat(Infinity) as ((Node | PseudoNode) & Depth)[];
+export function isDirectory(node: Node) {
+  return node.type == NodeType.Directory;
 }

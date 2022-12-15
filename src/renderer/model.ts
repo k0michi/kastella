@@ -2,15 +2,18 @@ import { Observable } from "kyoka";
 import produce from 'immer';
 import { v4 as uuidv4 } from 'uuid';
 import Timestamp from "./timestamp";
-import { round } from "./utils";
+import { arrayInsertBefore, arrayRemove, round } from "./utils";
+import { Version5 } from "./compat";
+import { visit } from "./tree";
 // import { validateLibrary } from "./validate";
 
-const LIBRARY_VERSION = 5;
+const LIBRARY_VERSION = 6;
 
 export interface Library {
   nodes: Node[];
   files: File[];
   tags: Tag[];
+  version: number;
 }
 
 export enum NodeType {
@@ -25,12 +28,21 @@ export enum NodeType {
 export interface Node {
   type: NodeType;
   id: string;
-  created: Timestamp;
-  modified: Timestamp;
+  created?: Timestamp;
+  modified?: Timestamp;
   tags?: string[];
-  index: number;
-  parentID?: string;
+  children: Node[];
+
+  parent?: Node; // memoization
+  index?: number; // memoization
+  depth?: number; // memoization
 }
+
+/*
+export interface RootNode extends Node {
+  type: undefined;
+}
+*/
 
 export interface TextNode extends Node {
   type: NodeType.Text;
@@ -56,7 +68,7 @@ export interface AnchorNode extends Node {
 
 export interface DirectoryNode extends Node {
   type: NodeType.Directory;
-  name: string;
+  name: string | undefined;
 }
 
 export interface TextEmbedNode extends Node {
@@ -68,19 +80,6 @@ export interface TextEmbedNode extends Node {
 export interface MathNode extends Node {
   type: NodeType.Math;
   expression: string;
-}
-
-export interface PseudoNode {
-  type: NodeType;
-  pseudo: true;
-  id: string | undefined;
-  tags?: string[];
-  parentID?: string;
-}
-
-export interface PseudoDirectoryNode extends PseudoNode {
-  type: NodeType.Directory;
-  name: string;
 }
 
 export interface File {
@@ -109,7 +108,7 @@ export interface View {
 
 export interface DirectoryView extends View {
   type: ViewType.Directory;
-  parentID?: string;
+  parentID: string;
 }
 
 export interface TagView extends View {
@@ -128,7 +127,7 @@ export interface Status {
 }
 
 export namespace ReservedID {
-  export const Root = undefined;
+  export const Master = 'master';
   export const Trash = 'trash';
 }
 
@@ -149,105 +148,155 @@ export default class Model {
   intersecting = new Observable<Set<string>>(new Set());
 
   constructor() {
-    this.changeView({ type: ViewType.Directory });
+    this.changeView({ type: ViewType.Directory, parentID: ReservedID.Master } as DirectoryView);
+    this.initializeData({
+      nodes: Model.blankNodes(),
+      files: [],
+      tags: [],
+      version: LIBRARY_VERSION
+    });
   }
 
 
   // Nodes
 
-  addNode(node: Node) {
-    if (node.parentID == ReservedID.Root) {
-      node.parentID = undefined;
-    }
-
-    this.nodes.get().push(node);
-    this.nodeMap.set(node.id, node);
-
-    this.nodes.set(this.nodes.get()); // Explicitly update
-    this.save();
+  static blankNodes() {
+    return [
+      {
+        type: NodeType.Directory,
+        id: ReservedID.Master,
+        children: [] as Node[]
+      } as DirectoryNode,
+      {
+        type: NodeType.Directory,
+        id: ReservedID.Trash,
+        children: [] as Node[]
+      } as DirectoryNode
+    ];
   }
 
-  addTextNode(text: string, timeStamp: Timestamp, parentID?: string, tags?: string[]) {
+  addNode(parent: Node | string, node: Node) {
+    if (typeof parent == 'string') {
+      parent = this.getNode(parent);
+    }
+
+    /*
+    // Set parent
+    node.parent = parent;
+
+    const prevNode = Model.getLastNodeOf(parent);
+    const prevIndex = prevNode.index!;
+
+    // Set index
+    node.index = prevIndex + 1;
+
+    for (const node of visit(this.nodes.get())) {
+      if (node.index! > prevIndex) {
+        node.index!++;
+      }
+    }
+
+    // Set depth
+    node.depth = parent.depth! + 1;
+    */
+
+    // Put on map
+    this.nodeMap.set(node.id, node);
+
+    parent.children.push(node);
+
+    // Stable, but not efficient
+    this.recalculateParent();
+    this.recalculateIndex();
+    this.recalculateDepth();
+
+    this.nodes.set(this.nodes.get()); // Explicitly update
+    this.saveLibrary();
+  }
+
+  addTextNode(text: string, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
     const id = uuidv4();
 
     if (tags?.length == 0) {
       tags = undefined;
     }
 
-    const node = {
+    const node: TextNode = {
       type: NodeType.Text,
       content: text,
       tags,
       created: timeStamp,
       modified: timeStamp,
-      id, parentID,
-      index: this.getNextIndex()
-    } as TextNode;
-    this.addNode(node);
+      id,
+      children: []
+    };
+
+    this.addNode(parent, node);
     return node;
   }
 
-  addImageNode(file: File, timeStamp: Timestamp, parentID?: string, tags?: string[]) {
+  addImageNode(file: File, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
     const id = uuidv4()
 
     if (tags?.length == 0) {
       tags = undefined;
     }
 
-    const node = {
+    const node: ImageNode = {
       type: NodeType.Image,
       fileID: file.id,
       tags,
       created: timeStamp,
       modified: timeStamp,
       id,
-      parentID,
-      index: this.getNextIndex()
-    } as ImageNode;
+      children: []
+    };
+
     this.addFile(file);
-    this.addNode(node);
+    this.addNode(parent, node);
     return node;
   }
 
-  addTextEmbedNode(file: File, timeStamp: Timestamp, parentID?: string, tags?: string[]) {
+  addTextEmbedNode(file: File, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
     const id = uuidv4()
 
     if (tags?.length == 0) {
       tags = undefined;
     }
 
-    const node = {
+    const node: TextEmbedNode = {
       type: NodeType.TextEmbed,
       fileID: file.id,
       tags,
       created: timeStamp,
       modified: timeStamp,
       id,
-      parentID,
-      index: this.getNextIndex()
-    } as TextEmbedNode;
+      children: []
+    };
+
     this.addFile(file);
-    this.addNode(node);
+    this.addNode(parent, node);
     return node;
   }
 
-  addDirectoryNode(name: string, timeStamp: Timestamp, parentID?: string, tags?: string[]) {
+  addDirectoryNode(name: string, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
     const id = uuidv4()
 
     if (tags?.length == 0) {
       tags = undefined;
     }
 
-    const node = {
+    const node: DirectoryNode = {
       type: NodeType.Directory,
       name: name,
       tags,
       created: timeStamp,
       modified: timeStamp,
-      id, parentID,
-      index: this.getNextIndex()
-    } as DirectoryNode;
-    this.addNode(node);
+      id,
+      children: []
+    };
+
+    this.addNode(parent, node);
     return node;
   }
 
@@ -261,7 +310,7 @@ export default class Model {
     contentAccessed: Timestamp
   },
     timeStamp: Timestamp,
-    parentID?: string,
+    parent: Node | string,
     tags?: string[]) {
     const id = uuidv4();
 
@@ -269,151 +318,261 @@ export default class Model {
       tags = undefined;
     }
 
-    const node = {
+    const node: AnchorNode = {
       type: NodeType.Anchor,
       ...anchor,
       created: timeStamp,
       modified: timeStamp,
       id,
-      parentID,
-      index: this.getNextIndex()
-    } as AnchorNode;
-    this.addNode(node);
+      children: []
+    };
+
+    this.addNode(parent, node);
     return node;
   }
 
-  addMathNode(exp: string, timeStamp: Timestamp, parentID?: string, tags?: string[]) {
+  addMathNode(exp: string, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
     const id = uuidv4()
 
     if (tags?.length == 0) {
       tags = undefined;
     }
 
-    const node = {
+    const node: MathNode = {
       type: NodeType.Math,
       expression: exp,
       tags,
       created: timeStamp,
       modified: timeStamp,
-      id, parentID,
-      index: this.getNextIndex()
-    } as MathNode;
-    this.addNode(node);
+      id,
+      children: []
+    };
+
+    this.addNode(parent, node);
     return node;
   }
 
-  removeNode(id: string) {
-    const foundIndex = this.nodes.get().findIndex(n => n.id == id);
-    const found = this.nodes.get()[foundIndex];
+  removeNode(node: Node | string) {
+    if (typeof node == 'string') {
+      const n = this.getNode(node);
 
-    if (found.type == NodeType.Image) {
-      this.removeFile((found as ImageNode).fileID);
+      if (n == undefined) {
+        throw new Error();
+      }
+
+      node = n;
     }
 
-    if (found.type == NodeType.Anchor) {
-      const fileID = (found as AnchorNode).contentImageFileID;
+    if (node.type == NodeType.Image) {
+      this.removeFile((node as ImageNode).fileID);
+    }
+
+    if (node.type == NodeType.Anchor) {
+      const fileID = (node as AnchorNode).contentImageFileID;
 
       if (fileID != null) {
         this.removeFile(fileID);
       }
     }
 
-    const index = found.index;
+    arrayRemove(node.parent!.children, node.parent!.children.indexOf(node));
 
-    const nodes = this.nodes.get();
-    nodes.splice(nodes.findIndex(n => n.id == id), 1);
-    this.nodeMap.delete(id);
-
-    for (const n of nodes) {
-      if (n.index > index) {
-        n.index--;
+    /*
+    // Update index
+    for (const n of visit(this.nodes.get())) {
+      if (n.index! > node.index!) {
+        n.index!--;
       }
     }
+    */
+
+    // Delete from map
+    this.nodeMap.delete(node.id);
 
     this.nodes.set(this.nodes.get());
-    this.save();
+
+    this.recalculateParent();
+    this.recalculateIndex();
+    this.recalculateDepth();
+
+    this.saveLibrary();
   }
 
-  getNode(id?: string) {
-    if (id === undefined) {
-      // TODO: Make this singleton
-      return {
-        type: NodeType.Directory,
-        pseudo: true,
-        id: ReservedID.Root,
-        name: '/'
-      } as PseudoDirectoryNode;
-    } else if (id === 'trash') {
-      return {
-        type: NodeType.Directory,
-        pseudo: true,
-        id: ReservedID.Trash,
-        name: 'Trash'
-      } as PseudoDirectoryNode;
+  getNode(id: string) {
+    const node = this.nodeMap.get(id);
+
+    if (node == undefined) {
+      throw new Error(`Node ${id} not found`);
     }
 
-    return this.nodeMap.get(id);
+    return node;
   }
 
-  getChildNodes(parentID: string | undefined) {
-    return this.nodes.get().filter(n => n.parentID == parentID);
+  getNodeIfNeeded(node: string | Node) {
+    if (typeof node == 'string') {
+      return this.getNode(node);
+    }
+
+    return node;
   }
 
-  getChildDirectories(parentID: string | undefined) {
-    return this.nodes.get().filter(n => n.type == NodeType.Directory && n.parentID == parentID);
+  getChildNodes(parentID: string) {
+    return this.nodeMap.get(parentID)?.children;
   }
 
-  getNextIndex() {
-    return this.nodes.get().length;
+  getChildDirectories(parentID: string) {
+    return this.nodeMap.get(parentID)?.children.filter(n => n.type == NodeType.Directory);
   }
 
-  moveNode(id: string, parentID: string | undefined) {
-    const foundIndex = this.nodes.get().findIndex(n => n.id == id);
-    const node = this.nodes.get()[foundIndex];
+  canMoveNode(id: string, parentID: string) {
+    return id != parentID && !this.isDescendantOf(parentID, id);
+  }
+
+  moveNodeBefore(id: string | Node, parent: string | Node, reference: string | Node | undefined = undefined) {
+    const node = this.getNodeIfNeeded(id);
+    const newParent = this.getNodeIfNeeded(parent);
+    const referenceNode = reference != undefined ? this.getNodeIfNeeded(reference) : undefined;
+
+    if (node == newParent) {
+      throw new Error("Node cannot be moved into itself");
+    }
+
+    if (this.isDescendantOf(newParent.id, node.id)) {
+      throw new Error("Node cannot be moved into it's descendant");
+    }
+
+    if (referenceNode != undefined && referenceNode.parent != newParent) {
+      throw new Error("Reference node is invalid");
+    }
 
     if (node.type == NodeType.Directory) {
-      if (this.getChildDirectories(parentID).some(d => (d as DirectoryNode).name == (node as DirectoryNode).name)) {
+      if (newParent.children
+        .filter(n => n.type == NodeType.Directory)
+        .some(d => d != node && (d as DirectoryNode).name == (node as DirectoryNode).name)) {
         throw new Error(`Directory ${(node as DirectoryNode).name} already exists`);
       }
     }
 
-    this.nodes.get()[foundIndex].parentID = parentID;
+    arrayRemove(node.parent!.children, node.parent!.children.indexOf(node));
+
+    /*
+    // Set parent
+    node.parent = newParent;
+
+    // Set index
+    const currentIndex = node.index!;
+    let newIndex;
+
+    if (referenceNode != undefined) {
+      newIndex = referenceNode.index!;
+    } else {
+      newIndex = Model.getLastNodeOf(newParent).index! + 1;
+    }
+
+    if (currentIndex == newIndex) {
+      return;
+    }
+    
+    if (currentIndex < newIndex) {
+      newIndex--;
+    }
+
+    node.index = newIndex;
+
+    for (const node of visit(this.nodes.get())) {
+      if (node.index! > currentIndex && node.index! <= newIndex) {
+        node.index!--;
+      }else if (node.index! >= newIndex && node.index! < currentIndex) {
+        node.index!++;
+      }
+    }
+
+    // Set depth
+    node.depth = newParent.depth! + 1;
+    */
+
+    arrayInsertBefore(newParent.children, node, referenceNode != undefined ?
+      newParent.children.indexOf(referenceNode) :
+      -1
+    );
 
     this.nodes.set(this.nodes.get());
-    this.save();
+
+    this.recalculateParent();
+    this.recalculateIndex();
+    this.recalculateDepth();
+
+    this.saveLibrary();
   }
 
-  getPath(directoryID?: string): string {
-    const nodes = this.nodes.get();
-    let dirID: string | undefined = directoryID;
-
-    if (directoryID == ReservedID.Root) {
+  getReservedDirName(id: string) {
+    if (id == ReservedID.Master) {
       return '/';
     }
 
-    if (directoryID == ReservedID.Trash) {
+    if (id == ReservedID.Trash) {
       return 'Trash';
     }
 
-    const found = nodes.find(n => n.id == dirID);
-
-    if (found == undefined) {
-      throw new Error(`Node ${dirID} not found`);
-    }
-
-    return this.getPath(found.parentID) + (found as DirectoryNode).name + '/';
+    return undefined;
   }
 
-  swapIndex(id1: string, id2: string) {
-    const nodes = this.nodes.get();
-    const n1 = nodes.find(n => n.id == id1)!;
-    const n2 = nodes.find(n => n.id == id2)!;
-    const temp = n1.index;
-    n1.index = n2.index;
-    n2.index = temp;
+  getPath(directoryID: string): string {
+    const reservedDirName = this.getReservedDirName(directoryID);
 
-    this.nodes.set(this.nodes.get());
-    this.save();
+    if (reservedDirName != undefined) {
+      return reservedDirName;
+    }
+    const node = this.getNode(directoryID);
+    return this.getPath(node.parent?.id!) + (node as DirectoryNode).name + '/';
+  }
+
+  swapIndex(node1: string | Node, node2: string | Node) {
+    node1 = this.getNodeIfNeeded(node1);
+    node2 = this.getNodeIfNeeded(node2);
+
+    console.log(node1, node2)
+
+    const node1Next = this.nextSiblingNode(node1);
+
+    if (node1Next != node2) {
+      console.log('node1Next != node2')
+      this.moveNodeBefore(node1, node2.parent!, node2);
+      this.moveNodeBefore(node2, node1Next?.parent!, node1Next?.id!);
+    } else {
+      console.log('node1Next == node2')
+      this.moveNodeBefore(node2, node1.parent!, node1);
+    }
+  }
+
+  nextSiblingNode(id: string | Node) {
+    const node = this.getNodeIfNeeded(id);
+    const index = node.parent!.children.indexOf(node);
+
+    if (index == node.parent!.children.length - 1) {
+      return undefined;
+    }
+
+    return node.parent!.children[index + 1];
+  }
+
+  prevSiblingNode(id: string | Node) {
+    const node = this.getNodeIfNeeded(id);
+    const index = node.parent!.children.indexOf(node);
+
+    if (index == 0) {
+      return undefined;
+    }
+
+    return node.parent!.children[index - 1];
+  }
+
+  static getLastNodeOf(node: Node): Node {
+    if (node.children.length == 0) {
+      return node;
+    }
+
+    return this.getLastNodeOf(node.children.at(-1)!);
   }
 
 
@@ -433,7 +592,7 @@ export default class Model {
     files.splice(files.findIndex(f => f.id == fileID), 1);
 
     this.files.set(this.files.get());
-    this.save();
+    this.saveLibrary();
   }
 
   getFile(fileID: string) {
@@ -450,7 +609,7 @@ export default class Model {
     this.tags.get().push({ id, name });
 
     this.tags.set(this.tags.get());
-    this.save();
+    this.saveLibrary();
     return id;
   }
 
@@ -463,9 +622,7 @@ export default class Model {
   }
 
   appendTag(id: string, tagID: string) {
-    const foundIndex = this.nodes.get().findIndex(n => n.id == id);
-
-    const node = this.nodes.get()[foundIndex];
+    const node = this.getNode(id);
 
     if (node.tags == undefined) {
       node.tags = [tagID];
@@ -476,7 +633,7 @@ export default class Model {
     }
 
     this.nodes.set(this.nodes.get());
-    this.save();
+    this.saveLibrary();
   }
 
   removeTag(id: string) {
@@ -486,23 +643,22 @@ export default class Model {
 
   // Directories
 
-  findDirectory(parentID: string | undefined, name: string) {
-    return this.nodes.get().find(n =>
+  findDirectory(parentID: string, name: string) {
+    return this.nodeMap.get(parentID)?.children.find(n =>
       n.type == NodeType.Directory &&
-      n.parentID == parentID &&
-      (n as DirectoryNode).name.localeCompare(name, undefined, { sensitivity: 'accent' }) == 0
+      (n as DirectoryNode).name?.localeCompare(name, undefined, { sensitivity: 'accent' }) == 0
     );
   }
 
   async createDirectory(path: string) {
     const dirs = path.split('/').filter(d => d.length > 0);
-    let parentID: string | undefined = undefined;
+    let parentID: string = ReservedID.Master;
 
     for (const dir of dirs) {
       const found = this.findDirectory(parentID, dir);
 
       if (found == null) {
-        parentID = this.addDirectoryNode(dir, Timestamp.fromNs(await bridge.now()), parentID).id;
+        parentID = this.addDirectoryNode(dir, Timestamp.fromNs(await bridge.now()), this.getNode(parentID) as DirectoryNode).id;
       } else {
         parentID = found.id;
       }
@@ -513,10 +669,10 @@ export default class Model {
 
   // Returns true if target is a descendant of parent
   isDescendantOf(target: string, parent: (string | undefined)) {
-    let d: (string | undefined) = target;
+    let d: string | undefined = target;
 
     while (d != undefined) {
-      d = (this.getNode(d) as DirectoryNode).parentID;
+      d = (this.getNode(d) as DirectoryNode).parent?.id;
 
       if (d == parent) {
         return true;
@@ -568,7 +724,7 @@ export default class Model {
       return (view as DirectoryView).parentID;
     }
 
-    return undefined;
+    return ReservedID.Master;
   }
 
   getViewTags() {
@@ -587,7 +743,7 @@ export default class Model {
   async loadLibrary() {
     const c = await bridge.readLibrary();
 
-    const data = JSON.parse(c, (key, value) => {
+    let data = JSON.parse(c, (key, value) => {
       if (key == 'created' || key == 'modified' || key == 'accessed' || key == 'contentModified' || key == 'contentAccessed') {
         return new Timestamp(value);
       }
@@ -597,31 +753,37 @@ export default class Model {
 
     // validateLibrary(data);
 
-    this.nodeMap.clear();
-
-    for (const n of data.nodes) {
-      this.nodeMap.set(n.id, n);
+    // Migrate older format
+    if (data.version == 5) {
+      data = Version5.convert(data);
     }
 
-    this.nodes.set(data.nodes ?? []);
-    this.files.set(data.files ?? []);
-    this.tags.set(data.tags ?? []);
+    this.initializeData(data);
   }
 
-  async save() {
+  async saveLibrary() {
     if (this.savePromise != null) {
       await this.savePromise;
     }
 
     this.saving.set(true);
     this.setStatus('Saving...');
-    const start = performance.now();
 
-    this.savePromise = bridge.writeLibrary(JSON.stringify({
+    const data = {
       nodes: this.nodes.get(),
       files: this.files.get(),
       tags: this.tags.get(),
       version: LIBRARY_VERSION
+    };
+
+    const start = performance.now();
+
+    this.savePromise = bridge.writeLibrary(JSON.stringify(data, (key, value) => {
+      if (key == 'index' || key == 'parent' || key == 'depth') {
+        return undefined;
+      }
+
+      return value;
     })).then((() => {
       this.savePromise = null;
       this.saving.set(false);
@@ -648,6 +810,90 @@ export default class Model {
   }
 
   clearStatus() {
-    this.status.set(undefined)
+    this.status.set(undefined);
+  }
+
+
+  // Memoization
+
+  static assignIndex(node: Node, base = 0) {
+    node.index = base;
+    base++;
+
+    for (const child of node.children) {
+      base = Model.assignIndex(child, base);
+    }
+
+    return base;
+  }
+
+  static assignDepth(node: Node, depth = 0) {
+    node.depth = depth;
+
+    for (const child of node.children) {
+      Model.assignDepth(child, depth + 1);
+    }
+  }
+
+  static assignParent(node: Node) {
+    for (const child of node.children) {
+      child.parent = node;
+      Model.assignParent(child);
+    }
+  }
+
+  recalculateParent() {
+    for (const n of this.nodes.get()) {
+      Model.assignParent(n);
+    }
+  }
+
+  recalculateIndex() {
+    let index = 0;
+
+    for (const n of this.nodes.get()) {
+      index = Model.assignIndex(n, index);
+    }
+  }
+
+  recalculateDepth() {
+    for (const n of this.nodes.get()) {
+      Model.assignDepth(n);
+    }
+  }
+
+  initializeNodeMap(nodes: Node[]) {
+    this.nodeMap.clear();
+
+    for (const n of visit(nodes)) {
+      this.nodeMap.set(n.id, n);
+    }
+  }
+
+  initializeData(data: Library) {
+    // Initialize parent
+    for (const n of data.nodes) {
+      Model.assignParent(n);
+    }
+
+    // Initialize nodeMap
+    this.initializeNodeMap(data.nodes);
+
+    // Initialize index
+    let index = 0;
+
+    for (const n of data.nodes) {
+      index = Model.assignIndex(n, index);
+    }
+
+    // Initialize depth
+    for (const n of data.nodes) {
+      Model.assignDepth(n);
+    }
+
+    // Set members
+    this.nodes.set(data.nodes ?? []);
+    this.files.set(data.files ?? []);
+    this.tags.set(data.tags ?? []);
   }
 }

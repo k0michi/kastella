@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { useModel, useObservable } from 'kyoka';
-import Model, { DateView, DirectoryNode, DirectoryView, Node, NodeType, PseudoDirectoryNode, PseudoNode, ReservedID, TagView, ViewType } from './model';
-import { DateTimeFormatter, ZonedDateTime } from '@js-joda/core';
-import { createTree, Depth, flatten } from './tree';
+import Model, { DateView, DirectoryNode, DirectoryView, TagView, ViewType } from './model';
+import { DateTimeFormatter } from '@js-joda/core';
+import { isDirectory, visit } from './tree';
 
 export default function ExplorerPane() {
   const model = useModel<Model>();
@@ -18,9 +18,11 @@ export default function ExplorerPane() {
   React.useEffect(() => {
     const dateSet = new Set<string>();
 
-    for (const node of nodes) {
-      const dateString = node.created.asZonedDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE);
-      dateSet.add(dateString);
+    for (const node of visit(nodes)) {
+      if (node.created != undefined) {
+        const dateString = node.created.asZonedDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE);
+        dateSet.add(dateString);
+      }
     }
 
     const dates = Array.from(dateSet);
@@ -28,8 +30,7 @@ export default function ExplorerPane() {
     setDates(dates);
   }, [nodes]);
 
-  const directories = flatten(createTree(model, undefined, n => n.type == NodeType.Directory));
-  directories.push({ depth: 0, ...model.getNode('trash')! });
+  const directories = [...visit(nodes, isDirectory)] as DirectoryNode[];
 
   return (
     <>
@@ -56,16 +57,16 @@ export default function ExplorerPane() {
               onDrop={e => {
                 const id = e.dataTransfer.getData('text/plain');
 
-                if (!model.isDescendantOf(d.id!, id)) {
-                  model.moveNode(id, d.id);
+                if (model.canMoveNode(id, d.id)) {
+                  model.moveNodeBefore(id, d.id);
                 }
 
                 setDraggedOver(false);
               }}
-              style={{ paddingLeft: `${d.depth * 12 + 4}px` }}
+              style={{ paddingLeft: `${d.depth! * 12 + 4}px` }}
               onClick={e => model.changeView({ 'type': ViewType.Directory, parentID: d.id } as DirectoryView)}
             >
-              {(d as ((DirectoryNode | PseudoDirectoryNode) & Depth)).name}
+              {d.name == undefined ? model.getReservedDirName(d.id) : d.name}
             </div>)}
           </div>
         </div>

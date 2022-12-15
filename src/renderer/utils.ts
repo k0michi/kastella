@@ -27,3 +27,15 @@ export function findStringIgnoreCase(string: string | null | undefined, search: 
 
   return string.toLowerCase().includes(search.toLowerCase());
 }
+
+export function arrayRemove(array: any[], index: number) {
+  return array.splice(index, 1);
+}
+
+export function arrayInsertBefore(array: any[], item: any, reference: number) {
+  if (reference < 0) {
+    reference = array.length + reference + 1;
+  }
+
+  return array.splice(reference, 0, item);
+}

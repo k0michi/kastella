@@ -11,7 +11,7 @@ import Timestamp from './timestamp';
 import TextEmbed from './text-embed';
 import { IconGripVertical } from '@tabler/icons';
 import Katex from 'katex';
-import { createTree, createTreeFromArray, Depth, flatten } from './tree';
+import { visit } from './tree';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -203,9 +203,14 @@ export default function EditorPane() {
   }
 
   const filtered = React.useMemo(() => {
-    let filtered = nodes.slice();
+    let filtered;
 
-    filtered.sort((a, b) => a.index - b.index);
+    if (view?.type == ViewType.Directory) {
+      let parent = model.getNode((view as DirectoryView).parentID);
+      filtered = parent?.children!;
+    } else {
+      filtered = model.getNode(ReservedID.Master)?.children!;
+    }
 
     if (search.length > 0) {
       filtered = filtered.filter(n =>
@@ -218,27 +223,15 @@ export default function EditorPane() {
       );
     }
 
-    if (view?.type == ViewType.Directory) {
-      let parent = (view as DirectoryView).parentID;
-
-      if (parent == ReservedID.Root) {
-        parent = undefined;
-      }
-
-      filtered = filtered.filter(n => n.parentID == parent);
-    } else {
-      filtered = filtered.filter(n => n.parentID != ReservedID.Trash);
-    }
-
     if (view?.type == ViewType.Tag) {
       filtered = filtered.filter(n => n.tags?.includes((view as TagView).tag));
     }
 
     if (view?.type == ViewType.Date) {
-      filtered = filtered.filter(n => n.created.asZonedDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE) == (view as DateView).date);
+      filtered = filtered.filter(n => n.created!.asZonedDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE) == (view as DateView).date);
     }
 
-    const flattened = flatten(createTreeFromArray(model, filtered)) as (Node & Depth)[];
+    const flattened = [...visit(filtered)];
     return flattened;
   }, [model.nodes.getSnapShot(), view, search]);
 
@@ -264,7 +257,7 @@ export default function EditorPane() {
             for (let i = foundIndex - 1; i >= 0; i--) {
               const n = filtered[i];
 
-              if (n.depth < node.depth) {
+              if (n.depth! < node.depth!) {
                 break;
               }
 
@@ -285,7 +278,7 @@ export default function EditorPane() {
             for (let i = foundIndex +1; i < filtered.length; i++) {
               const n = filtered[i];
 
-              if (n.depth < node.depth) {
+              if (n.depth! < node.depth!) {
                 break;
               }
 
@@ -325,7 +318,7 @@ export default function EditorPane() {
           if (view?.type == ViewType.Directory && (view as DirectoryView).parentID == ReservedID.Trash) {
             model.removeNode(selected);
           } else {
-            model.moveNode(selected, ReservedID.Trash);
+            model.moveNodeBefore(selected, ReservedID.Trash);
           }
 
           const foundIndex = filtered.findIndex(n => n.id == selected);
@@ -343,8 +336,8 @@ export default function EditorPane() {
           }
 
           const node = filtered[foundIndex];
-          const parent = model.getNode(node.parentID);
-          model.moveNode(node.id, parent?.parentID);
+          const parent = node.parent;
+          model.moveNodeBefore(node.id, parent?.parent?.id!);
         } else if (e.key == 'Tab' && selected != undefined) {
           e.preventDefault();
           const foundIndex = filtered.findIndex(n => n.id == selected);
@@ -358,12 +351,12 @@ export default function EditorPane() {
           for (let i = foundIndex - 1; i >= 0; i--) {
             const n = filtered[i];
 
-            if (n.depth < node.depth) {
+            if (n.depth! < node.depth!) {
               break;
             }
 
             if (n.depth == node.depth) {
-              model.moveNode(selected, n.id);
+              model.moveNodeBefore(selected, n.id);
               break;
             }
           }
@@ -448,8 +441,9 @@ export default function EditorPane() {
   }, []);
 
   const last = filtered.at(-1);
-  const lastIndex = last != null ? last.index + 1 : 1;
+  const lastIndex = last != null ? last.index! + 1 : 1;
   const lastIndexDigits = Math.ceil(Math.log10(lastIndex));
+  const baseDepth = filtered[0]?.depth!;
 
   return <div id='editor-pane'>
     <EditorBar />
@@ -568,9 +562,9 @@ export default function EditorPane() {
                       <IconGripVertical width={16} />
                     </div>
                     : null}</td>
-                  {lineNumberVisibility ? <td className='index'>{n.index + 1}</td> : null}
-                  {dateVisibility ? <td className='date'>{n.created.asString()}</td> : null}
-                  <td style={{ paddingLeft: `${n.depth * 16}px` }}>
+                  {lineNumberVisibility ? <td className='index'>{n.index!}</td> : null}
+                  {dateVisibility ? <td className='date'>{n.created!.asString()}</td> : null}
+                  <td style={{ paddingLeft: `${(n.depth! - baseDepth) * 16}px` }}>
                     {content}
                   </td>
                 </tr>;
