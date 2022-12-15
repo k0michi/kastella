@@ -275,7 +275,7 @@ export default function EditorPane() {
             const foundIndex = filtered.findIndex(n => n.id == selected);
             const node = filtered[foundIndex];
 
-            for (let i = foundIndex +1; i < filtered.length; i++) {
+            for (let i = foundIndex + 1; i < filtered.length; i++) {
               const n = filtered[i];
 
               if (n.depth! < node.depth!) {
@@ -472,82 +472,85 @@ export default function EditorPane() {
 
                 const tagNames = n.tags?.map(t => '#' + model.getTag(t)?.name);
                 const visible = intersecting.has(n.id);
+
+                if (!visible) {
+                  return <tr key={n.id} data-id={id} className={visible ? 'visible' : 'invisible'}></tr>;
+                }
+
                 let content;
 
-                if (visible) {
-                  if (n.type == undefined || n.type == NodeType.Text) {
-                    const textNode = n as Node as TextNode;
+                if (n.type == undefined || n.type == NodeType.Text) {
+                  const textNode = n as Node as TextNode;
 
+                  content = <div className={className}>
+                    <div className='content text-node'>{textNode.content as string}</div>
+                    <div className='tags'>{tagNames?.join(' ')}</div>
+                  </div>;
+                } else if (n.type == NodeType.Image) {
+                  const imageNode = n as Node as ImageNode;
+                  const file = model.getFile(imageNode.fileID);
+
+                  if (file != null) {
                     content = <div className={className}>
-                      <div className='content text-node'>{textNode.content as string}</div>
-                      <div className='tags'>{tagNames?.join(' ')}</div>
-                    </div>;
-                  } else if (n.type == NodeType.Image) {
-                    const imageNode = n as Node as ImageNode;
-                    const file = model.getFile(imageNode.fileID);
-
-                    if (file != null) {
-                      content = <div className={className}>
-                        <div className='content image-node'>
-                          <Image file={file} />
-                        </div>
-                        <div className='tags'>{tagNames?.join(' ')}</div>
-                      </div>;
-                    } else {
-                      content = <div className='error'>{`Failed to read ${imageNode.fileID}`}</div>;
-                    }
-                  } else if (n.type == NodeType.Directory) {
-                    const dNode = n as Node as DirectoryNode;
-
-                    content = <div className={className}>
-                      <div className='content directory-node'>[dir] {dNode.name as string}</div>
-                      <div className='tags'>{tagNames?.join(' ')}</div>
-                    </div>;
-                  } else if (n.type == NodeType.Anchor) {
-                    const anchor = n as Node as AnchorNode;
-                    const imageFile = anchor.contentImageFileID != null ? model.getFile(anchor.contentImageFileID) : null;
-                    const description = anchor.contentDescription;
-
-                    content = <div className={className}>
-                      <div className='content anchor-node'>
-                        {imageFile != null ? <div className='image'><Image file={imageFile}></Image></div> : null}
-                        <div className='details'>
-                          <div className='url'>{decodeURI(anchor.contentURL)}</div>
-                          <div className='title'><a draggable={false} href={anchor.contentURL}>{anchor.contentTitle}</a></div>
-                          {
-                            description != undefined ?
-                              <div className='description'>{formatFetchedText(description)}</div>
-                              : null
-                          }
-                        </div>
+                      <div className='content image-node'>
+                        <Image file={file} />
                       </div>
                       <div className='tags'>{tagNames?.join(' ')}</div>
                     </div>;
-                  } else if (n.type == NodeType.TextEmbed) {
-                    const textEmbedNode = n as Node as TextEmbedNode;
-                    const file = model.getFile(textEmbedNode.fileID);
-
-                    if (file != null) {
-                      content = <div className={className}>
-                        <div className='content text-embed-node'>
-                          <TextEmbed file={file} />
-                        </div>
-                        <div className='tags'>{tagNames?.join(' ')}</div>
-                      </div>;
-                    } else {
-                      content = <div className='error'>{`Failed to read ${textEmbedNode.fileID}`}</div>;
-                    }
-                  } else if (n.type == NodeType.Math) {
-                    const mathNode = n as Node as MathNode;
-
-                    content = <div className={className}>
-                      <div className='content math-node' dangerouslySetInnerHTML={{
-                        __html: Katex.renderToString(mathNode.expression, { displayMode: true })
-                      }}>
-                      </div>
-                      <div className='tags'>{tagNames?.join(' ')}</div>
-                    </div>;
+                  } else {
+                    content = <div className='error'>{`Failed to read ${imageNode.fileID}`}</div>;
                   }
+                } else if (n.type == NodeType.Directory) {
+                  const dNode = n as Node as DirectoryNode;
+
+                  content = <div className={className}>
+                    <div className='content directory-node'>[dir] {dNode.name as string}</div>
+                    <div className='tags'>{tagNames?.join(' ')}</div>
+                  </div>;
+                } else if (n.type == NodeType.Anchor) {
+                  const anchor = n as Node as AnchorNode;
+                  const imageFile = anchor.contentImageFileID != null ? model.getFile(anchor.contentImageFileID) : null;
+                  const description = anchor.contentDescription;
+
+                  content = <div className={className}>
+                    <div className='content anchor-node'>
+                      {imageFile != null ? <div className='image'><Image file={imageFile}></Image></div> : null}
+                      <div className='details'>
+                        <div className='url'>{decodeURI(anchor.contentURL)}</div>
+                        <div className='title'><a draggable={false} href={anchor.contentURL}>{anchor.contentTitle}</a></div>
+                        {
+                          description != undefined ?
+                            <div className='description'>{formatFetchedText(description)}</div>
+                            : null
+                        }
+                      </div>
+                    </div>
+                    <div className='tags'>{tagNames?.join(' ')}</div>
+                  </div>;
+                } else if (n.type == NodeType.TextEmbed) {
+                  const textEmbedNode = n as Node as TextEmbedNode;
+                  const file = model.getFile(textEmbedNode.fileID);
+
+                  if (file != null) {
+                    content = <div className={className}>
+                      <div className='content text-embed-node'>
+                        <TextEmbed file={file} />
+                      </div>
+                      <div className='tags'>{tagNames?.join(' ')}</div>
+                    </div>;
+                  } else {
+                    content = <div className='error'>{`Failed to read ${textEmbedNode.fileID}`}</div>;
+                  }
+                } else if (n.type == NodeType.Math) {
+                  const mathNode = n as Node as MathNode;
+
+                  content = <div className={className}>
+                    <div className='content math-node' dangerouslySetInnerHTML={{
+                      __html: Katex.renderToString(mathNode.expression, { displayMode: true })
+                    }}>
+                    </div>
+                    <div className='tags'>{tagNames?.join(' ')}</div>
+                  </div>;
                 }
 
                 return <tr key={n.id} data-id={id} className={visible ? 'visible' : 'invisible'}>
