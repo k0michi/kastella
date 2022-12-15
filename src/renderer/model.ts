@@ -176,9 +176,7 @@ export default class Model {
   }
 
   addNode(parent: Node | string, node: Node) {
-    if (typeof parent == 'string') {
-      parent = this.getNode(parent);
-    }
+    parent = this.getNodeIfNeeded(parent);
 
     /*
     // Set parent
@@ -416,39 +414,42 @@ export default class Model {
     return node;
   }
 
+  // Deprecated
   getChildNodes(parentID: string) {
     return this.nodeMap.get(parentID)?.children;
   }
 
+  // Deprecated
   getChildDirectories(parentID: string) {
     return this.nodeMap.get(parentID)?.children.filter(n => n.type == NodeType.Directory);
   }
 
-  canMoveNode(id: string, parentID: string) {
-    return id != parentID && !this.isDescendantOf(parentID, id);
+  canMoveNode(node: string | Node, parent: string | Node) {
+    node = this.getNodeIfNeeded(node);
+    parent = this.getNodeIfNeeded(parent);
+
+    return node != parent && !this.isDescendantOf(parent, node);
   }
 
-  moveNodeBefore(id: string | Node, parent: string | Node, reference: string | Node | undefined = undefined) {
-    const node = this.getNodeIfNeeded(id);
-    const newParent = this.getNodeIfNeeded(parent);
-    const referenceNode = reference != undefined ? this.getNodeIfNeeded(reference) : undefined;
+  moveNodeBefore(node: string | Node, parent: string | Node, reference: string | Node | undefined = undefined) {
+    node = this.getNodeIfNeeded(node);
+    parent = this.getNodeIfNeeded(parent);
+    reference = reference != undefined ? this.getNodeIfNeeded(reference) : undefined;
 
-    if (node == newParent) {
+    if (node == parent) {
       throw new Error("Node cannot be moved into itself");
     }
 
-    if (this.isDescendantOf(newParent.id, node.id)) {
+    if (this.isDescendantOf(parent.id, node.id)) {
       throw new Error("Node cannot be moved into it's descendant");
     }
 
-    if (referenceNode != undefined && referenceNode.parent != newParent) {
+    if (reference != undefined && reference.parent != parent) {
       throw new Error("Reference node is invalid");
     }
 
     if (node.type == NodeType.Directory) {
-      if (newParent.children
-        .filter(n => n.type == NodeType.Directory)
-        .some(d => d != node && (d as DirectoryNode).name == (node as DirectoryNode).name)) {
+      if (this.findDirectory(parent, (node as DirectoryNode).name!) != undefined) {
         throw new Error(`Directory ${(node as DirectoryNode).name} already exists`);
       }
     }
@@ -491,8 +492,8 @@ export default class Model {
     node.depth = newParent.depth! + 1;
     */
 
-    arrayInsertBefore(newParent.children, node, referenceNode != undefined ?
-      newParent.children.indexOf(referenceNode) :
+    arrayInsertBefore(parent.children, node, reference != undefined ?
+      parent.children.indexOf(reference) :
       -1
     );
 
@@ -643,8 +644,8 @@ export default class Model {
 
   // Directories
 
-  findDirectory(parentID: string, name: string) {
-    return this.nodeMap.get(parentID)?.children.find(n =>
+  findDirectory(parent: string | Node, name: string) {
+    return this.getNodeIfNeeded(parent).children.find(n =>
       n.type == NodeType.Directory &&
       (n as DirectoryNode).name?.localeCompare(name, undefined, { sensitivity: 'accent' }) == 0
     );
@@ -668,11 +669,14 @@ export default class Model {
   }
 
   // Returns true if target is a descendant of parent
-  isDescendantOf(target: string, parent: (string | undefined)) {
-    let d: string | undefined = target;
+  isDescendantOf(target: string | Node, parent: string | Node) {
+    target = this.getNodeIfNeeded(target);
+    parent = this.getNodeIfNeeded(parent);
+
+    let d: Node | undefined = this.getNodeIfNeeded(target);
 
     while (d != undefined) {
-      d = (this.getNode(d) as DirectoryNode).parent?.id;
+      d = d.parent;
 
       if (d == parent) {
         return true;

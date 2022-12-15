@@ -28,9 +28,9 @@ export default function ExplorerPane() {
     const dates = Array.from(dateSet);
     dates.sort((a, b) => b.localeCompare(a, undefined));
     setDates(dates);
-  }, [nodes]);
+  }, [model.nodes.getSnapShot()]);
 
-  const directories = [...visit(nodes, isDirectory)] as DirectoryNode[];
+  const directories = React.useMemo(() => [...visit(nodes, isDirectory)] as DirectoryNode[], [model.nodes.getSnapShot()]);
 
   return (
     <>
