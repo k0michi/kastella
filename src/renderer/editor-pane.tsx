@@ -464,6 +464,12 @@ export default function EditorPane() {
             {writeOnly ? null :
               filtered.map(n => {
                 const id = n.id;
+                const visible = intersecting.has(id);
+
+                if (!visible) {
+                  return <tr key={id} data-id={id} className='invisible'></tr>;
+                }
+
                 let className = 'node';
 
                 if (id == selected) {
@@ -471,11 +477,6 @@ export default function EditorPane() {
                 }
 
                 const tagNames = n.tags?.map(t => '#' + model.getTag(t)?.name);
-                const visible = intersecting.has(n.id);
-
-                if (!visible) {
-                  return <tr key={n.id} data-id={id} className={visible ? 'visible' : 'invisible'}></tr>;
-                }
 
                 let content;
 
@@ -553,7 +554,7 @@ export default function EditorPane() {
                   </div>;
                 }
 
-                return <tr key={n.id} data-id={id} className={visible ? 'visible' : 'invisible'}>
+                return <tr key={n.id} data-id={id} className='visible'>
                   <td className='grip'>{n.id == hovered ?
                     <div draggable
                       onDragStart={e => {
