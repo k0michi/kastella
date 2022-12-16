@@ -131,8 +131,8 @@ export default class Model {
     this.saving.set(true);
     this.setStatus('Saving...');
 
-    const json = this.library.toJSON();
     const start = performance.now();
+    const json = this.library.toJSON();
 
     this.savePromise = bridge.writeLibrary(json).then((() => {
       this.savePromise = null;
