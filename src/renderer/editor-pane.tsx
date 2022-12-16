@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime';
 import { findStringIgnoreCase, isHTTPURL } from './utils';
 import { useModel, useObservable } from 'kyoka';
-import Model, { AnchorNode, DateView, DirectoryNode, DirectoryView, File, ImageNode, MathNode, Node, NodeType, ReservedID, TagView, TextEmbedNode, TextNode, ViewType } from './model.js';
+import Model, { DateView, DirectoryView, TagView, ViewType } from './model.js';
 import EditorBar from './editor-bar';
 import Image from './image';
 import { DateTimeFormatter } from '@js-joda/core';
@@ -12,11 +12,12 @@ import TextEmbed from './text-embed';
 import { IconGripVertical } from '@tabler/icons';
 import Katex from 'katex';
 import { visit } from './tree';
+import { AnchorNode, DirectoryNode, File, ImageNode, MathNode, Node, NodeType, ReservedID, TextEmbedNode, TextNode } from './node';
 
 export default function EditorPane() {
   const model = useModel<Model>();
-  const nodes = useObservable(model.nodes);
-  const tags = useObservable(model.tags);
+  const nodes = useObservable(model.library.nodes);
+  const tags = useObservable(model.library.tags);
   const view = useObservable(model.view);
   const [input, setInput] = React.useState<string>('');
   const editorRef = React.useRef<HTMLDivElement>(null);
@@ -103,7 +104,7 @@ export default function EditorPane() {
           const parentID = model.getViewDirectory();
           const tagIDs = model.getViewTags();
 
-          model.addImageNode(image, accessed, parentID, tagIDs);
+          model.library.addImageNode(image, accessed, parentID, tagIDs);
         }
 
         if (mimeType == 'text/plain') {
@@ -123,7 +124,7 @@ export default function EditorPane() {
           const parentID = model.getViewDirectory();
           const tagIDs = model.getViewTags();
 
-          model.addTextEmbedNode(image, accessed, parentID, tagIDs);
+          model.library.addTextEmbedNode(image, accessed, parentID, tagIDs);
         }
       }
     };
@@ -141,7 +142,7 @@ export default function EditorPane() {
       document.removeEventListener('drop', onDrop);
       document.removeEventListener('dragover', onDragover);
     };
-  }, [model.nodes.getSnapShot()]);
+  }, [model.library.nodes.getSnapShot()]);
 
   async function confirm() {
     if (input.length == 0) {
@@ -151,10 +152,10 @@ export default function EditorPane() {
     const [content, tags] = splitTags(input);
 
     let tagIDs = tags.map(t => {
-      const found = model.findTag(t);
+      const found = model.library.findTag(t);
 
       if (found == null) {
-        return model.createTag(t);
+        return model.library.createTag(t);
       }
 
       return found.id;
@@ -182,13 +183,13 @@ export default function EditorPane() {
             modified: image.modified != undefined ? new Timestamp(image.modified) : undefined,
             accessed
           } as File;
-          model.addFile(imageFile);
+          model.library.addFile(imageFile);
         } catch (e) {
           // Fetch error
         }
       }
 
-      model.addAnchorNode({
+      model.library.addAnchorNode({
         contentURL: content,
         contentType: meta.type,
         contentTitle: meta.title,
@@ -198,7 +199,7 @@ export default function EditorPane() {
         contentAccessed: accessed
       }, accessed, parentID, tagIDs);
     } else {
-      model.addTextNode(content, Timestamp.fromNs(await bridge.now()), parentID, tagIDs);
+      model.library.addTextNode(content, Timestamp.fromNs(await bridge.now()), parentID, tagIDs);
     }
   }
 
@@ -206,10 +207,10 @@ export default function EditorPane() {
     let filtered;
 
     if (view?.type == ViewType.Directory) {
-      let parent = model.getNode((view as DirectoryView).parentID);
+      let parent = model.library.getNode((view as DirectoryView).parentID);
       filtered = parent?.children!;
     } else {
-      filtered = model.getNode(ReservedID.Master)?.children!;
+      filtered = model.library.getNode(ReservedID.Master)?.children!;
     }
 
     if (search.length > 0) {
@@ -233,7 +234,7 @@ export default function EditorPane() {
 
     const flattened = [...visit(filtered)];
     return flattened;
-  }, [model.nodes.getSnapShot(), view, search]);
+  }, [model.library.nodes.getSnapShot(), view, search]);
 
   React.useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -250,7 +251,7 @@ export default function EditorPane() {
           e.preventDefault();
 
           if (selected != null) {
-            const selectedNode = model.getNode(selected);
+            const selectedNode = model.library.getNode(selected);
             const foundIndex = filtered.findIndex(n => n.id == selected);
             const node = filtered[foundIndex];
 
@@ -262,7 +263,7 @@ export default function EditorPane() {
               }
 
               if (n.depth == node.depth) {
-                model.swapIndex(selectedNode!.id!, n.id);
+                model.library.swapIndex(selectedNode!.id!, n.id);
                 break;
               }
             }
@@ -271,7 +272,7 @@ export default function EditorPane() {
           e.preventDefault();
 
           if (selected != null) {
-            const selectedNode = model.getNode(selected);
+            const selectedNode = model.library.getNode(selected);
             const foundIndex = filtered.findIndex(n => n.id == selected);
             const node = filtered[foundIndex];
 
@@ -283,7 +284,7 @@ export default function EditorPane() {
               }
 
               if (n.depth == node.depth) {
-                model.swapIndex(selectedNode!.id!, n.id);
+                model.library.swapIndex(selectedNode!.id!, n.id);
                 break;
               }
             }
@@ -316,9 +317,9 @@ export default function EditorPane() {
           e.preventDefault();
 
           if (view?.type == ViewType.Directory && (view as DirectoryView).parentID == ReservedID.Trash) {
-            model.removeNode(selected);
+            model.library.removeNode(selected);
           } else {
-            model.moveNodeBefore(selected, ReservedID.Trash);
+            model.library.moveNodeBefore(selected, ReservedID.Trash);
           }
 
           const foundIndex = filtered.findIndex(n => n.id == selected);
@@ -345,10 +346,10 @@ export default function EditorPane() {
           const nodesAfter = node.parent!.children.slice(node.parent!.children.indexOf(node) + 1);
 
           for (const n of nodesAfter) {
-            model.moveNodeBefore(n, node);
+            model.library.moveNodeBefore(n, node);
           }
 
-          model.moveNodeBefore(node, node.parent?.parent!, model.nextSiblingNode(node.parent!));
+          model.library.moveNodeBefore(node, node.parent?.parent!, model.library.nextSiblingNode(node.parent!));
         } else if (e.key == 'Tab' && selected != undefined) {
           e.preventDefault();
           const foundIndex = filtered.findIndex(n => n.id == selected);
@@ -367,7 +368,7 @@ export default function EditorPane() {
             }
 
             if (n.depth == node.depth) {
-              model.moveNodeBefore(selected, n.id);
+              model.library.moveNodeBefore(selected, n.id);
               break;
             }
           }
@@ -487,7 +488,7 @@ export default function EditorPane() {
                   className += ' selected';
                 }
 
-                const tagNames = n.tags?.map(t => '#' + model.getTag(t)?.name);
+                const tagNames = n.tags?.map(t => '#' + model.library.getTag(t)?.name);
 
                 let content;
 
@@ -500,7 +501,7 @@ export default function EditorPane() {
                   </div>;
                 } else if (n.type == NodeType.Image) {
                   const imageNode = n as Node as ImageNode;
-                  const file = model.getFile(imageNode.fileID);
+                  const file = model.library.getFile(imageNode.fileID);
 
                   if (file != null) {
                     content = <div className={className}>
@@ -521,7 +522,7 @@ export default function EditorPane() {
                   </div>;
                 } else if (n.type == NodeType.Anchor) {
                   const anchor = n as Node as AnchorNode;
-                  const imageFile = anchor.contentImageFileID != null ? model.getFile(anchor.contentImageFileID) : null;
+                  const imageFile = anchor.contentImageFileID != null ? model.library.getFile(anchor.contentImageFileID) : null;
                   const description = anchor.contentDescription;
 
                   content = <div className={className}>
@@ -541,7 +542,7 @@ export default function EditorPane() {
                   </div>;
                 } else if (n.type == NodeType.TextEmbed) {
                   const textEmbedNode = n as Node as TextEmbedNode;
-                  const file = model.getFile(textEmbedNode.fileID);
+                  const file = model.library.getFile(textEmbedNode.fileID);
 
                   if (file != null) {
                     content = <div className={className}>

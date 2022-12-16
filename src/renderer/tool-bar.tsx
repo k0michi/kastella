@@ -56,7 +56,7 @@ export default function ToolBar() {
                 const parentID = model.getViewDirectory();
                 tagIDs = tagIDs.concat(model.getViewTags());
 
-                model.addMathNode(exp, now, parentID, tagIDs);
+                model.library.addMathNode(exp, now, parentID, tagIDs);
               }
 
               mathModalRef.current?.close();

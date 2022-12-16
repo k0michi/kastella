@@ -1,5 +1,5 @@
-import { DirectoryNode, Node, NodeType, ReservedID } from "./model";
 import { v4 as uuidv4 } from 'uuid';
+import { DirectoryNode, NodeType, ReservedID } from './node';
 
 export namespace Version5 {
   export function findNode(nodes: any, id: string | undefined) {

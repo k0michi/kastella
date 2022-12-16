@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { File } from './model';
+import { File } from './node';
 
 export interface TextEmbedProps {
   file: File;

@@ -1,13 +1,14 @@
 import * as React from 'react';
 import { useModel, useObservable } from 'kyoka';
-import Model, { DateView, DirectoryNode, DirectoryView, TagView, ViewType } from './model';
+import Model, { DateView, DirectoryView, TagView, ViewType } from './model';
 import { DateTimeFormatter } from '@js-joda/core';
 import { isDirectory, visit } from './tree';
+import { DirectoryNode } from './node';
 
 export default function ExplorerPane() {
   const model = useModel<Model>();
-  const nodes = useObservable(model.nodes);
-  const tags = useObservable(model.tags);
+  const nodes = useObservable(model.library.nodes);
+  const tags = useObservable(model.library.tags);
   const view = useObservable(model.view);
   const modalRef = React.useRef<HTMLDialogElement>(null);
   const [directoryPath, setDirectoryPath] = React.useState<string>();
@@ -28,9 +29,9 @@ export default function ExplorerPane() {
     const dates = Array.from(dateSet);
     dates.sort((a, b) => b.localeCompare(a, undefined));
     setDates(dates);
-  }, [model.nodes.getSnapShot()]);
+  }, [model.library.nodes.getSnapShot()]);
 
-  const directories = React.useMemo(() => [...visit(nodes, isDirectory)] as DirectoryNode[], [model.nodes.getSnapShot()]);
+  const directories = React.useMemo(() => [...visit(nodes, isDirectory)] as DirectoryNode[], [model.library.nodes.getSnapShot()]);
 
   return (
     <>
@@ -57,8 +58,8 @@ export default function ExplorerPane() {
               onDrop={e => {
                 const id = e.dataTransfer.getData('text/plain');
 
-                if (model.canMoveNode(id, d.id)) {
-                  model.moveNodeBefore(id, d.id);
+                if (model.library.canMoveNode(id, d.id)) {
+                  model.library.moveNodeBefore(id, d.id);
                 }
 
                 setDraggedOver(false);
@@ -66,7 +67,7 @@ export default function ExplorerPane() {
               style={{ paddingLeft: `${d.depth! * 12 + 4}px` }}
               onClick={e => model.changeView({ 'type': ViewType.Directory, parentID: d.id } as DirectoryView)}
             >
-              {d.name == undefined ? model.getReservedDirName(d.id) : d.name}
+              {d.name == undefined ? model.library.getReservedDirName(d.id) : d.name}
             </div>)}
           </div>
         </div>
@@ -88,7 +89,7 @@ export default function ExplorerPane() {
               }}
               onDrop={e => {
                 const id = e.dataTransfer.getData('text/plain');
-                model.appendTag(id, t.id);
+                model.library.appendTag(id, t.id);
                 setDraggedOver(false);
               }}
               onClick={e => model.changeView({ 'type': 'tag', tag: t.id } as TagView)}>
@@ -121,7 +122,7 @@ export default function ExplorerPane() {
             <div className='left'><button onClick={e => modalRef.current?.close()}>Cancel</button></div>
             <div className='right'><button className='highlighted' onClick={e => {
               if (directoryPath != null) {
-                model.createDirectory(directoryPath);
+                model.library.createDirectory(directoryPath);
               }
 
               modalRef.current?.close();
