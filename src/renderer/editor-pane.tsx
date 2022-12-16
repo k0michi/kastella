@@ -336,8 +336,19 @@ export default function EditorPane() {
           }
 
           const node = filtered[foundIndex];
-          const parent = node.parent;
-          model.moveNodeBefore(node.id, parent?.parent?.id!);
+
+          if (view?.type == ViewType.Directory && (view as DirectoryView).parentID == node.parent!.id) {
+            return;
+          }
+
+          // Nodes after the target node will keep the same depth
+          const nodesAfter = node.parent!.children.slice(node.parent!.children.indexOf(node) + 1);
+
+          for (const n of nodesAfter) {
+            model.moveNodeBefore(n, node);
+          }
+
+          model.moveNodeBefore(node, node.parent?.parent!, model.nextSiblingNode(node.parent!));
         } else if (e.key == 'Tab' && selected != undefined) {
           e.preventDefault();
           const foundIndex = filtered.findIndex(n => n.id == selected);
