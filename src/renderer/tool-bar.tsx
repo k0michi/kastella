@@ -3,9 +3,12 @@ import Katex from 'katex';
 import { useModel, useObservable } from 'kyoka';
 import Model, { DirectoryView, TagView, ViewType } from './model';
 import Timestamp from './timestamp';
+import { NodeType } from './node';
 
 export default function ToolBar() {
   const model = useModel<Model>();
+  const selected = useObservable(model.selected);
+
   const mathModalRef = React.useRef<HTMLDialogElement>(null);
   const [exp, setExp] = React.useState<string>('');
 
@@ -29,6 +32,17 @@ export default function ToolBar() {
         <button className='tool' onClick={e => {
           mathModalRef.current?.showModal();
         }}>Math</button>
+        <button className='tool' onClick={e => {
+          const selected = model.selected.get();
+
+          if (selected != undefined) {
+            if (model.library.isHeading(selected)) {
+              model.library.changeNodeType(selected, NodeType.Text);
+            } else if (model.library.isText(selected)) {
+              model.library.changeNodeType(selected, NodeType.Heading);
+            }
+          }
+        }}>Heading</button>
       </div>
       <dialog ref={mathModalRef}>
         <div className='dialog-container'>

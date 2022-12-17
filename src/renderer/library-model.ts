@@ -9,7 +9,7 @@ import { AnchorNode, DirectoryNode, File, ImageNode, MathNode, Node, NodeType, R
 import Model from "./model";
 import EventHandler from "./event-handler";
 
-export const LIBRARY_VERSION = 6;
+export const LIBRARY_VERSION = 7;
 
 export interface Library {
   nodes: Node[];
@@ -579,6 +579,69 @@ export default class LibraryModel {
     return this.getLastNodeOf(node.children.at(-1)!);
   }
 
+  async changeNodeType(node: Node | string, type: NodeType) {
+    node = this.getNodeIfNeeded(node);
+
+    if (node.type == NodeType.Text) {
+      if (type == NodeType.Heading) {
+        node.type = type;
+        await this.updateModified(node);
+        this.nodes.set(this.nodes.get());
+        this.save();
+      }
+    } else if (node.type == NodeType.Heading) {
+      if (type == NodeType.Text) {
+        node.type = type;
+        await this.updateModified(node);
+        this.nodes.set(this.nodes.get());
+        this.save();
+      }
+    }
+  }
+
+  async updateModified(node: Node) {
+    node.modified = Timestamp.fromNs(await bridge.now());
+    this.nodes.set(this.nodes.get());
+    this.save();
+  }
+
+  // Nodes / Types
+
+  isText(node: Node | string) {
+    node = this.getNodeIfNeeded(node);
+    return node.type == NodeType.Text;
+  }
+
+  isImage(node: Node | string) {
+    node = this.getNodeIfNeeded(node);
+    return node.type == NodeType.Image;
+  }
+
+  isAnchor(node: Node | string) {
+    node = this.getNodeIfNeeded(node);
+    return node.type == NodeType.Anchor;
+  }
+
+  isDirectory(node: Node | string) {
+    node = this.getNodeIfNeeded(node);
+    return node.type == NodeType.Directory;
+  }
+
+  isTextEmbed(node: Node | string) {
+    node = this.getNodeIfNeeded(node);
+    return node.type == NodeType.TextEmbed;
+  }
+
+  isMath(node: Node | string) {
+    node = this.getNodeIfNeeded(node);
+    return node.type == NodeType.Math;
+  }
+
+  isHeading(node: Node | string) {
+    node = this.getNodeIfNeeded(node);
+    return node.type == NodeType.Heading;
+  }
+
 
   // Files
 
@@ -586,6 +649,7 @@ export default class LibraryModel {
     this.files.get().push(file);
 
     this.files.set(this.files.get());
+    this.save();
   }
 
   removeFile(fileID: string) {

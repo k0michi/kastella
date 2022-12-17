@@ -7,6 +7,7 @@ export enum NodeType {
   Directory = 'directory',
   TextEmbed = 'text-embed',
   Math = 'math',
+  Heading = 'heading',
 }
 
 export interface Node {
@@ -64,6 +65,11 @@ export interface TextEmbedNode extends Node {
 export interface MathNode extends Node {
   type: NodeType.Math;
   expression: string;
+}
+
+export interface HeadingNode extends Node {
+  type: NodeType.Heading;
+  content: string;
 }
 
 export interface File {

@@ -69,6 +69,7 @@ body,
 
   display: flex;
   flex-direction: row;
+  gap: 4px;
 }
 
 #tool-bar .tool {
@@ -271,6 +272,11 @@ body,
 
 #editor-area .math-node .katex-display > .katex > .katex-html {
   width: fit-content;
+}
+
+#editor-area .heading-node {
+  font-size: 2em;
+  font-weight: bold;
 }
 
 
