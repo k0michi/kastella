@@ -412,7 +412,7 @@ export default function EditorPane() {
   }, [selected]);
 
   React.useEffect(() => {
-    const MARGIN_Y = 2 ** 14;
+    const MARGIN_Y = 2 ** 13;
 
     const iObserver = new IntersectionObserver((entries) => {
       for (const e of entries) {
