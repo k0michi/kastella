@@ -47,6 +47,7 @@ export default class Model {
   savePromise: Promise<void> | null = null;
   status = new Observable<Status | undefined>(undefined);
   intersecting = new Observable<Set<string>>(new Set());
+  saveSchedule: number | undefined;
 
   constructor() {
     this.changeView({ type: ViewType.Directory, parentID: ReservedID.Master } as DirectoryView);
@@ -124,30 +125,45 @@ export default class Model {
   }
 
   async saveLibrary() {
-    if (this.savePromise != null) {
-      await this.savePromise;
-    }
+    const delay = 2 * 1000;
+    this.saveSchedule = Date.now() + delay;
 
-    this.saving.set(true);
-    this.setStatus('Saving...');
+    const save = (() => {
+      this.saving.set(true);
+      this.setStatus('Saving...');
 
-    const start = performance.now();
-    const json = this.library.toJSON();
+      const start = performance.now();
+      const json = this.library.toJSON();
 
-    this.savePromise = bridge.writeLibrary(json).then((() => {
-      this.savePromise = null;
-      this.saving.set(false);
-    }).bind(this));
+      this.savePromise = bridge.writeLibrary(json).then((() => {
+        const end = performance.now();
+        this.savePromise = null;
+        this.saving.set(false);
 
-    const end = performance.now();
-    const elapsed = end - start;
-    const statusID = this.setStatus(`Saved! (${round(elapsed, 2)} ms)`);
+        const elapsed = end - start;
+        const statusID = this.setStatus(`Saved! (${round(elapsed, 2)} ms)`);
+  
+        setTimeout((() => {
+          if (this.status.get()?.id == statusID) {
+            this.clearStatus();
+          }
+        }).bind(this), 5 * 1000);
+      }).bind(this));
+    }).bind(this);
 
-    setTimeout((() => {
-      if (this.status.get()?.id == statusID) {
-        this.clearStatus();
+    const timeout = (() => {
+      const now = Date.now();
+
+      if (this.saveSchedule == undefined) {
+        return;
       }
-    }).bind(this), 5 * 1000);
+
+      if (now >= this.saveSchedule) {
+        save();
+      }
+    }).bind(this);
+
+    setTimeout(timeout, delay);
   }
 
 
