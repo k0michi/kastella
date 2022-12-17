@@ -567,9 +567,12 @@ export default function EditorPane() {
                   </div>;
                 } else if (n.type == NodeType.Heading) {
                   const headingNode = n as Node as HeadingNode;
+                  const headingDepth = model.library.getHeadingDepth(headingNode);
+                  const COEFF = 2 ** (1 / 6);
+                  const fontSize = Math.max(2 / COEFF ** headingDepth, 1);
 
                   content = <div className={className}>
-                    <div className='content heading-node'>{headingNode.content as string}</div>
+                    <div className='content heading-node' style={{ 'fontSize': fontSize + 'em' }}>{headingNode.content as string}</div>
                     <div className='tags'>{tagNames?.join(' ')}</div>
                   </div>;
                 }

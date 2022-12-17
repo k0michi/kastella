@@ -668,6 +668,18 @@ export default class LibraryModel {
     return found;
   }
 
+  getHeadingDepth(node: Node | undefined):number {
+    if (node == undefined) {
+      return 0;
+    }
+
+    if (this.isHeading(node)) {
+      return this.getHeadingDepth(node.parent) + 1;
+    }
+
+    return this.getHeadingDepth(node.parent);
+  }
+
 
   // Tags
 
