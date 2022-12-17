@@ -10,22 +10,42 @@ html {
 
 :root {
   --color: white;
-  --color-border: hsl(231, 10%, 28%);
-  --color-editor: hsl(227, 11%, 16%);
-  --color-tool-bar: hsl(240, 8%, 10%);
-  --color-tool: hsl(229, 12%, 18%);;
-  --color-editor-bar: hsl(231, 10%, 14%);
-  --color-editor-index: hsl(229, 7%, 44%);
+  --color-border: hsl(230, 10%, 28%);
+  --color-editor: hsl(230, 11%, 16%);
+  --color-tool-bar: hsl(230, 8%, 10%);
+  --color-tool: hsl(230, 12%, 18%);
+  --color-editor-bar: hsl(230, 10%, 14%);
+  --color-editor-index: hsl(230, 7%, 44%);
   --color-editor-selected: rgba(121, 221, 252, 0.371);
   --color-error: red;
   --color-editor-tag: gray;
   --color-explorer: rgba(0, 0, 0, 0);
   --color-explorer-header: rgb(234, 234, 234);
   --color-explorer-selected: rgb(63, 123, 200);
-  --color-status: hsl(240, 8%, 10%);
+  --color-status: hsl(230, 8%, 10%);
   --color-button-1-back: rgb(63, 114, 226);
   --color-button-1-fore: rgb(255, 255, 255);
   --color-math-preview-border: #eee;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --color: black;
+    --color-border: hsl(200, 12%, 80%);
+    --color-editor: hsl(0, 0%, 100%);
+    --color-tool-bar: hsl(200, 53%, 97%);
+    --color-tool: hsl(200, 50%, 95%);
+    --color-editor-bar: hsl(200, 32%, 92%);
+    --color-editor-index: hsl(200, 7%, 44%);
+    --color-editor-selected: rgba(121, 221, 252, 0.371);
+    --color-explorer: rgba(0, 0, 0, 0);
+    --color-explorer-header: rgb(0, 0, 0);
+    --color-explorer-selected: rgb(63, 123, 200);
+    --color-status: hsl(200, 53%, 97%);
+    --color-button-1-back: rgb(63, 114, 226);
+    --color-button-1-fore: rgb(255, 255, 255);
+    --color-math-preview-border: #eee;
+  }
 }
 
 html {
@@ -273,7 +293,7 @@ body,
   padding: .25em 0;
 }
 
-#editor-area .math-node .katex-display > .katex > .katex-html {
+#editor-area .math-node .katex-display>.katex>.katex-html {
   width: fit-content;
 }
 
