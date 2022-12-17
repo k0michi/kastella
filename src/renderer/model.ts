@@ -89,15 +89,13 @@ export default class Model {
   }
 
   addIntersecting(id: string) {
-    const newVisibleNodes = new Set(this.intersecting.get());
-    newVisibleNodes.add(id);
-    this.intersecting.set(newVisibleNodes);
+    this.intersecting.get().add(id);
+    this.intersecting.set(this.intersecting.get());
   }
 
   removeIntersecting(id: string) {
-    const newVisibleNodes = new Set(this.intersecting.get());
-    newVisibleNodes.delete(id);
-    this.intersecting.set(newVisibleNodes);
+    this.intersecting.get().delete(id);
+    this.intersecting.set(this.intersecting.get());
   }
 
   getViewDirectory() {
