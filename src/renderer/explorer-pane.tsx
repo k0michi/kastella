@@ -21,7 +21,7 @@ export default function ExplorerPane() {
 
     for (const node of visit(nodes)) {
       if (node.created != undefined) {
-        const dateString = node.created.asZonedDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE);
+        const dateString = node.created.asDate().toLocaleDateString();
         dateSet.add(dateString);
       }
     }
