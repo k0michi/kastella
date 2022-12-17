@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { useModel, useObservable } from 'kyoka';
 import Model, { DateView, DirectoryView, TagView, ViewType } from './model';
-import { DateTimeFormatter } from '@js-joda/core';
 import { isDirectory, visit } from './tree';
 import { DirectoryNode } from './node';
+import { toDateString } from './utils';
 
 export default function ExplorerPane() {
   const model = useModel<Model>();
@@ -21,7 +21,7 @@ export default function ExplorerPane() {
 
     for (const node of visit(nodes)) {
       if (node.created != undefined) {
-        const dateString = node.created.asDate().toLocaleDateString();
+        const dateString = toDateString(node.created.asDate());
         dateSet.add(dateString);
       }
     }

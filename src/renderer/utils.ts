@@ -39,3 +39,11 @@ export function arrayInsertBefore(array: any[], item: any, reference: number) {
 
   return array.splice(reference, 0, item);
 }
+
+export function toDateString(date: Date) {
+  return `${padZero(date.getFullYear(), 4)}-${padZero(date.getMonth() + 1, 2)}-${padZero(date.getDate(), 2)}`;
+}
+
+export function padZero(number: number, digits: number) {
+  return number.toString().padStart(digits, '0');
+}
