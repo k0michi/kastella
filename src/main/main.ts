@@ -37,7 +37,7 @@ function createWindow() {
   }
 
   mainWindow.webContents.on('will-navigate', handleNavigate);
-  mainWindow.webContents.on('new-window', handleNavigate);
+  // mainWindow.webContents.on('new-window', handleNavigate);
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
