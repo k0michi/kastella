@@ -10,19 +10,19 @@ html {
 
 :root {
   --color: white;
-  --color-border: rgb(59, 59, 59);
-  --color-editor: black;
-  --color-tool-bar: rgb(28, 28, 28);
-  --color-tool: rgb(47, 47, 47);
-  --color-editor-bar: rgb(33, 33, 33);
-  --color-editor-index: rgb(117, 117, 117);
+  --color-border: hsl(231, 10%, 28%);
+  --color-editor: hsl(227, 11%, 16%);
+  --color-tool-bar: hsl(240, 8%, 10%);
+  --color-tool: hsl(229, 12%, 18%);;
+  --color-editor-bar: hsl(231, 10%, 14%);
+  --color-editor-index: hsl(229, 7%, 44%);
   --color-editor-selected: rgba(121, 221, 252, 0.371);
   --color-error: red;
   --color-editor-tag: gray;
   --color-explorer: rgba(0, 0, 0, 0);
   --color-explorer-header: rgb(234, 234, 234);
   --color-explorer-selected: rgb(63, 123, 200);
-  --color-status: rgb(28, 28, 28);
+  --color-status: hsl(240, 8%, 10%);
   --color-button-1-back: rgb(63, 114, 226);
   --color-button-1-fore: rgb(255, 255, 255);
   --color-math-preview-border: #eee;
