@@ -297,6 +297,68 @@ export default class LibraryModel {
     return node;
   }
 
+  moveNodeBefore(node: string | Node, parent: string | Node, reference: string | Node | undefined = undefined) {
+    node = this.getNodeIfNeeded(node);
+    parent = this.getNodeIfNeeded(parent);
+    reference = reference != undefined ? this.getNodeIfNeeded(reference) : undefined;
+
+    if (node == parent) {
+      throw new Error("Node cannot be moved into itself");
+    }
+
+    if (this.isDescendantOf(parent.id, node.id)) {
+      throw new Error("Node cannot be moved into it's descendant");
+    }
+
+    if (reference != undefined && reference.parent != parent) {
+      throw new Error("Reference node is invalid");
+    }
+
+    if (node.type == NodeType.Directory) {
+      if (this.findDirectory(parent, (node as DirectoryNode).name!) != undefined) {
+        throw new Error(`Directory ${(node as DirectoryNode).name} already exists`);
+      }
+    }
+
+    const nodeIndex = node.index!;
+    const referenceIndex = reference?.index ?? LibraryModel.getLastNodeOf(parent).index! + 1;
+
+    // [begin, end) These nodes' indices will be updated
+    let begin, end;
+
+    // nodeIndex == referenceIndex means only indentation will change
+    if (nodeIndex <= referenceIndex) {
+      begin = this.nextIndexNode(LibraryModel.getLastNodeOf(node));
+      end = reference;
+    } else {
+      begin = node;
+      end = this.nextIndexNode(LibraryModel.getLastNodeOf(node));
+    }
+
+    arrayRemove(node.parent!.children, node.parent!.children.indexOf(node));
+    arrayInsertBefore(parent.children, node, reference != undefined ?
+      parent.children.indexOf(reference) :
+      -1
+    );
+
+    // Set parent
+    this.updateParent(node, parent);
+
+    // Set index
+    // begin == undefined if the last node's indentation has changed
+    if (begin != undefined) {
+      const prev = this.prevIndexNode(begin);
+      this.updateIndex(begin, end, prev!.index! + 1);
+    }
+
+    // Set depth
+    this.updateDepth(node, parent.depth! + 1);
+
+    this.nodes.set(this.nodes.get());
+
+    this.save();
+  }
+
   removeNode(node: Node | string) {
     if (typeof node == 'string') {
       const n = this.getNode(node);
@@ -321,26 +383,30 @@ export default class LibraryModel {
     }
 
     arrayRemove(node.parent!.children, node.parent!.children.indexOf(node));
+    const size = this.getSubTreeSize(node);
 
-    /*
     // Update index
     for (const n of visit(this.nodes.get())) {
       if (n.index! > node.index!) {
-        n.index!--;
+        n.index! -= size;
       }
     }
-    */
 
     // Delete from map
     this.nodeMap.delete(node.id);
 
     this.nodes.set(this.nodes.get());
-
-    this.recalculateParent();
-    this.recalculateIndex();
-    this.recalculateDepth();
-
     this.save();
+  }
+
+  getSubTreeSize(node: Node) {
+    let size = 1;
+
+    for (const c of node.children) {
+      size += this.getSubTreeSize(c);
+    }
+
+    return size;
   }
 
   getNode(id: string) {
@@ -378,81 +444,6 @@ export default class LibraryModel {
     return node != parent && !this.isDescendantOf(parent, node);
   }
 
-  moveNodeBefore(node: string | Node, parent: string | Node, reference: string | Node | undefined = undefined) {
-    node = this.getNodeIfNeeded(node);
-    parent = this.getNodeIfNeeded(parent);
-    reference = reference != undefined ? this.getNodeIfNeeded(reference) : undefined;
-
-    if (node == parent) {
-      throw new Error("Node cannot be moved into itself");
-    }
-
-    if (this.isDescendantOf(parent.id, node.id)) {
-      throw new Error("Node cannot be moved into it's descendant");
-    }
-
-    if (reference != undefined && reference.parent != parent) {
-      throw new Error("Reference node is invalid");
-    }
-
-    if (node.type == NodeType.Directory) {
-      if (this.findDirectory(parent, (node as DirectoryNode).name!) != undefined) {
-        throw new Error(`Directory ${(node as DirectoryNode).name} already exists`);
-      }
-    }
-
-    arrayRemove(node.parent!.children, node.parent!.children.indexOf(node));
-
-    /*
-    // Set parent
-    node.parent = newParent;
-
-    // Set index
-    const currentIndex = node.index!;
-    let newIndex;
-
-    if (referenceNode != undefined) {
-      newIndex = referenceNode.index!;
-    } else {
-      newIndex = Model.getLastNodeOf(newParent).index! + 1;
-    }
-
-    if (currentIndex == newIndex) {
-      return;
-    }
-    
-    if (currentIndex < newIndex) {
-      newIndex--;
-    }
-
-    node.index = newIndex;
-
-    for (const node of visit(this.nodes.get())) {
-      if (node.index! > currentIndex && node.index! <= newIndex) {
-        node.index!--;
-      }else if (node.index! >= newIndex && node.index! < currentIndex) {
-        node.index!++;
-      }
-    }
-
-    // Set depth
-    node.depth = newParent.depth! + 1;
-    */
-
-    arrayInsertBefore(parent.children, node, reference != undefined ?
-      parent.children.indexOf(reference) :
-      -1
-    );
-
-    this.nodes.set(this.nodes.get());
-
-    this.recalculateParent();
-    this.recalculateIndex();
-    this.recalculateDepth();
-
-    this.save();
-  }
-
   getReservedDirName(id: string) {
     if (id == ReservedID.Master) {
       return '/';
@@ -479,29 +470,37 @@ export default class LibraryModel {
     node1 = this.getNodeIfNeeded(node1);
     node2 = this.getNodeIfNeeded(node2);
 
-    console.log(node1, node2)
-
     const node1Next = this.nextSiblingNode(node1);
+    const node2Next = this.nextSiblingNode(node2);
 
-    if (node1Next != node2) {
-      console.log('node1Next != node2')
-      this.moveNodeBefore(node1, node2.parent!, node2);
-      this.moveNodeBefore(node2, node1Next?.parent!, node1Next?.id!);
-    } else {
-      console.log('node1Next == node2')
+    if (node1Next == node2) {
       this.moveNodeBefore(node2, node1.parent!, node1);
+      return;
     }
+
+    if (node2Next == node1) {
+      this.moveNodeBefore(node1, node2.parent!, node2);
+      return;
+    }
+
+    this.moveNodeBefore(node1, node2.parent!, node2);
+    this.moveNodeBefore(node2, node1Next?.parent!, node1Next?.id!);
   }
 
   nextSiblingNode(id: string | Node) {
     const node = this.getNodeIfNeeded(id);
-    const index = node.parent!.children.indexOf(node);
 
-    if (index == node.parent!.children.length - 1) {
+    if (node.parent == undefined) {
       return undefined;
     }
 
-    return node.parent!.children[index + 1];
+    const index = node.parent.children.indexOf(node);
+
+    if (index == node.parent.children.length - 1) {
+      return undefined;
+    }
+
+    return node.parent.children[index + 1];
   }
 
   prevSiblingNode(id: string | Node) {
@@ -513,6 +512,63 @@ export default class LibraryModel {
     }
 
     return node.parent!.children[index - 1];
+  }
+
+  nextIndexNode(node: string | Node) {
+    node = this.getNodeIfNeeded(node);
+
+    if (node.children[0] != undefined) {
+      return node.children[0];
+    }
+
+    let n: Node | undefined = node;
+
+    while (this.nextSiblingNode(n) == undefined) {
+      n = n?.parent;
+
+      if (n == undefined) {
+        return undefined;
+      }
+    }
+
+    return this.nextSiblingNode(n);
+  }
+
+  prevIndexNode(node: string | Node) {
+    node = this.getNodeIfNeeded(node);
+    const prevSibling = this.prevSiblingNode(node);
+
+    if (prevSibling == undefined) {
+      return node.parent;
+    }
+
+    return LibraryModel.getLastNodeOf(prevSibling);
+  }
+
+  updateParent(node: Node, parent: Node) {
+    node.parent = parent;
+
+    for (const c of node.children) {
+      this.updateParent(c, node);
+    }
+  }
+
+  updateDepth(node: Node, depth: number) {
+    node.depth = depth;
+
+    for (const c of node.children) {
+      this.updateDepth(c, depth + 1);
+    }
+  }
+
+  updateIndex(begin: Node, end: Node | undefined, base: number) {
+    let n: Node | undefined = begin;
+
+    while (n != end) {
+      n!.index = base;
+      base++;
+      n = this.nextIndexNode(n!);
+    }
   }
 
   static getLastNodeOf(node: Node): Node {
