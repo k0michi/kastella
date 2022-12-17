@@ -9,12 +9,27 @@ html {
 }
 
 :root {
-  --border-color: rgb(59, 59, 59);
+  --color: white;
+  --color-border: rgb(59, 59, 59);
+  --color-editor: black;
+  --color-tool-bar: rgb(28, 28, 28);
+  --color-tool: rgb(47, 47, 47);
+  --color-editor-bar: rgb(33, 33, 33);
+  --color-editor-index: rgb(117, 117, 117);
+  --color-editor-selected: rgba(121, 221, 252, 0.371);
+  --color-error: red;
+  --color-editor-tag: gray;
+  --color-explorer: rgba(0, 0, 0, 0);
+  --color-explorer-header: rgb(234, 234, 234);
+  --color-explorer-selected: rgb(63, 123, 200);
+  --color-status: rgb(28, 28, 28);
+  --color-button-1-back: rgb(63, 114, 226);
+  --color-button-1-fore: rgb(255, 255, 255);
+  --color-math-preview-border: #eee;
 }
 
 html {
-  color: white;
-  background-color: black;
+  color: var(--color);
 }
 
 textarea {
@@ -59,13 +74,13 @@ body,
 /* Tool bar */
 
 #tool-bar {
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--color-border);
   box-sizing: content-box;
   padding: 4px;
   min-height: 1em;
   line-height: 1;
   flex: 0 0 fit-content;
-  background-color: rgb(28, 28, 28);
+  background-color: var(--color-tool-bar);
 
   display: flex;
   flex-direction: row;
@@ -73,10 +88,10 @@ body,
 }
 
 #tool-bar .tool {
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-border);
   padding: 0.15em 0.3em;
-  background-color: rgb(47, 47, 47);
-  color: white;
+  background-color: var(--color-tool);
+  color: var(--color);
   border-radius: 2px;
 }
 
@@ -90,12 +105,13 @@ body,
   overflow-y: auto;
   overflow-x: auto;
   max-width: 100%;
+  background-color: var(--color-editor);
 }
 
 #editor-pane textarea {
   resize: none;
   border: none;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--color-border);
   outline: none;
 }
 
@@ -103,24 +119,12 @@ body,
   border-bottom: 1px solid rgb(125, 210, 255);
 }
 
-@media (prefers-color-scheme: dark) {
-  #editor-pane button {
-    color: white;
-    background-color: black;
-  }
-}
-
-#editor-pane button {
-  border: 1px solid var(--border-color);
-  padding: 2px 6px;
-  border-radius: 4px;
-}
 
 /* Editor bar */
 
 .editor-bar-section {
-  background-color: rgb(33, 33, 33);
-  border-bottom: 1px solid var(--border-color);
+  background-color: var(--color-editor-bar);
+  border-bottom: 1px solid var(--color-border);
   padding: 6px;
 }
 
@@ -173,7 +177,7 @@ body,
 }
 
 #editor-area #nodes td.grip {
-  color: rgb(117, 117, 117);
+  color: var(--color-editor-index);
   position: relative;
   width: 16px;
   min-width: 16px;
@@ -185,7 +189,7 @@ body,
 }
 
 #editor-area #nodes td.index {
-  color: rgb(117, 117, 117);
+  color: var(--color-editor-index);
   padding-right: 4px;
   text-align: right;
   white-space: nowrap;
@@ -195,7 +199,7 @@ body,
 }
 
 #editor-area #nodes td.date {
-  color: rgb(117, 117, 117);
+  color: var(--color-editor-index);
   padding-right: 4px;
   text-align: right;
   white-space: nowrap;
@@ -210,13 +214,12 @@ body,
 }
 
 #editor-area #nodes .node.selected {
-  background-color: rgb(40, 76, 87);
+  background-color: var(--color-editor-selected);
 }
 
 #editor-area #nodes .node.selected::before {
   content: '';
   position: absolute;
-  background-color: rgb(24, 176, 222);
   height: 100%;
   width: 4px;
   left: 0px;
@@ -228,12 +231,12 @@ body,
 }
 
 #editor-area .error {
-  color: red;
+  color: var(--color-editor-error);
 }
 
 #editor-area .tags {
   margin-left: 4px;
-  color: gray;
+  color: var(--color-editor-tag);
 }
 
 #editor-area .image-node img {
@@ -287,8 +290,8 @@ body,
   top: 0;
   padding: 12px;
   overflow-y: auto;
-  background-color: rgb(21, 21, 21);
-  border-right: solid 1px var(--border-color);
+  background-color: var(--color-explorer);
+  border-right: solid 1px var(--color-border);
   user-select: none;
   font-size: 14px;
 }
@@ -302,7 +305,7 @@ body,
 }
 
 #explorer-pane .section .header {
-  color: rgb(165, 165, 165);
+  color: var(--color-explorer-header);
   font-weight: lighter;
   display: flex;
   flex-direction: row;
@@ -324,24 +327,24 @@ body,
 }
 
 #explorer-pane .selected {
-  background-color: rgb(63, 123, 200);
+  background-color: var(--color-explorer-selected)
 }
 
 #explorer-pane .dragged {
-  border: 1px solid rgb(102, 159, 232);
+  border: 1px solid var(--color-explorer-selected);
 }
 
 
 /* Status bar */
 
 #status-bar {
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--color-border);
   box-sizing: content-box;
   padding: 4px;
   min-height: 1em;
   line-height: 1;
   flex: 0 0 fit-content;
-  background-color: rgb(28, 28, 28);
+  background-color: var(--color-status);
 }
 
 
@@ -376,13 +379,13 @@ dialog::backdrop {
 input[type="text"] {
   border: none;
   outline: none;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--color-border);
   font-size: 16px;
   width: 256px;
 }
 
 input[type="text"].invalid {
-  border-bottom: 1px solid red;
+  border-bottom: 1px solid var(--color-error);
 }
 
 .dialog-buttons button {
@@ -393,8 +396,8 @@ input[type="text"].invalid {
 }
 
 .dialog-buttons button.highlighted {
-  background-color: rgb(63, 114, 226);
-  color: rgb(255, 255, 255);
+  background-color: var(--color-button-1-back);
+  color: var(--color-button-1-fore);
 }
 
 
@@ -408,10 +411,10 @@ textarea.exp-input {
 
 .math-preview {
   margin-top: 4px;
-  border: 1px solid #eee;
+  border: 1px solid var(--color-math-preview-border);
   overflow-x: auto;
 }
 
 .math-preview.error {
-  color: red;
+  color: var(--color-error);
 }
