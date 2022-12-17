@@ -260,7 +260,7 @@ body,
 }
 
 #editor-area .image-node img {
-  width: 256px;
+  max-width: 100%;
   display: block;
 }
 
