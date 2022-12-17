@@ -48,6 +48,10 @@ export default class Model {
   status = new Observable<Status | undefined>(undefined);
   intersecting = new Observable<Set<string>>(new Set());
   saveSchedule: number | undefined;
+  selected = new Observable<string | undefined>(undefined);
+  hovered = new Observable<string | undefined>(undefined);
+  atBottom = new Observable<boolean>(true);
+  input = new Observable<string>('');
 
   constructor() {
     this.changeView({ type: ViewType.Directory, parentID: ReservedID.Master } as DirectoryView);
@@ -116,6 +120,22 @@ export default class Model {
     return [];
   }
 
+  setSelected(id: string | undefined) {
+    this.selected.set(id);
+  }
+
+  setHovered(id: string | undefined) {
+    this.hovered.set(id);
+  }
+
+  setInput(string: string) {
+    this.input.set(string);
+  }
+
+  setAtBottom(atBottom: boolean) {
+    this.atBottom.set(atBottom);
+  }
+
 
   // File System
 
@@ -142,7 +162,7 @@ export default class Model {
 
         const elapsed = end - start;
         const statusID = this.setStatus(`Saved! (${round(elapsed, 2)} ms)`);
-  
+
         setTimeout((() => {
           if (this.status.get()?.id == statusID) {
             this.clearStatus();

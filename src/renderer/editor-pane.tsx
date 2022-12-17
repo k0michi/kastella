@@ -19,18 +19,19 @@ export default function EditorPane() {
   const nodes = useObservable(model.library.nodes);
   const tags = useObservable(model.library.tags);
   const view = useObservable(model.view);
-  const [input, setInput] = React.useState<string>('');
-  const editorRef = React.useRef<HTMLDivElement>(null);
-  const nodesRef = React.useRef<HTMLDivElement>(null);
-  const [atBottom, setAtBottom] = React.useState(true);
-  const [selected, setSelected] = React.useState<string>();
-  const inputRef = React.useRef<HTMLTextAreaElement>(null);
+  const input = useObservable(model.input);
+  const atBottom = useObservable(model.atBottom);
+  const selected = useObservable(model.selected);
   const writeOnly = useObservable(model.writeOnly);
   const search = useObservable(model.search);
   const lineNumberVisibility = useObservable(model.lineNumberVisibility);
   const dateVisibility = useObservable(model.dateVisibility);
   const intersecting = useObservable(model.intersecting);
-  const [hovered, setHovered] = React.useState<string>();
+  const hovered = useObservable(model.hovered);
+
+  const editorRef = React.useRef<HTMLDivElement>(null);
+  const nodesRef = React.useRef<HTMLDivElement>(null);
+  const inputRef = React.useRef<HTMLTextAreaElement>(null);
 
   React.useEffect(() => {
     const onScroll = () => {
@@ -38,7 +39,7 @@ export default function EditorPane() {
       const scrollHeight = editorRef.current!.scrollHeight;
       const scrollTop = editorRef.current!.scrollTop;
       const atBottom = scrollHeight - clientHeight - scrollTop <= 0;
-      setAtBottom(atBottom);
+      model.setAtBottom(atBottom);
     }
 
     editorRef.current?.addEventListener('scroll', onScroll);
@@ -53,7 +54,7 @@ export default function EditorPane() {
       const id = getAncestorID(e.target as HTMLElement);
 
       if (id != null) {
-        setSelected(id);
+        model.setSelected(id);
       }
     };
 
@@ -164,7 +165,7 @@ export default function EditorPane() {
     const parentID = model.getViewDirectory();
     tagIDs = tagIDs.concat(model.getViewTags());
 
-    setInput('');
+    model.setInput('');
 
     if (!content.includes(' ') && isHTTPURL(content)) {
       const accessed = Timestamp.fromNs(await bridge.now());
@@ -242,11 +243,11 @@ export default function EditorPane() {
         if (e.key == 'ArrowUp' && e.metaKey) {
           e.preventDefault();
 
-          setSelected(filtered[0].id);
+          model.setSelected(filtered[0].id);
         } else if (e.key == 'ArrowDown' && e.metaKey) {
           e.preventDefault();
 
-          setSelected(undefined);
+          model.setSelected(undefined);
         } else if (e.key == 'ArrowUp' && e.altKey) {
           e.preventDefault();
 
@@ -293,13 +294,13 @@ export default function EditorPane() {
           e.preventDefault();
 
           if (selected == null) {
-            setSelected(filtered.at(-1)?.id);
+            model.setSelected(filtered.at(-1)?.id);
           } else {
             const foundIndex = filtered.findIndex(n => n.id == selected);
             const prev = filtered[foundIndex - 1];
 
             if (prev != null && foundIndex != -1) {
-              setTimeout(() => setSelected(prev.id));
+              setTimeout(() => model.setSelected(prev.id));
             }
           }
         } else if (e.key == 'ArrowDown') {
@@ -309,9 +310,9 @@ export default function EditorPane() {
           const next = filtered[foundIndex + 1];
 
           if (next != null && foundIndex != -1) {
-            setTimeout(() => setSelected(next.id));
+            setTimeout(() => model.setSelected(next.id));
           } else {
-            setSelected(undefined);
+            model.setSelected(undefined);
           }
         } else if (e.key == 'Backspace' && selected != undefined) {
           e.preventDefault();
@@ -326,7 +327,7 @@ export default function EditorPane() {
           const nextNode = filtered[foundIndex + 1];
 
           if (nextNode != null && foundIndex != -1) {
-            setSelected(nextNode.id);
+            model.setSelected(nextNode.id);
           }
         } else if (e.key == 'Tab' && e.shiftKey && selected != undefined) {
           e.preventDefault();
@@ -384,7 +385,7 @@ export default function EditorPane() {
   }, [selected, filtered, view]);
 
   React.useEffect(() => {
-    setSelected(undefined);
+    model.setSelected(undefined);
   }, [view]);
 
   React.useEffect(() => {
@@ -464,13 +465,13 @@ export default function EditorPane() {
         <table>
           <tbody
             onMouseLeave={e => {
-              setHovered(undefined);
+              model.setHovered(undefined);
             }}
             onMouseMove={e => {
               const id = getAncestorID(e.target as HTMLElement);
 
               if (hovered != id) {
-                setHovered(id ?? undefined);
+                model.setHovered(id ?? undefined);
               }
             }}>
             {writeOnly ? null :
@@ -591,9 +592,9 @@ export default function EditorPane() {
               {lineNumberVisibility ? <td className='index'>{'-'.repeat(lastIndexDigits)}</td> : null}
               {dateVisibility ? <td className='date'></td> : null}
               <td>
-                <textarea ref={inputRef} rows={1} onChange={e => setInput(e.target.value)}
+                <textarea ref={inputRef} rows={1} onChange={e => model.setInput(e.target.value)}
                   onFocus={e => {
-                    setSelected(undefined);
+                    model.setSelected(undefined);
                   }}
                   onKeyDown={e => {
                     if (e.key == 'Enter' && !e.nativeEvent.isComposing) {
