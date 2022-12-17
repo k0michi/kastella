@@ -261,6 +261,7 @@ body,
 
 #editor-area .image-node img {
   max-width: 100%;
+  border-radius: 4px;
   display: block;
 }
 
