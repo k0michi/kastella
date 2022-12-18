@@ -125,35 +125,26 @@ export default class LibraryModel {
   addNode(parent: Node | string, node: Node) {
     parent = this.getNodeIfNeeded(parent);
 
-    /*
-    // Set parent
-    node.parent = parent;
-
-    const prevNode = Model.getLastNodeOf(parent);
-    const prevIndex = prevNode.index!;
-
-    // Set index
-    node.index = prevIndex + 1;
-
-    for (const node of visit(this.nodes.get())) {
-      if (node.index! > prevIndex) {
-        node.index!++;
+    if (node.type == NodeType.Directory) {
+      if (this.findDirectory(parent, (node as DirectoryNode).name!) != undefined) {
+        throw new Error(`Directory ${(node as DirectoryNode).name} already exists`);
       }
     }
 
+    parent.children.push(node);
+
+    // Set parent
+    this.updateParent(node, parent);
+
+    // Set index
+    const prev = this.prevIndexNode(node);
+    this.updateIndex(node, undefined, prev?.index! + 1);
+
     // Set depth
-    node.depth = parent.depth! + 1;
-    */
+    this.updateDepth(node, parent.depth! + 1);
 
     // Put on map
     this.nodeMap.set(node.id, node);
-
-    parent.children.push(node);
-
-    // Stable, but not efficient
-    this.recalculateParent();
-    this.recalculateIndex();
-    this.recalculateDepth();
 
     this.nodes.set(this.nodes.get()); // Explicitly update
     this.save();
@@ -791,26 +782,6 @@ export default class LibraryModel {
     for (const child of node.children) {
       child.parent = node;
       LibraryModel.assignParent(child);
-    }
-  }
-
-  recalculateParent() {
-    for (const n of this.nodes.get()) {
-      LibraryModel.assignParent(n);
-    }
-  }
-
-  recalculateIndex() {
-    let index = 0;
-
-    for (const n of this.nodes.get()) {
-      index = LibraryModel.assignIndex(n, index);
-    }
-  }
-
-  recalculateDepth() {
-    for (const n of this.nodes.get()) {
-      LibraryModel.assignDepth(n);
     }
   }
 
