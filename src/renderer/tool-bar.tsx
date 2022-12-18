@@ -106,6 +106,32 @@ export default function ToolBar() {
             }
           }
         }}><IconPhoto stroke={2} size={16} /></button>
+        <button className='tool' onClick={async e => {
+          const result = await bridge.openFile(FileType.Text);
+
+          if (result != null) {
+            for (const filePath of result) {
+              const mimeType = mime.getType(filePath);
+              const accessed = Timestamp.fromNs(await bridge.now());
+              const modified = Timestamp.fromNs(await bridge.getMTime(filePath));
+              const id = uuidv4();
+              await bridge.copyFile(id, filePath);
+              const basename = await bridge.basename(filePath);
+              const image = {
+                id,
+                name: basename,
+                type: mimeType,
+                accessed,
+                modified
+              } as File;
+
+              const parentID = model.getViewDirectory();
+              const tagIDs = model.getViewTags();
+
+              model.library.addTextEmbedNode(image, accessed, parentID, tagIDs);
+            }
+          }
+        }}><IconFileText stroke={2} size={16} /></button>
       </div>
       <dialog ref={mathModalRef}>
         <div className='dialog-container'>
