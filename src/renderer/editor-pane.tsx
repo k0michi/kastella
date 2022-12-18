@@ -610,9 +610,7 @@ export default function EditorPane() {
                     display: itemStyle == undefined ? 'block' : 'list-item',
                     listStyleType: listStyleType != undefined ? `'${listStyleType}'` : 'initial'
                   }}>
-                    <div style={{ display: 'inline-block' }}>
-                      {content}
-                    </div>
+                    {content}
                   </td>
                 </tr>;
               })

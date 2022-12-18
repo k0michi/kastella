@@ -234,6 +234,7 @@ body,
   position: relative;
   display: flex;
   flex-direction: row;
+  width: 100%;
 }
 
 #editor-area #nodes .node-wrapper {
