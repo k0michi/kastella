@@ -115,6 +115,7 @@ body,
   background-color: var(--color-tool);
   color: var(--color);
   border-radius: 2px;
+  line-height: 0;
 }
 
 /* Editor pane */

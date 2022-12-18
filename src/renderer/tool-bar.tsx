@@ -4,6 +4,7 @@ import { useModel, useObservable } from 'kyoka';
 import Model, { DirectoryView, TagView, ViewType } from './model';
 import Timestamp from './timestamp';
 import { NodeType } from './node';
+import { IconMathFunction, IconHeading, IconQuote } from '@tabler/icons';
 
 export default function ToolBar() {
   const model = useModel<Model>();
@@ -31,7 +32,7 @@ export default function ToolBar() {
       <div id="tool-bar">
         <button className='tool' onClick={e => {
           mathModalRef.current?.showModal();
-        }}>Math</button>
+        }}><IconMathFunction stroke={2} size={16} /></button>
         <button className='tool' onClick={e => {
           const selected = model.selected.get();
 
@@ -42,7 +43,7 @@ export default function ToolBar() {
               model.library.changeNodeType(selected, NodeType.Heading);
             }
           }
-        }}>Heading</button>
+        }}><IconHeading stroke={2} size={16} /></button>
         <button className='tool' onClick={e => {
           const selected = model.selected.get();
 
@@ -53,7 +54,7 @@ export default function ToolBar() {
               model.library.changeNodeType(selected, NodeType.Quote);
             }
           }
-        }}>Quote</button>
+        }}><IconQuote stroke={2} size={16} /></button>
       </div>
       <dialog ref={mathModalRef}>
         <div className='dialog-container'>
