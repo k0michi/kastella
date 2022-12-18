@@ -39,6 +39,7 @@ html {
     --color-editor-bar: hsl(200, 32%, 92%);
     --color-editor-index: hsl(200, 7%, 44%);
     --color-editor-selected: rgba(121, 221, 252, 0.371);
+    --color-editor-quote: rgb(26, 26, 26);
     --color-explorer: rgba(0, 0, 0, 0);
     --color-explorer-header: rgb(0, 0, 0);
     --color-explorer-selected: rgb(63, 123, 200);
