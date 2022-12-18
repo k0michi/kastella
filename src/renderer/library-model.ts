@@ -601,9 +601,10 @@ export default class LibraryModel {
     this.save();
   }
 
-  setListStyle(node: Node | string, listStyle: ListStyle | undefined) {
+  async setListStyle(node: Node | string, listStyle: ListStyle | undefined) {
     node = this.getNodeIfNeeded(node);
     node.list = listStyle;
+    await this.updateModified(node);
     this.nodes.set(this.nodes.get());
     this.save();
   }
