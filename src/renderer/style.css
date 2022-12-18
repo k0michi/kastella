@@ -230,22 +230,17 @@ body,
 }
 
 #editor-area #nodes .node {
-  padding-left: 8px;
+  padding-left: 4px;
   position: relative;
   display: flex;
   flex-direction: row;
 }
 
-#editor-area #nodes .node.selected {
-  background-color: var(--color-editor-selected);
+#editor-area #nodes .node-wrapper {
 }
 
-#editor-area #nodes .node.selected::before {
-  content: '';
-  position: absolute;
-  height: 100%;
-  width: 4px;
-  left: 0px;
+#editor-area #nodes .node.selected {
+  background-color: var(--color-editor-selected);
 }
 
 #editor-area #nodes textarea {

@@ -11,6 +11,11 @@ export enum NodeType {
   Quote = 'quote',
 }
 
+export enum ItemStyle {
+  Unordered = 'unordered',
+  Ordered = 'ordered'
+}
+
 export interface Node {
   type: NodeType;
   id: string;
@@ -18,6 +23,7 @@ export interface Node {
   modified?: Timestamp;
   tags?: string[];
   children: Node[];
+  list?: string;
 
   parent?: Node; // memoization
   index?: number; // memoization

@@ -12,7 +12,7 @@ import TextEmbed from './text-embed';
 import { IconGripVertical } from '@tabler/icons';
 import Katex from 'katex';
 import { visit } from './tree';
-import { AnchorNode, DirectoryNode, File, HeadingNode, ImageNode, MathNode, Node, NodeType, QuoteNode, ReservedID, TextEmbedNode, TextNode } from './node';
+import { AnchorNode, DirectoryNode, File, HeadingNode, ImageNode, ItemStyle, MathNode, Node, NodeType, QuoteNode, ReservedID, TextEmbedNode, TextNode } from './node';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -584,6 +584,13 @@ export default function EditorPane() {
                   </div>;
                 }
 
+                const itemStyle = n.parent?.list;
+                let listStyleType;
+
+                if (itemStyle == ItemStyle.Ordered) {
+                  listStyleType = `${(n.parent?.children.indexOf(n)! + 1)}.`;
+                }
+
                 return <tr key={n.id} data-id={id} className='visible'>
                   <td className='grip'>{n.id == hovered ?
                     <div draggable
@@ -598,8 +605,14 @@ export default function EditorPane() {
                     : null}</td>
                   {lineNumberVisibility ? <td className='index'>{n.index!}</td> : null}
                   {dateVisibility ? <td className='date'>{n.created!.asString()}</td> : null}
-                  <td style={{ paddingLeft: `${(n.depth! - baseDepth) * 16}px` }}>
-                    {content}
+                  <td className='node-wrapper' style={{
+                    marginLeft: `${(n.depth! - baseDepth) * 16}px`,
+                    display: itemStyle == undefined ? 'block' : 'list-item',
+                    listStyleType: listStyleType != undefined ? `'${listStyleType}'` : 'initial'
+                  }}>
+                    <div style={{ display: 'inline-block' }}>
+                      {content}
+                    </div>
                   </td>
                 </tr>;
               })

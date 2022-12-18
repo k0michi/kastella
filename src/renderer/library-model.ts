@@ -1,15 +1,13 @@
 import { Observable } from "kyoka";
-import produce from 'immer';
 import { v4 as uuidv4 } from 'uuid';
 import Timestamp from "./timestamp";
 import { arrayInsertBefore, arrayRemove, round } from "./utils";
 import { Version5 } from "./compat";
 import { visit } from "./tree";
-import { AnchorNode, DirectoryNode, File, ImageNode, MathNode, Node, NodeType, ReservedID, Tag, TextEmbedNode, TextNode } from "./node";
-import Model from "./model";
+import { AnchorNode, DirectoryNode, File, ImageNode, ItemStyle as ListStyle, MathNode, Node, NodeType, ReservedID, Tag, TextEmbedNode, TextNode } from "./node";
 import EventHandler from "./event-handler";
 
-export const LIBRARY_VERSION = 8;
+export const LIBRARY_VERSION = 9;
 
 export interface Library {
   nodes: Node[];
@@ -601,6 +599,18 @@ export default class LibraryModel {
     node.modified = Timestamp.fromNs(await bridge.now());
     this.nodes.set(this.nodes.get());
     this.save();
+  }
+
+  setListStyle(node: Node | string, listStyle: ListStyle | undefined) {
+    node = this.getNodeIfNeeded(node);
+    node.list = listStyle;
+    this.nodes.set(this.nodes.get());
+    this.save();
+  }
+
+  getParentIndex(node: Node | string) {
+    node = this.getNodeIfNeeded(node);
+    return node.parent?.children.indexOf(node);
   }
 
   // Nodes / Types

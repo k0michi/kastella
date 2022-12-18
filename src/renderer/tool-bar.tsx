@@ -3,8 +3,8 @@ import Katex from 'katex';
 import { useModel, useObservable } from 'kyoka';
 import Model, { DirectoryView, TagView, ViewType } from './model';
 import Timestamp from './timestamp';
-import { NodeType } from './node';
-import { IconMathFunction, IconHeading, IconQuote } from '@tabler/icons';
+import { ItemStyle, NodeType } from './node';
+import { IconMathFunction, IconHeading, IconQuote, IconList, IconListNumbers, IconMenu2 } from '@tabler/icons';
 
 export default function ToolBar() {
   const model = useModel<Model>();
@@ -55,6 +55,27 @@ export default function ToolBar() {
             }
           }
         }}><IconQuote stroke={2} size={16} /></button>
+        <button className='tool' onClick={e => {
+          const selected = model.selected.get();
+
+          if (selected != undefined) {
+            model.library.setListStyle(selected, undefined);
+          }
+        }}><IconMenu2 stroke={2} size={16} /></button>
+        <button className='tool' onClick={e => {
+          const selected = model.selected.get();
+
+          if (selected != undefined) {
+            model.library.setListStyle(selected, ItemStyle.Unordered);
+          }
+        }}><IconList stroke={2} size={16} /></button>
+        <button className='tool' onClick={e => {
+          const selected = model.selected.get();
+
+          if (selected != undefined) {
+            model.library.setListStyle(selected, ItemStyle.Ordered);
+          }
+        }}><IconListNumbers stroke={2} size={16} /></button>
       </div>
       <dialog ref={mathModalRef}>
         <div className='dialog-container'>
