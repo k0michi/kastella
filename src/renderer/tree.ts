@@ -1,9 +1,5 @@
 import { Node, NodeType } from "./node";
 
-export interface Depth {
-  depth: number;
-}
-
 export function* visit(node: Node[] | Node, filter = (node: Node) => true): Generator<Node> {
   let children;
 
