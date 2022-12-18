@@ -238,6 +238,12 @@ export default function EditorPane() {
   }, [model.library.nodes.getSnapShot(), view, search]);
 
   React.useEffect(() => {
+    if (selected != undefined && !filtered.includes(model.library.getNode(selected))) {
+      model.selected.set(undefined);
+    }
+  }, [filtered]);
+
+  React.useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (!e.isComposing) {
         if (e.key == 'ArrowUp' && e.metaKey) {
