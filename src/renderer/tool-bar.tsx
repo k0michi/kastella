@@ -1,10 +1,13 @@
 import * as React from 'react';
 import Katex from 'katex';
+import { v4 as uuidv4 } from 'uuid';
 import { useModel, useObservable } from 'kyoka';
 import Model, { DirectoryView, TagView, ViewType } from './model';
 import Timestamp from './timestamp';
-import { ItemStyle, NodeType } from './node';
-import { IconMathFunction, IconHeading, IconQuote, IconList, IconListNumbers, IconMenu2 } from '@tabler/icons';
+import { File, ItemStyle, NodeType } from './node';
+import { IconMathFunction, IconHeading, IconQuote, IconList, IconListNumbers, IconMenu2, IconPhoto, IconFileText, IconCode, IconBold, IconAnchor, IconLink } from '@tabler/icons';
+import { FileType } from '../common/fetch';
+import mime from 'mime';
 
 export default function ToolBar() {
   const model = useModel<Model>();
@@ -76,6 +79,33 @@ export default function ToolBar() {
             model.library.setListStyle(selected, ItemStyle.Ordered);
           }
         }}><IconListNumbers stroke={2} size={16} /></button>
+        <button className='tool' onClick={async e => {
+          const result = await bridge.openFile(FileType.Image);
+
+          if (result != null) {
+            for (const filePath of result) {
+              const mimeType = mime.getType(filePath);
+
+              const accessed = Timestamp.fromNs(await bridge.now());
+              const modified = Timestamp.fromNs(await bridge.getMTime(filePath));
+              const id = uuidv4();
+              await bridge.copyFile(id, filePath);
+              const basename = await bridge.basename(filePath);
+              const image = {
+                id,
+                name: basename,
+                type: mimeType,
+                accessed,
+                modified
+              } as File;
+
+              const parentID = model.getViewDirectory();
+              const tagIDs = model.getViewTags();
+
+              model.library.addImageNode(image, accessed, parentID, tagIDs);
+            }
+          }
+        }}><IconPhoto stroke={2} size={16} /></button>
       </div>
       <dialog ref={mathModalRef}>
         <div className='dialog-container'>

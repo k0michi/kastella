@@ -1,11 +1,12 @@
 // Modules to control application life and create native browser window
 
-import { app, BrowserWindow, Event, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, dialog, Event, ipcMain, shell } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { now } from '@k0michi/now';
 import { fetchFile, fetchMeta } from './fetch.js';
 import * as mime from 'mime';
+import { FileType } from '../common/fetch.js';
 
 let libraryPath = path.join(app.getPath('userData'), 'library');
 const devURL = `http://localhost:5173/`;
@@ -137,4 +138,36 @@ ipcMain.handle('write-file', async (e, id: string, data: Uint8Array, type: strin
   await fs.mkdir(path.join(libraryPath, 'files'), { recursive: true });
   const destPath = path.join(libraryPath, 'files', id + '.' + ext);
   return await fs.writeFile(destPath, data);
+});
+
+ipcMain.handle('open-file', async (e, fileType: FileType) => {
+  if (fileType == FileType.Text) {
+    const result = await dialog.showOpenDialog({
+      properties: ['openFile', 'multiSelections']
+    });
+
+    if (result.canceled) {
+      return null;
+    }
+
+    return result.filePaths;
+  }
+
+  if (fileType == FileType.Image) {
+    const result = await dialog.showOpenDialog({
+      title: 'Open image file',
+      properties: ['openFile', 'multiSelections'],
+      filters: [
+        { name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'gif'] }
+      ]
+    });
+
+    if (result.canceled) {
+      return null;
+    }
+
+    return result.filePaths;
+  }
+
+  return null;
 });

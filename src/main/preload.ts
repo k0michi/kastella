@@ -1,5 +1,5 @@
 import { ipcRenderer, contextBridge } from 'electron';
-import { FetchedFile, FetchedMeta } from '../common/fetch.js';
+import { FetchedFile, FetchedMeta, FileType } from '../common/fetch.js';
 
 export class Bridge {
   readLibrary = (): Promise<string> => ipcRenderer.invoke('read-library');
@@ -14,6 +14,7 @@ export class Bridge {
   fetchMeta = (url: string): Promise<FetchedMeta> => ipcRenderer.invoke('fetch-meta', url);
   fetchFile = (url: string): Promise<FetchedFile> => ipcRenderer.invoke('fetch-file', url);
   writeFile = (id: string, data: Uint8Array, type: string): Promise<void> => ipcRenderer.invoke('write-file', id, data, type);
+  openFile = (fileType: FileType): Promise<string[] | null> => ipcRenderer.invoke('open-file', fileType);
 }
 
 contextBridge.exposeInMainWorld('bridge', new Bridge());

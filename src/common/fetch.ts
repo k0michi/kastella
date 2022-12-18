@@ -13,3 +13,8 @@ export interface FetchedFile {
   modified?: string;
   data: Uint8Array;
 }
+
+export enum FileType {
+  Text,
+  Image
+}
