@@ -8,6 +8,7 @@ export enum NodeType {
   TextEmbed = 'text-embed',
   Math = 'math',
   Heading = 'heading',
+  Quote = 'quote',
 }
 
 export interface Node {
@@ -69,6 +70,11 @@ export interface MathNode extends Node {
 
 export interface HeadingNode extends Node {
   type: NodeType.Heading;
+  content: string;
+}
+
+export interface QuoteNode extends Node {
+  type: NodeType.Quote;
   content: string;
 }
 

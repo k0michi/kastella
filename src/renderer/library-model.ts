@@ -9,7 +9,7 @@ import { AnchorNode, DirectoryNode, File, ImageNode, MathNode, Node, NodeType, R
 import Model from "./model";
 import EventHandler from "./event-handler";
 
-export const LIBRARY_VERSION = 7;
+export const LIBRARY_VERSION = 8;
 
 export interface Library {
   nodes: Node[];
@@ -574,14 +574,21 @@ export default class LibraryModel {
     node = this.getNodeIfNeeded(node);
 
     if (node.type == NodeType.Text) {
-      if (type == NodeType.Heading) {
+      if (type == NodeType.Heading || type == NodeType.Quote) {
         node.type = type;
         await this.updateModified(node);
         this.nodes.set(this.nodes.get());
         this.save();
       }
     } else if (node.type == NodeType.Heading) {
-      if (type == NodeType.Text) {
+      if (type == NodeType.Text || type == NodeType.Quote) {
+        node.type = type;
+        await this.updateModified(node);
+        this.nodes.set(this.nodes.get());
+        this.save();
+      }
+    } else if (node.type == NodeType.Quote) {
+      if (type == NodeType.Text || type == NodeType.Heading) {
         node.type = type;
         await this.updateModified(node);
         this.nodes.set(this.nodes.get());
@@ -633,6 +640,11 @@ export default class LibraryModel {
     return node.type == NodeType.Heading;
   }
 
+  isQuote(node: Node | string) {
+    node = this.getNodeIfNeeded(node);
+    return node.type == NodeType.Quote;
+  }
+
 
   // Files
 
@@ -659,7 +671,7 @@ export default class LibraryModel {
     return found;
   }
 
-  getHeadingDepth(node: Node | undefined):number {
+  getHeadingDepth(node: Node | undefined): number {
     if (node == undefined) {
       return 0;
     }

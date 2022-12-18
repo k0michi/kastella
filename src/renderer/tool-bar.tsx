@@ -38,11 +38,22 @@ export default function ToolBar() {
           if (selected != undefined) {
             if (model.library.isHeading(selected)) {
               model.library.changeNodeType(selected, NodeType.Text);
-            } else if (model.library.isText(selected)) {
+            } else if (model.library.isText(selected) || model.library.isQuote(selected)) {
               model.library.changeNodeType(selected, NodeType.Heading);
             }
           }
         }}>Heading</button>
+        <button className='tool' onClick={e => {
+          const selected = model.selected.get();
+
+          if (selected != undefined) {
+            if (model.library.isQuote(selected)) {
+              model.library.changeNodeType(selected, NodeType.Text);
+            } else if (model.library.isText(selected) || model.library.isHeading(selected)) {
+              model.library.changeNodeType(selected, NodeType.Quote);
+            }
+          }
+        }}>Quote</button>
       </div>
       <dialog ref={mathModalRef}>
         <div className='dialog-container'>

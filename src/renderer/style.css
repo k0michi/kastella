@@ -17,6 +17,7 @@ html {
   --color-editor-bar: hsl(230, 10%, 14%);
   --color-editor-index: hsl(230, 7%, 44%);
   --color-editor-selected: rgba(121, 221, 252, 0.371);
+  --color-editor-quote: rgb(232, 232, 232);
   --color-error: red;
   --color-editor-tag: gray;
   --color-explorer: rgba(0, 0, 0, 0);
@@ -301,6 +302,11 @@ body,
 #editor-area .heading-node {
   font-size: 2em;
   font-weight: bold;
+}
+
+#editor-area .quote-node {
+  border-left: 2px solid var(--color-editor-quote);
+  padding-left: 12px;
 }
 
 
