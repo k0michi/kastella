@@ -1,8 +1,10 @@
 import { Observable } from "kyoka";
 import { v4 as uuidv4 } from 'uuid';
 import { round } from "./utils";
-import { ReservedID } from "./node";
+import { File, ReservedID } from "./node";
 import LibraryModel from "./library-model";
+import mime from "mime";
+import Timestamp from "./timestamp";
 // import { validateLibrary } from "./validate";
 
 export enum ViewType {
@@ -63,6 +65,51 @@ export default class Model {
 
   destruct() {
     this.library.saveHandler.off(this.saveLibrary);
+  }
+
+
+  // Import
+
+  async importImageFile(filePath: string) {
+    const mimeType = mime.getType(filePath);
+    const accessed = Timestamp.fromNs(await bridge.now());
+    const modified = Timestamp.fromNs(await bridge.getMTime(filePath));
+    const id = uuidv4();
+    await bridge.copyFile(id, filePath);
+    const basename = await bridge.basename(filePath);
+    const image = {
+      id,
+      name: basename,
+      type: mimeType,
+      accessed,
+      modified
+    } as File;
+
+    const parentID = this.getViewDirectory();
+    const tagIDs = this.getViewTags();
+
+    this.library.addImageNode(image, accessed, parentID, tagIDs);
+  }
+
+  async importTextFile(filePath: string) {
+    const mimeType = mime.getType(filePath);
+    const accessed = Timestamp.fromNs(await bridge.now());
+    const modified = Timestamp.fromNs(await bridge.getMTime(filePath));
+    const id = uuidv4();
+    await bridge.copyFile(id, filePath);
+    const basename = await bridge.basename(filePath);
+    const image = {
+      id,
+      name: basename,
+      type: mimeType,
+      accessed,
+      modified
+    } as File;
+
+    const parentID = this.getViewDirectory();
+    const tagIDs = this.getViewTags();
+
+    this.library.addTextEmbedNode(image, accessed, parentID, tagIDs);
   }
 
 

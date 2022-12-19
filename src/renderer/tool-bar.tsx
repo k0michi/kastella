@@ -84,25 +84,7 @@ export default function ToolBar() {
 
           if (result != null) {
             for (const filePath of result) {
-              const mimeType = mime.getType(filePath);
-
-              const accessed = Timestamp.fromNs(await bridge.now());
-              const modified = Timestamp.fromNs(await bridge.getMTime(filePath));
-              const id = uuidv4();
-              await bridge.copyFile(id, filePath);
-              const basename = await bridge.basename(filePath);
-              const image = {
-                id,
-                name: basename,
-                type: mimeType,
-                accessed,
-                modified
-              } as File;
-
-              const parentID = model.getViewDirectory();
-              const tagIDs = model.getViewTags();
-
-              model.library.addImageNode(image, accessed, parentID, tagIDs);
+              await model.importImageFile(filePath);
             }
           }
         }}><IconPhoto stroke={2} size={16} /></button>
@@ -111,24 +93,7 @@ export default function ToolBar() {
 
           if (result != null) {
             for (const filePath of result) {
-              const mimeType = mime.getType(filePath);
-              const accessed = Timestamp.fromNs(await bridge.now());
-              const modified = Timestamp.fromNs(await bridge.getMTime(filePath));
-              const id = uuidv4();
-              await bridge.copyFile(id, filePath);
-              const basename = await bridge.basename(filePath);
-              const image = {
-                id,
-                name: basename,
-                type: mimeType,
-                accessed,
-                modified
-              } as File;
-
-              const parentID = model.getViewDirectory();
-              const tagIDs = model.getViewTags();
-
-              model.library.addTextEmbedNode(image, accessed, parentID, tagIDs);
+              await model.importTextFile(filePath);
             }
           }
         }}><IconFileText stroke={2} size={16} /></button>
