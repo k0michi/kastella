@@ -4,7 +4,7 @@ import * as contentType from 'content-type';
 import charset from 'charset';
 import { FetchedFile, FetchedMeta } from '../common/fetch';
 import '@js-joda/locale';
-import { DateTimeFormatter, ZonedDateTime } from '@js-joda/core';
+import { DateTimeFormatter, LocalDateTime, ZonedDateTime } from '@js-joda/core';
 
 const USER_AGENT = 'WhatsApp/2';
 
@@ -139,7 +139,8 @@ function longest(...strings: (string | null | undefined)[]) {
 }
 
 function rfc1123ToISO8601(dateTime: string) {
-  const parsed = ZonedDateTime.parse(dateTime, DateTimeFormatter.RFC_1123_DATE_TIME);
+  // DateTimeFormatter.RFC_1123_DATE_TIME sometimes fails to parse
+  const parsed = ZonedDateTime.parse((new Date(dateTime)).toISOString());
   return parsed.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 }
 
