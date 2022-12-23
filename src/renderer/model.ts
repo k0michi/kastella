@@ -192,6 +192,7 @@ export default class Model {
   async saveLibrary() {
     const delay = 2 * 1000;
     this.saveSchedule = Date.now() + delay;
+    bridge.setEdited(true);
 
     const save = (() => {
       this.saving.set(true);
@@ -207,6 +208,7 @@ export default class Model {
 
         const elapsed = end - start;
         const statusID = this.setStatus(`Saved! (${round(elapsed, 2)} ms)`);
+        bridge.setEdited(false);
 
         setTimeout((() => {
           if (this.status.get()?.id == statusID) {

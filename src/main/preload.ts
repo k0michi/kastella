@@ -15,6 +15,7 @@ export class Bridge {
   fetchFile = (url: string): Promise<FetchedFile> => ipcRenderer.invoke('fetch-file', url);
   writeFile = (id: string, data: Uint8Array, type: string): Promise<void> => ipcRenderer.invoke('write-file', id, data, type);
   openFile = (fileType: FileType): Promise<string[] | null> => ipcRenderer.invoke('open-file', fileType);
+  setEdited = (edited: boolean): Promise<void> => ipcRenderer.invoke('set-edited', edited);
 }
 
 contextBridge.exposeInMainWorld('bridge', new Bridge());

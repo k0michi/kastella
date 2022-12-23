@@ -10,10 +10,11 @@ import { FileType } from '../common/fetch.js';
 
 let libraryPath = path.join(app.getPath('userData'), 'library');
 const devURL = `http://localhost:5173/`;
+let mainWindow: BrowserWindow | undefined;
 
 function createWindow() {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -170,4 +171,8 @@ ipcMain.handle('open-file', async (e, fileType: FileType) => {
   }
 
   return null;
+});
+
+ipcMain.handle('set-edited', async (e, edited: boolean) => {
+  mainWindow?.setDocumentEdited(edited);
 });
