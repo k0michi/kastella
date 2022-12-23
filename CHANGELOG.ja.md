@@ -1,13 +1,16 @@
 # Library Versions
 
-## Library Version 9
+## Version 10
+インライン要素を実装
+
+## Version 9
 リストスタイル(Ordered, Unordered)を設定可能に
 
-## Library Version 8
+## Version 8
 Quoteを追加
 
-## Library Version 7
+## Version 7
 Headingを追加
 
-## Library Version 6
+## Version 6
 ノードをツリーとして保存するように
