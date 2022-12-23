@@ -11,7 +11,7 @@ import Timestamp from './timestamp';
 import TextEmbed from './text-embed';
 import { IconGripVertical } from '@tabler/icons';
 import Katex from 'katex';
-import { visit } from './tree';
+import { inlineNodeToElement, inlineNodeToString, visit } from './tree';
 import { AnchorNode, DirectoryNode, File, HeadingNode, ImageNode, ItemStyle, MathNode, Node, NodeType, QuoteNode, ReservedID, TextEmbedNode, TextNode } from './node';
 
 export default function EditorPane() {
@@ -184,7 +184,7 @@ export default function EditorPane() {
 
     if (search.length > 0) {
       filtered = filtered.filter(n =>
-        n.type == NodeType.Text && findStringIgnoreCase((n as TextNode).content, search) ||
+        n.type == NodeType.Text && findStringIgnoreCase(inlineNodeToString((n as TextNode).content), search) ||
         (n.type == NodeType.Anchor &&
           findStringIgnoreCase((n as AnchorNode).contentTitle, search) ||
           findStringIgnoreCase((n as AnchorNode).contentDescription, search) ||
@@ -471,7 +471,7 @@ export default function EditorPane() {
                   const textNode = n as Node as TextNode;
 
                   content = <div className={className}>
-                    <div className='content text-node'>{textNode.content as string}</div>
+                    <div className='content text-node'>{inlineNodeToElement(textNode.content)}</div>
                     <div className='tags'>{tagNames?.join(' ')}</div>
                   </div>;
                 } else if (n.type == NodeType.Image) {
@@ -546,14 +546,14 @@ export default function EditorPane() {
                   const fontSize = Math.max(2 / COEFF ** headingDepth, 1);
 
                   content = <div className={className}>
-                    <div className='content heading-node' style={{ 'fontSize': fontSize + 'em' }}>{headingNode.content as string}</div>
+                    <div className='content heading-node' style={{ 'fontSize': fontSize + 'em' }}>{inlineNodeToElement(headingNode.content)}</div>
                     <div className='tags'>{tagNames?.join(' ')}</div>
                   </div>;
                 } else if (n.type == NodeType.Quote) {
                   const quoteNode = n as Node as QuoteNode;
 
                   content = <div className={className}>
-                    <div className='content quote-node'>{quoteNode.content as string}</div>
+                    <div className='content quote-node'>{inlineNodeToElement(quoteNode.content)}</div>
                     <div className='tags'>{tagNames?.join(' ')}</div>
                   </div>;
                 }

@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { DirectoryNode, NodeType, ReservedID } from './node';
+import { visit } from './tree';
 
 export namespace Version5 {
   export function findNode(nodes: any, id: string | undefined) {
@@ -48,7 +49,19 @@ export namespace Version5 {
     } as DirectoryNode;
 
     data.nodes = [root, trash];
-    
+
+    return data;
+  }
+}
+
+export namespace Version9 {
+  export function convert(data: any) {
+    for (const node of visit(data.nodes) as any) {
+      if (node.type == 'text' || node.type == 'heading' || node.type == 'quote') {
+        node.content = [node.content];
+      }
+    }
+
     return data;
   }
 }
