@@ -39,7 +39,15 @@ function createWindow() {
   }
 
   mainWindow.webContents.on('will-navigate', handleNavigate);
-  // mainWindow.webContents.on('new-window', handleNavigate);
+
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url == devURL) {
+      return { action: 'allow' };
+    }
+
+    shell.openExternal(url);
+    return { action: 'deny' };
+  });
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
