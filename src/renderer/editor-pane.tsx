@@ -369,16 +369,12 @@ export default function EditorPane() {
         const id = (e.target as HTMLElement).dataset['id']!;
 
         if (e.isIntersecting) {
-          if (type == 'node') {
-            model.addIntersecting(id);
-          } else {
-            for (const n of model.chunked.get()[parseInt(id)].nodes) {
-              model.addIntersecting(n.id);
-            }
+          for (const n of model.chunked.get()[parseInt(id)].nodes) {
+            model.addIntersecting(n.id);
           }
         } else {
-          if (type == 'node') {
-            model.removeIntersecting(id);
+          for (const n of model.chunked.get()[parseInt(id)].nodes) {
+            model.removeIntersecting(n.id);
           }
         }
       }
@@ -395,20 +391,14 @@ export default function EditorPane() {
     const observer = new MutationObserver((mutationList) => {
       for (const m of mutationList) {
         for (const n of m.addedNodes) {
-          if (n.nodeType == window.Node.ELEMENT_NODE && (n as HTMLElement).dataset['type'] != null) {
+          if (n.nodeType == window.Node.ELEMENT_NODE && (n as HTMLElement).dataset['type'] == 'chunk') {
             iObserver.observe(n as Element);
           }
         }
 
         for (const n of m.removedNodes) {
-          if (n.nodeType == window.Node.ELEMENT_NODE && (n as HTMLElement).dataset['type'] != null) {
+          if (n.nodeType == window.Node.ELEMENT_NODE && (n as HTMLElement).dataset['type'] == 'chunk') {
             iObserver.unobserve(n as Element);
-            const type = (n as HTMLElement).dataset['type']!;
-            const id = (n as HTMLElement).dataset['id']!;
-
-            if (type == 'node') {
-              model.removeIntersecting(id);
-            }
           }
         }
       }

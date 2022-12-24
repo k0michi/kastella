@@ -43,6 +43,8 @@ export interface Chunk {
   nodes: Node[];
 }
 
+export const CHUNK_NODE_COUNT = 256;
+
 export default class Model {
   library: LibraryModel;
 
@@ -229,7 +231,7 @@ export default class Model {
     const chunked: Chunk[] = [];
 
     for (let i = 0; i < flattened.length; i++) {
-      const index = Math.floor(i / 1024);
+      const index = Math.floor(i / CHUNK_NODE_COUNT);
 
       if (chunked.length <= index) {
         chunked.push({
