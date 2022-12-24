@@ -22,6 +22,7 @@ export default class LibraryModel {
   tags = new Observable<Tag[]>([]); // mutable
   nodeMap = new Map<string, Node>();
   saveHandler = new EventHandler();
+  updateHandler = new EventHandler();
 
   constructor() {
     this.initialize({
@@ -97,6 +98,7 @@ export default class LibraryModel {
     this.nodes.set(data.nodes ?? []);
     this.files.set(data.files ?? []);
     this.tags.set(data.tags ?? []);
+    this.update();
   }
 
 
@@ -104,6 +106,11 @@ export default class LibraryModel {
 
   save() {
     this.saveHandler.emit();
+    this.update();
+  }
+
+  update() {
+    this.updateHandler.emit();
   }
 
 
@@ -348,7 +355,6 @@ export default class LibraryModel {
     this.updateDepth(node, parent.depth! + 1);
 
     this.nodes.set(this.nodes.get());
-
     this.save();
   }
 

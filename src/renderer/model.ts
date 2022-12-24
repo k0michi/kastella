@@ -1,10 +1,12 @@
 import { Observable } from "kyoka";
 import { v4 as uuidv4 } from 'uuid';
-import { round } from "./utils";
-import { File, ReservedID } from "./node";
+import { findStringIgnoreCase, round } from "./utils";
+import { AnchorNode, File, Node, NodeType, ReservedID, TextNode } from "./node";
 import LibraryModel from "./library-model";
 import mime from "mime";
 import Timestamp from "./timestamp";
+import { inlineNodeToString, visit } from "./tree";
+import { DateTimeFormatter } from "@js-joda/core";
 // import { validateLibrary } from "./validate";
 
 export enum ViewType {
@@ -37,6 +39,10 @@ export interface Status {
   message: string;
 }
 
+export interface Chunk {
+  nodes: Node[];
+}
+
 export default class Model {
   library: LibraryModel;
 
@@ -54,17 +60,22 @@ export default class Model {
   hovered = new Observable<string | undefined>(undefined);
   atBottom = new Observable<boolean>(true);
   input = new Observable<string>('');
+  flattened = new Observable<Node[]>([]);
+  chunked = new Observable<Chunk[]>([]);
 
   constructor() {
-    this.changeView({ type: ViewType.Directory, parentID: ReservedID.Master } as DirectoryView);
     this.library = new LibraryModel();
+    this.changeView({ type: ViewType.Directory, parentID: ReservedID.Master } as DirectoryView);
 
     this.saveLibrary = this.saveLibrary.bind(this);
+    this.updateNodes = this.updateNodes.bind(this);
     this.library.saveHandler.on(this.saveLibrary);
+    this.library.updateHandler.on(this.updateNodes);
   }
 
   destruct() {
     this.library.saveHandler.off(this.saveLibrary);
+    this.library.updateHandler.off(this.updateNodes);
   }
 
 
@@ -117,10 +128,12 @@ export default class Model {
 
   changeView(view: View) {
     this.view.set(view);
+    this.updateNodes();
   }
 
   setSearch(search: string) {
     this.search.set(search);
+    this.updateNodes();
   }
 
   setWriteOnly(writeOnly: boolean) {
@@ -179,6 +192,56 @@ export default class Model {
 
   setAtBottom(atBottom: boolean) {
     this.atBottom.set(atBottom);
+  }
+
+  updateNodes() {
+    const view = this.view.get();
+    const search = this.search.get();
+    let filtered;
+
+    if (view?.type == ViewType.Directory) {
+      let parent = this.library.getNode((view as DirectoryView).parentID);
+      filtered = parent?.children!;
+    } else {
+      filtered = this.library.getNode(ReservedID.Master)?.children!;
+    }
+
+    if (search.length > 0) {
+      filtered = filtered.filter(n =>
+        n.type == NodeType.Text && findStringIgnoreCase(inlineNodeToString((n as TextNode).content), search) ||
+        (n.type == NodeType.Anchor &&
+          findStringIgnoreCase((n as AnchorNode).contentTitle, search) ||
+          findStringIgnoreCase((n as AnchorNode).contentDescription, search) ||
+          findStringIgnoreCase((n as AnchorNode).contentURL, search)
+        )
+      );
+    }
+
+    if (view?.type == ViewType.Tag) {
+      filtered = filtered.filter(n => n.tags?.includes((view as TagView).tag));
+    }
+
+    if (view?.type == ViewType.Date) {
+      filtered = filtered.filter(n => n.created!.asZonedDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE) == (view as DateView).date);
+    }
+
+    const flattened = [...visit(filtered)];
+    const chunked: Chunk[] = [];
+
+    for (let i = 0; i < flattened.length; i++) {
+      const index = Math.floor(i / 1024);
+
+      if (chunked.length <= index) {
+        chunked.push({
+          nodes: []
+        });
+      }
+
+      chunked[index].nodes.push(flattened[i]);
+    }
+
+    this.flattened.set(flattened);
+    this.chunked.set(chunked);
   }
 
 
