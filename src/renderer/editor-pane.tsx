@@ -12,7 +12,7 @@ import TextEmbed from './text-embed';
 import { IconGripVertical } from '@tabler/icons';
 import Katex from 'katex';
 import { inlineNodeToElement, inlineNodeToString, visit } from './tree';
-import { AnchorNode, DirectoryNode, File, HeadingNode, ImageNode, ItemStyle, MathNode, Node, NodeType, QuoteNode, ReservedID, TextEmbedNode, TextNode } from './node';
+import { AnchorNode, DirectoryNode, File, HeadingNode, ImageNode, ItemStyle, MathNode, Node, NodeType, PageNode, QuoteNode, ReservedID, TextEmbedNode, TextNode } from './node';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -493,6 +493,13 @@ export default function EditorPane() {
 
                   content = <div className={className}>
                     <div className='content directory-node'>[dir] {dNode.name as string}</div>
+                    <div className='tags'>{tagNames?.join(' ')}</div>
+                  </div>;
+                } else if (n.type == NodeType.Page) {
+                  const pNode = n as Node as PageNode;
+
+                  content = <div className={className}>
+                    <div className='content page-node'>[page] {pNode.name as string}</div>
                     <div className='tags'>{tagNames?.join(' ')}</div>
                   </div>;
                 } else if (n.type == NodeType.Anchor) {
