@@ -254,7 +254,6 @@ export default function EditorPane() {
           e.preventDefault();
 
           const foundIndex = filtered.findIndex(n => n.id == selected);
-          console.log(foundIndex)
           const next = filtered[foundIndex + 1];
 
           if (next != null && foundIndex != -1) {
