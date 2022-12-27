@@ -58,7 +58,9 @@
   },
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "icon": "assets/notist.icns"
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
