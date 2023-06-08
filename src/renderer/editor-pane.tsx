@@ -180,6 +180,17 @@ export default function EditorPane() {
   }, [filtered]);
 
   React.useEffect(() => {
+    const length = filtered.length;
+
+    if (!writeOnly) {
+      model.setViewRange({
+        first: length,
+        last: length
+      });
+    }
+  }, [writeOnly]);
+
+  React.useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       const view = model.view.get();
       const filtered = model.flattened.get();
