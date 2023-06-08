@@ -8,9 +8,49 @@ import { fetchFile, fetchMeta } from './fetch.js';
 import * as mime from 'mime';
 import { FileType } from '../common/fetch.js';
 
-let libraryPath = path.join(app.getPath('userData'), 'library');
+// Paths
 const devURL = `http://localhost:5173/`;
+const configFileName = 'config.json';
+const userDataPath = app.getPath('userData');
+let defaultLibraryPath = path.join(userDataPath, 'library');
+
+// Variables
 let mainWindow: BrowserWindow | undefined;
+let config: Config;
+let libraryPath: string;
+
+interface Config {
+  libraryPath?: string;
+}
+
+function getConfigPath() {
+  return path.join(userDataPath, configFileName);
+}
+
+async function loadConfig() {
+  const configPath = getConfigPath();
+  let configContent: string;
+  
+  try {
+    configContent = await fs.readFile(configPath, 'utf-8');
+  } catch (error) {
+    // Does not exist
+    configContent = `{}`;
+    await fs.writeFile(configPath, configContent);
+  }
+
+  config = JSON.parse(configContent);
+}
+
+function getLibraryPath() {
+  if (!app.isPackaged) {
+    // Development
+    return './library';
+  }
+
+
+  return config.libraryPath ?? defaultLibraryPath;
+}
 
 function createWindow() {
   // Create the browser window.
@@ -26,9 +66,7 @@ function createWindow() {
   if (app.isPackaged) {
     mainWindow.loadFile(path.join(__dirname, '../../renderer/index.html'))
   } else {
-    // For development
-    libraryPath = './library';
-    mainWindow.loadURL(devURL)
+    mainWindow.loadURL(devURL);
   }
 
   function handleNavigate(e: Event, url: string) {
@@ -56,7 +94,10 @@ function createWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  await loadConfig();
+  libraryPath = getLibraryPath();
+
   createWindow()
 
   app.on('activate', function () {
