@@ -272,14 +272,8 @@ export default class Model {
         this.saving.set(false);
 
         const elapsed = end - start;
-        const statusID = this.setStatus(`Saved! (${round(elapsed, 2)} ms)`);
+        this.setStatusFor(`Saved! (${round(elapsed, 2)} ms)`);
         bridge.setEdited(false);
-
-        setTimeout((() => {
-          if (this.status.get()?.id == statusID) {
-            this.clearStatus();
-          }
-        }).bind(this), 5 * 1000);
       }).bind(this));
     }).bind(this);
 
@@ -305,6 +299,16 @@ export default class Model {
     const id = uuidv4();
     this.status.set({ id, message });
     return id;
+  }
+
+  setStatusFor(message: string, duration: number = 5 * 1000) {
+    const statusID = this.setStatus(message);
+
+    setTimeout((() => {
+      if (this.status.get()?.id == statusID) {
+        this.clearStatus();
+      }
+    }).bind(this), duration);
   }
 
   clearStatus() {
