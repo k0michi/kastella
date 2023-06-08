@@ -26,10 +26,9 @@ export default function EditorPane() {
   const search = useObservable(model.search);
   const lineNumberVisibility = useObservable(model.lineNumberVisibility);
   const dateVisibility = useObservable(model.dateVisibility);
-  const intersecting = useObservable(model.intersecting);
   const hovered = useObservable(model.hovered);
   const filtered = useObservable(model.flattened);
-  const chunked = useObservable(model.chunked);
+  const range = useObservable(model.range);
 
   const editorRef = React.useRef<HTMLDivElement>(null);
   const nodesRef = React.useRef<HTMLDivElement>(null);
@@ -360,26 +359,55 @@ export default function EditorPane() {
   }, [selected]);
 
   React.useEffect(() => {
-    const MARGIN_Y = 2 ** 13;
+    const MARGIN_Y = 2 ** 10;
 
     const iObserver = new IntersectionObserver((entries) => {
       for (const e of entries) {
-        const type = (e.target as HTMLElement).dataset['type']!;
-        const id = (e.target as HTMLElement).dataset['id']!;
+        const element = (e.target as HTMLElement);
+        const index = parseInt(element.dataset['index']!);
+        const id = element.dataset['id']!;
+        const range = model.range.get();
+
+        const editorArea = editorRef.current!;
+        const rect = element.getBoundingClientRect();
+        const rectFrame = editorArea.getBoundingClientRect();
+        const offsetY = rect.y - rectFrame.y;
 
         if (e.isIntersecting) {
-          if (type == 'chunk') {
-            console.log(e.target)
-            for (const n of model.chunked.get()[parseInt(id)].nodes) {
-              model.addIntersecting(n.id);
-            }
+          if (index < range.first) {
+            const newRange = {
+              ...range,
+              first: index
+            };
+
+            model.setViewRange(newRange);
+          } else if (index > range.last) {
+            const newRange = {
+              ...range,
+              last: index
+            };
+
+            model.setViewRange(newRange);
           }
         } else {
-          if (type == 'node') {
-            model.removeIntersecting(id);
+          if (index > range.first && index < range.last && offsetY < 0) {
+            const newRange = {
+              ...range,
+              first: index
+            };
+
+            model.setViewRange(newRange);
+          } else if (index < range.last && index > range.first && offsetY > 0) {
+            const newRange = {
+              ...range,
+              last: index
+            };
+
+            model.setViewRange(newRange);
           }
         }
       }
+
     }, {
       root: editorRef.current,
       rootMargin: `${MARGIN_Y}px 0px ${MARGIN_Y}px 0px`
@@ -414,6 +442,8 @@ export default function EditorPane() {
   const lastIndexDigits = Math.ceil(Math.log10(lastIndex));
   const baseDepth = filtered[0]?.depth!;
 
+  const PADDINGS = 32;
+
   return <div id='editor-pane'>
     <EditorBar />
     <div id="editor-area" ref={editorRef}>
@@ -431,160 +461,156 @@ export default function EditorPane() {
               }
             }}>
             {writeOnly ? null :
-              chunked.map((chunk, i) => {
-                const chunkVisible = chunk.nodes.some(n => intersecting.has(n.id));
-
-                if (chunkVisible) {
-                  return chunk.nodes.map(n => {
-                    const id = n.id;
-                    /*
-                    const visible = intersecting.has(id);
-
-                    if (!visible) {
-                      return <tr key={id} data-id={id} className='invisible'></tr>;
-                    }*/
-
-                    let className = 'node';
-
-                    if (id == selected) {
-                      className += ' selected';
-                    }
-
-                    const tagNames = n.tags?.map(t => '#' + model.library.getTag(t)?.name);
-
-                    let content;
-
-                    if (n.type == NodeType.Text) {
-                      const textNode = n as Node as TextNode;
-
-                      content = <div className={className}>
-                        <div className='content text-node'>{inlineNodeToElement(textNode.content)}</div>
-                        <div className='tags'>{tagNames?.join(' ')}</div>
-                      </div>;
-                    } else if (n.type == NodeType.Image) {
-                      const imageNode = n as Node as ImageNode;
-                      const file = model.library.getFile(imageNode.fileID);
-
-                      if (file != null) {
-                        content = <div className={className}>
-                          <div className='content image-node'>
-                            <Image file={file} />
-                          </div>
-                          <div className='tags'>{tagNames?.join(' ')}</div>
-                        </div>;
-                      } else {
-                        content = <div className='error'>{`Failed to read ${imageNode.fileID}`}</div>;
-                      }
-                    } else if (n.type == NodeType.Directory) {
-                      const dNode = n as Node as DirectoryNode;
-
-                      content = <div className={className}>
-                        <div className='content directory-node'>[dir] {dNode.name as string}</div>
-                        <div className='tags'>{tagNames?.join(' ')}</div>
-                      </div>;
-                    } else if (n.type == NodeType.Page) {
-                      const pNode = n as Node as PageNode;
-
-                      content = <div className={className}>
-                        <div className='content page-node'>[page] {pNode.name as string}</div>
-                        <div className='tags'>{tagNames?.join(' ')}</div>
-                      </div>;
-                    } else if (n.type == NodeType.Anchor) {
-                      const anchor = n as Node as AnchorNode;
-                      const imageFile = anchor.contentImageFileID != null ? model.library.getFile(anchor.contentImageFileID) : null;
-                      const description = anchor.contentDescription;
-
-                      content = <div className={className}>
-                        <div className='content anchor-node'>
-                          {imageFile != null ? <div className='image'><Image file={imageFile}></Image></div> : null}
-                          <div className='details'>
-                            <div className='url'>{decodeURI(anchor.contentURL)}</div>
-                            <div className='title'><a draggable={false} href={anchor.contentURL}>{anchor.contentTitle}</a></div>
-                            {
-                              description != undefined ?
-                                <div className='description'>{formatFetchedText(description)}</div>
-                                : null
-                            }
-                          </div>
-                        </div>
-                        <div className='tags'>{tagNames?.join(' ')}</div>
-                      </div>;
-                    } else if (n.type == NodeType.TextEmbed) {
-                      const textEmbedNode = n as Node as TextEmbedNode;
-                      const file = model.library.getFile(textEmbedNode.fileID);
-
-                      if (file != null) {
-                        content = <div className={className}>
-                          <div className='content text-embed-node'>
-                            <TextEmbed file={file} />
-                          </div>
-                          <div className='tags'>{tagNames?.join(' ')}</div>
-                        </div>;
-                      } else {
-                        content = <div className='error'>{`Failed to read ${textEmbedNode.fileID}`}</div>;
-                      }
-                    } else if (n.type == NodeType.Math) {
-                      const mathNode = n as Node as MathNode;
-
-                      content = <div className={className}>
-                        <div className='content math-node' dangerouslySetInnerHTML={{
-                          __html: Katex.renderToString(mathNode.expression, { displayMode: true })
-                        }}>
-                        </div>
-                        <div className='tags'>{tagNames?.join(' ')}</div>
-                      </div>;
-                    } else if (n.type == NodeType.Heading) {
-                      const headingNode = n as Node as HeadingNode;
-                      const headingDepth = model.library.getHeadingDepth(headingNode);
-                      const COEFF = 2 ** (1 / 6);
-                      const fontSize = Math.max(2 / COEFF ** headingDepth, 1);
-
-                      content = <div className={className}>
-                        <div className='content heading-node' style={{ 'fontSize': fontSize + 'em' }}>{inlineNodeToElement(headingNode.content)}</div>
-                        <div className='tags'>{tagNames?.join(' ')}</div>
-                      </div>;
-                    } else if (n.type == NodeType.Quote) {
-                      const quoteNode = n as Node as QuoteNode;
-
-                      content = <div className={className}>
-                        <div className='content quote-node'>{inlineNodeToElement(quoteNode.content)}</div>
-                        <div className='tags'>{tagNames?.join(' ')}</div>
-                      </div>;
-                    }
-
-                    const itemStyle = n.parent?.list;
-                    let listStyleType;
-
-                    if (itemStyle == ItemStyle.Ordered) {
-                      listStyleType = `${(n.parent?.children.indexOf(n)! + 1)}.`;
-                    }
-
-                    return <tr key={n.id} data-type="node" data-id={id} className='visible'>
-                      <td className='grip'>{n.id == hovered ?
-                        <div draggable
-                          onDragStart={e => {
-                            const parent = (e.target as HTMLElement).parentElement?.parentElement!;
-                            e.dataTransfer.setDragImage(parent, 0, 0);
-                            e.dataTransfer.setData('text/plain', n.id);
-                            e.dataTransfer.effectAllowed = 'move';
-                          }}>
-                          <IconGripVertical width={16} />
-                        </div>
-                        : null}</td>
-                      {lineNumberVisibility ? <td className='index'>{n.index!}</td> : null}
-                      {dateVisibility ? <td className='date'>{n.created!.asString()}</td> : null}
-                      <td className='node-wrapper' style={{
-                        marginLeft: `${(n.depth! - baseDepth) * 16}px`,
-                        display: itemStyle == undefined ? 'block' : 'list-item',
-                        listStyleType: listStyleType != undefined ? `'${listStyleType}'` : 'initial'
-                      }}>
-                        {content}
-                      </td>
-                    </tr>;
-                  });
-                } else {
-                  return <tr key={`chunk-${i}`} data-type="chunk" data-id={i} style={{ height: `${16 * chunk.nodes.length}px` }}></tr>;
+              filtered.map((n, i) => {
+                if (!(i >= range.first - PADDINGS && i <= range.last + PADDINGS)) {
+                  return null;
                 }
+
+                const id = n.id;
+                /*
+                const visible = intersecting.has(id);
+
+                if (!visible) {
+                  return <tr key={id} data-id={id} className='invisible'></tr>;
+                }*/
+
+                let className = 'node';
+
+                if (id == selected) {
+                  className += ' selected';
+                }
+
+                const tagNames = n.tags?.map(t => '#' + model.library.getTag(t)?.name);
+
+                let content;
+
+                if (n.type == NodeType.Text) {
+                  const textNode = n as Node as TextNode;
+
+                  content = <div className={className}>
+                    <div className='content text-node'>{inlineNodeToElement(textNode.content)}</div>
+                    <div className='tags'>{tagNames?.join(' ')}</div>
+                  </div>;
+                } else if (n.type == NodeType.Image) {
+                  const imageNode = n as Node as ImageNode;
+                  const file = model.library.getFile(imageNode.fileID);
+
+                  if (file != null) {
+                    content = <div className={className}>
+                      <div className='content image-node'>
+                        <Image file={file} />
+                      </div>
+                      <div className='tags'>{tagNames?.join(' ')}</div>
+                    </div>;
+                  } else {
+                    content = <div className='error'>{`Failed to read ${imageNode.fileID}`}</div>;
+                  }
+                } else if (n.type == NodeType.Directory) {
+                  const dNode = n as Node as DirectoryNode;
+
+                  content = <div className={className}>
+                    <div className='content directory-node'>[dir] {dNode.name as string}</div>
+                    <div className='tags'>{tagNames?.join(' ')}</div>
+                  </div>;
+                } else if (n.type == NodeType.Page) {
+                  const pNode = n as Node as PageNode;
+
+                  content = <div className={className}>
+                    <div className='content page-node'>[page] {pNode.name as string}</div>
+                    <div className='tags'>{tagNames?.join(' ')}</div>
+                  </div>;
+                } else if (n.type == NodeType.Anchor) {
+                  const anchor = n as Node as AnchorNode;
+                  const imageFile = anchor.contentImageFileID != null ? model.library.getFile(anchor.contentImageFileID) : null;
+                  const description = anchor.contentDescription;
+
+                  content = <div className={className}>
+                    <div className='content anchor-node'>
+                      {imageFile != null ? <div className='image'><Image file={imageFile}></Image></div> : null}
+                      <div className='details'>
+                        <div className='url'>{decodeURI(anchor.contentURL)}</div>
+                        <div className='title'><a draggable={false} href={anchor.contentURL}>{anchor.contentTitle}</a></div>
+                        {
+                          description != undefined ?
+                            <div className='description'>{formatFetchedText(description)}</div>
+                            : null
+                        }
+                      </div>
+                    </div>
+                    <div className='tags'>{tagNames?.join(' ')}</div>
+                  </div>;
+                } else if (n.type == NodeType.TextEmbed) {
+                  const textEmbedNode = n as Node as TextEmbedNode;
+                  const file = model.library.getFile(textEmbedNode.fileID);
+
+                  if (file != null) {
+                    content = <div className={className}>
+                      <div className='content text-embed-node'>
+                        <TextEmbed file={file} />
+                      </div>
+                      <div className='tags'>{tagNames?.join(' ')}</div>
+                    </div>;
+                  } else {
+                    content = <div className='error'>{`Failed to read ${textEmbedNode.fileID}`}</div>;
+                  }
+                } else if (n.type == NodeType.Math) {
+                  const mathNode = n as Node as MathNode;
+
+                  content = <div className={className}>
+                    <div className='content math-node' dangerouslySetInnerHTML={{
+                      __html: Katex.renderToString(mathNode.expression, { displayMode: true })
+                    }}>
+                    </div>
+                    <div className='tags'>{tagNames?.join(' ')}</div>
+                  </div>;
+                } else if (n.type == NodeType.Heading) {
+                  const headingNode = n as Node as HeadingNode;
+                  const headingDepth = model.library.getHeadingDepth(headingNode);
+                  const COEFF = 2 ** (1 / 6);
+                  const fontSize = Math.max(2 / COEFF ** headingDepth, 1);
+
+                  content = <div className={className}>
+                    <div className='content heading-node' style={{ 'fontSize': fontSize + 'em' }}>{inlineNodeToElement(headingNode.content)}</div>
+                    <div className='tags'>{tagNames?.join(' ')}</div>
+                  </div>;
+                } else if (n.type == NodeType.Quote) {
+                  const quoteNode = n as Node as QuoteNode;
+
+                  content = <div className={className}>
+                    <div className='content quote-node'>{inlineNodeToElement(quoteNode.content)}</div>
+                    <div className='tags'>{tagNames?.join(' ')}</div>
+                  </div>;
+                }
+
+                const itemStyle = n.parent?.list;
+                let listStyleType;
+
+                if (itemStyle == ItemStyle.Ordered) {
+                  listStyleType = `${(n.parent?.children.indexOf(n)! + 1)}.`;
+                }
+
+                return <tr key={n.id} data-type="node" data-id={id} data-index={i} className='visible'>
+                  <td className='grip'>{n.id == hovered ?
+                    <div draggable
+                      onDragStart={e => {
+                        const parent = (e.target as HTMLElement).parentElement?.parentElement!;
+                        e.dataTransfer.setDragImage(parent, 0, 0);
+                        e.dataTransfer.setData('text/plain', n.id);
+                        e.dataTransfer.effectAllowed = 'move';
+                      }}>
+                      <IconGripVertical width={16} />
+                    </div>
+                    : null}</td>
+                  {lineNumberVisibility ? <td className='index'>{n.index!}</td> : null}
+                  {dateVisibility ? <td className='date'>{n.created!.asString()}</td> : null}
+                  <td className='node-wrapper' style={{
+                    marginLeft: `${(n.depth! - baseDepth) * 16}px`,
+                    display: itemStyle == undefined ? 'block' : 'list-item',
+                    listStyleType: listStyleType != undefined ? `'${listStyleType}'` : 'initial'
+                  }}>
+                    {content}
+                  </td>
+                </tr>;
               })
             }
             <tr>

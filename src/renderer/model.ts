@@ -43,7 +43,10 @@ export interface Chunk {
   nodes: Node[];
 }
 
-export const CHUNK_NODE_COUNT = 256;
+export interface Range {
+  first: number;
+  last: number;
+}
 
 export default class Model {
   library: LibraryModel;
@@ -56,14 +59,16 @@ export default class Model {
   search = new Observable<string>('');
   savePromise: Promise<void> | null = null;
   status = new Observable<Status | undefined>(undefined);
-  intersecting = new Observable<Set<string>>(new Set());
   saveSchedule: number | undefined;
   selected = new Observable<string | undefined>(undefined);
   hovered = new Observable<string | undefined>(undefined);
   atBottom = new Observable<boolean>(true);
   input = new Observable<string>('');
   flattened = new Observable<Node[]>([]);
-  chunked = new Observable<Chunk[]>([]);
+  range = new Observable<Range>({
+    first: 0,
+    last: 0
+  });
   unsaved = new Observable<boolean>(false);
 
   constructor() {
@@ -151,14 +156,8 @@ export default class Model {
     this.dateVisibility.set(visibility);
   }
 
-  addIntersecting(id: string) {
-    this.intersecting.get().add(id);
-    this.intersecting.set(this.intersecting.get());
-  }
-
-  removeIntersecting(id: string) {
-    this.intersecting.get().delete(id);
-    this.intersecting.set(this.intersecting.get());
+  setViewRange(range: Range) {
+    this.range.set(range);
   }
 
   getViewDirectory() {
@@ -229,22 +228,7 @@ export default class Model {
     }
 
     const flattened = [...visit(filtered)];
-    const chunked: Chunk[] = [];
-
-    for (let i = 0; i < flattened.length; i++) {
-      const index = Math.floor(i / CHUNK_NODE_COUNT);
-
-      if (chunked.length <= index) {
-        chunked.push({
-          nodes: []
-        });
-      }
-
-      chunked[index].nodes.push(flattened[i]);
-    }
-
     this.flattened.set(flattened);
-    this.chunked.set(chunked);
   }
 
 
