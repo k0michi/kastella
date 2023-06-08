@@ -64,6 +64,7 @@ export default class Model {
   input = new Observable<string>('');
   flattened = new Observable<Node[]>([]);
   chunked = new Observable<Chunk[]>([]);
+  unsaved = new Observable<boolean>(false);
 
   constructor() {
     this.library = new LibraryModel();
@@ -258,6 +259,7 @@ export default class Model {
     const delay = 2 * 1000;
     this.saveSchedule = Date.now() + delay;
     bridge.setEdited(true);
+    this.unsaved.set(true);
 
     const save = (() => {
       this.saving.set(true);
@@ -270,6 +272,7 @@ export default class Model {
         const end = performance.now();
         this.savePromise = null;
         this.saving.set(false);
+        this.unsaved.set(false);
 
         const elapsed = end - start;
         this.setStatusFor(`Saved! (${round(elapsed, 2)} ms)`);

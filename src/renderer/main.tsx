@@ -13,6 +13,15 @@ import ToolBar from './tool-bar';
 const model = new Model();
 model.loadLibrary();
 
+window.addEventListener('beforeunload', e => {
+  if (model.unsaved.get()) {
+    e.preventDefault();
+
+    // Chrome requires this
+    e.returnValue = false;
+  }
+});
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <ModelProvider model={model}>
     <>
