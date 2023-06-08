@@ -2,22 +2,22 @@ import { Observable } from "kyoka";
 import { v4 as uuidv4 } from 'uuid';
 import Timestamp from "./timestamp";
 import { arrayInsertBefore, arrayRemove, round } from "./utils";
-import { Version5, Version9 } from "./compat";
+import { Version10, Version5, Version9 } from "./compat";
 import { visit } from "./tree";
 import { AnchorNode, DirectoryNode, File, ImageNode, ItemStyle as ListStyle, MathNode, Node, NodeType, ReservedID, Tag, TextEmbedNode, TextNode } from "./node";
 import EventHandler from "./event-handler";
 
-export const LIBRARY_VERSION = 10;
+export const LIBRARY_VERSION = 11;
 
 export interface Library {
-  nodes: Node[];
+  nodes: Node;
   files: File[];
   tags: Tag[];
   version: number;
 }
 
 export default class LibraryModel {
-  nodes = new Observable<Node[]>([]); // mutable
+  nodes = new Observable<Node>(LibraryModel.blankTree()); // mutable
   files = new Observable<File[]>([]); // mutable
   tags = new Observable<Tag[]>([]); // mutable
   nodeMap = new Map<string, Node>();
@@ -26,7 +26,7 @@ export default class LibraryModel {
 
   constructor() {
     this.initialize({
-      nodes: LibraryModel.blankNodes(),
+      nodes: LibraryModel.blankTree(),
       files: [],
       tags: [],
       version: LIBRARY_VERSION
@@ -45,12 +45,16 @@ export default class LibraryModel {
     // validateLibrary(data);
 
     // Migrate older format
-    if (data.version == 5) {
+    if (data.version <= 5) {
       data = Version5.convert(data);
     }
 
-    if (data.version == 9) {
+    if (data.version <= 9) {
       data = Version9.convert(data);
+    }
+
+    if (data.version <= 10) {
+      data = Version10.convert(data);
     }
 
     this.initialize(data);
@@ -75,9 +79,7 @@ export default class LibraryModel {
 
   initialize(data: Library) {
     // Initialize parent
-    for (const n of data.nodes) {
-      LibraryModel.assignParent(n);
-    }
+    LibraryModel.assignParent(data.nodes);
 
     // Initialize nodeMap
     this.initializeNodeMap(data.nodes);
@@ -85,19 +87,15 @@ export default class LibraryModel {
     // Initialize index
     let index = 0;
 
-    for (const n of data.nodes) {
-      index = LibraryModel.assignIndex(n, index);
-    }
+    index = LibraryModel.assignIndex(data.nodes, index);
 
     // Initialize depth
-    for (const n of data.nodes) {
-      LibraryModel.assignDepth(n);
-    }
+    LibraryModel.assignDepth(data.nodes);
 
     // Set members
-    this.nodes.set(data.nodes ?? []);
-    this.files.set(data.files ?? []);
-    this.tags.set(data.tags ?? []);
+    this.nodes.set(data.nodes);
+    this.files.set(data.files);
+    this.tags.set(data.tags);
     this.update();
   }
 
@@ -116,19 +114,24 @@ export default class LibraryModel {
 
   // Nodes
 
-  static blankNodes() {
-    return [
-      {
-        type: NodeType.Directory,
-        id: ReservedID.Master,
-        children: [] as Node[]
-      } as DirectoryNode,
-      {
-        type: NodeType.Directory,
-        id: ReservedID.Trash,
-        children: [] as Node[]
-      } as DirectoryNode
-    ];
+  static blankTree() {
+    return {
+      type: NodeType.Directory,
+      id: ReservedID.Root,
+      children:
+        [
+          {
+            type: NodeType.Directory,
+            id: ReservedID.Master,
+            children: [] as Node[]
+          } as DirectoryNode,
+          {
+            type: NodeType.Directory,
+            id: ReservedID.Trash,
+            children: [] as Node[]
+          } as DirectoryNode
+        ] as Node[]
+    }
   }
 
   addNode(parent: Node | string, node: Node) {
@@ -298,6 +301,7 @@ export default class LibraryModel {
   }
 
   moveNodeBefore(node: string | Node, parent: string | Node, reference: string | Node | undefined = undefined) {
+    console.log(`moveNodeBefore(${node},${parent},${reference})`);
     node = this.getNodeIfNeeded(node);
     parent = this.getNodeIfNeeded(parent);
     reference = reference != undefined ? this.getNodeIfNeeded(reference) : undefined;
@@ -321,7 +325,9 @@ export default class LibraryModel {
     }
 
     const nodeIndex = node.index!;
+    console.log('nodeIndex', nodeIndex);
     const referenceIndex = reference?.index ?? LibraryModel.getLastNodeOf(parent).index! + 1;
+    console.log('referenceIndex', referenceIndex);
 
     // [begin, end) These nodes' indices will be updated
     let begin, end;
@@ -334,6 +340,8 @@ export default class LibraryModel {
       begin = node;
       end = this.nextIndexNode(LibraryModel.getLastNodeOf(node));
     }
+    console.log('begin', begin);
+    console.log('end', end);
 
     arrayRemove(node.parent!.children, node.parent!.children.indexOf(node));
     arrayInsertBefore(parent.children, node, reference != undefined ?
@@ -351,6 +359,8 @@ export default class LibraryModel {
       this.updateIndex(begin, end, prev!.index! + 1);
     }
 
+    console.log('updated nodeIndex', nodeIndex);
+
     // Set depth
     this.updateDepth(node, parent.depth! + 1);
 
@@ -358,6 +368,7 @@ export default class LibraryModel {
     this.save();
   }
 
+  // node: Node or node id
   removeNode(node: Node | string) {
     if (typeof node == 'string') {
       const n = this.getNode(node);
@@ -818,7 +829,7 @@ export default class LibraryModel {
     }
   }
 
-  initializeNodeMap(nodes: Node[]) {
+  initializeNodeMap(nodes: Node) {
     this.nodeMap.clear();
 
     for (const n of visit(nodes)) {

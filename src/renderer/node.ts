@@ -165,6 +165,7 @@ export interface Tag {
 }
 
 export namespace ReservedID {
+  export const Root = 'root';
   export const Master = 'master';
   export const Trash = 'trash';
 }

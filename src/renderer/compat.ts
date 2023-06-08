@@ -65,3 +65,15 @@ export namespace Version9 {
     return data;
   }
 }
+
+export namespace Version10 {
+  export function convert(data: any) {
+    data.nodes = {
+      type: NodeType.Directory,
+      id: ReservedID.Root,
+      children: data.nodes
+    };
+
+    return data;
+  }
+}

@@ -1,5 +1,8 @@
 # Library Versions
 
+## Version 11
+`nodes`をノードの配列ではなくルートノードに変更
+
 ## Version 10
 インライン要素を実装
 
