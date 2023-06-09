@@ -48,7 +48,7 @@ export default function EditorPane() {
         // Temporal fix for the scroll issue when scrollTop == 0
         e.preventDefault();
         e.stopPropagation();
-        editor.scrollBy(0, 1);
+        editor.scrollBy(0, 2);
       }
     }
 
