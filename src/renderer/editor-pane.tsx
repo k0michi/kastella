@@ -35,12 +35,21 @@ export default function EditorPane() {
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
 
   React.useEffect(() => {
-    const onScroll = () => {
-      const clientHeight = editorRef.current!.clientHeight;
-      const scrollHeight = editorRef.current!.scrollHeight;
-      const scrollTop = editorRef.current!.scrollTop;
+    const onScroll = (e: Event) => {
+      const editor = editorRef.current!;
+
+      const clientHeight = editor.clientHeight;
+      const scrollHeight = editor.scrollHeight;
+      const scrollTop = editor.scrollTop;
       const atBottom = scrollHeight - clientHeight - scrollTop <= 0;
       model.setAtBottom(atBottom);
+
+      if (scrollTop == 0 && model.range.get().first != 0) {
+        // Temporal fix for the scroll issue when scrollTop == 0
+        e.preventDefault();
+        e.stopPropagation();
+        editor.scrollBy(0, 1);
+      }
     }
 
     editorRef.current?.addEventListener('scroll', onScroll);
