@@ -32,18 +32,18 @@ html {
 @media (prefers-color-scheme: light) {
   :root {
     --color: black;
-    --color-border: hsl(200, 12%, 80%);
+    --color-border: hsl(206, 5%, 74%);
     --color-editor: hsl(0, 0%, 100%);
-    --color-tool-bar: hsl(200, 53%, 97%);
-    --color-tool: hsl(200, 50%, 95%);
-    --color-editor-bar: hsl(200, 32%, 92%);
+    --color-tool-bar: hsl(210, 7%, 95%);
+    --color-tool: hsl(0, 0%, 100%);
+    --color-editor-bar: hsl(204, 11%, 91%);
     --color-editor-index: hsl(200, 7%, 44%);
     --color-editor-selected: rgba(121, 221, 252, 0.371);
     --color-editor-quote: rgb(26, 26, 26);
     --color-explorer: rgba(0, 0, 0, 0);
     --color-explorer-header: rgb(0, 0, 0);
     --color-explorer-selected: rgb(63, 123, 200);
-    --color-status: hsl(200, 53%, 97%);
+    --color-status: hsl(195, 14%, 95%);
     --color-button-1-back: rgb(63, 114, 226);
     --color-button-1-fore: rgb(255, 255, 255);
     --color-math-preview-border: #eee;
@@ -237,8 +237,7 @@ body,
   width: 100%;
 }
 
-#editor-area #nodes .node-wrapper {
-}
+#editor-area #nodes .node-wrapper {}
 
 #editor-area #nodes .node.selected {
   background-color: var(--color-editor-selected);
