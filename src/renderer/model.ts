@@ -65,6 +65,7 @@ export default class Model {
   atBottom = new Observable<boolean>(true);
   input = new Observable<string>('');
   flattened = new Observable<Node[]>([]);
+  // Nodes that are intersecting with the visible area
   range = new Observable<Range>({
     first: 0,
     last: 0

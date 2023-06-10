@@ -20,7 +20,8 @@ html {
   --color-editor-selected: rgba(121, 221, 252, 0.371);
   --color-editor-quote: rgb(232, 232, 232);
   --color-error: red;
-  --color-editor-tag: gray;
+  --color-editor-tag-back: rgb(233, 233, 233);
+  --color-editor-tag-fore: rgb(0, 0, 0);
   --color-explorer: rgba(0, 0, 0, 0);
   --color-explorer-header: rgb(234, 234, 234);
   --color-explorer-selected: rgb(63, 123, 200);
@@ -234,7 +235,13 @@ body,
   position: relative;
   display: flex;
   flex-direction: row;
+  gap: 12px;
   width: 100%;
+}
+
+#editor-area #nodes .node.block {
+  flex-direction: column;
+  gap: 4px;
 }
 
 #editor-area #nodes .node-wrapper {}
@@ -253,8 +260,19 @@ body,
 }
 
 #editor-area .tags {
-  margin-left: 4px;
-  color: var(--color-editor-tag);
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+#editor-area .tags .tag {
+  background-color: var(--color-editor-tag-back);
+  color: var(--color-editor-tag-fore);
+  padding: 0px 6px;
+  font-size: 10px;
+  border-radius: 6px;
 }
 
 #editor-area .image-node img {

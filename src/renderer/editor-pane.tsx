@@ -496,6 +496,10 @@ export default function EditorPane() {
 
                 const tagNames = n.tags?.map(t => '#' + model.library.getTag(t)?.name);
 
+                const tags = <div className='tags'>
+                  {tagNames?.map(t => <div className='tag'>{t}</div>)}
+                </div>;
+
                 let content;
 
                 if (n.type == NodeType.Text) {
@@ -503,9 +507,11 @@ export default function EditorPane() {
 
                   content = <div className={className}>
                     <div className='content text-node'>{inlineNodeToElement(textNode.content)}</div>
-                    <div className='tags'>{tagNames?.join(' ')}</div>
+                    {tags}
                   </div>;
                 } else if (n.type == NodeType.Image) {
+                  className += ' block';
+
                   const imageNode = n as Node as ImageNode;
                   const file = model.library.getFile(imageNode.fileID);
 
@@ -514,7 +520,7 @@ export default function EditorPane() {
                       <div className='content image-node'>
                         <Image file={file} />
                       </div>
-                      <div className='tags'>{tagNames?.join(' ')}</div>
+                      {tags}
                     </div>;
                   } else {
                     content = <div className='error'>{`Failed to read ${imageNode.fileID}`}</div>;
@@ -524,16 +530,18 @@ export default function EditorPane() {
 
                   content = <div className={className}>
                     <div className='content directory-node'>[dir] {dNode.name as string}</div>
-                    <div className='tags'>{tagNames?.join(' ')}</div>
+                    {tags}
                   </div>;
                 } else if (n.type == NodeType.Page) {
                   const pNode = n as Node as PageNode;
 
                   content = <div className={className}>
                     <div className='content page-node'>[page] {pNode.name as string}</div>
-                    <div className='tags'>{tagNames?.join(' ')}</div>
+                    {tags}
                   </div>;
                 } else if (n.type == NodeType.Anchor) {
+                  className += ' block';
+
                   const anchor = n as Node as AnchorNode;
                   const imageFile = anchor.contentImageFileID != null ? model.library.getFile(anchor.contentImageFileID) : null;
                   const description = anchor.contentDescription;
@@ -551,9 +559,10 @@ export default function EditorPane() {
                         }
                       </div>
                     </div>
-                    <div className='tags'>{tagNames?.join(' ')}</div>
+                    {tags}
                   </div>;
                 } else if (n.type == NodeType.TextEmbed) {
+                  className += ' block';
                   const textEmbedNode = n as Node as TextEmbedNode;
                   const file = model.library.getFile(textEmbedNode.fileID);
 
@@ -562,12 +571,13 @@ export default function EditorPane() {
                       <div className='content text-embed-node'>
                         <TextEmbed file={file} />
                       </div>
-                      <div className='tags'>{tagNames?.join(' ')}</div>
+                      {tags}
                     </div>;
                   } else {
                     content = <div className='error'>{`Failed to read ${textEmbedNode.fileID}`}</div>;
                   }
                 } else if (n.type == NodeType.Math) {
+                  className += ' block';
                   const mathNode = n as Node as MathNode;
 
                   content = <div className={className}>
@@ -575,7 +585,7 @@ export default function EditorPane() {
                       __html: Katex.renderToString(mathNode.expression, { displayMode: true })
                     }}>
                     </div>
-                    <div className='tags'>{tagNames?.join(' ')}</div>
+                    {tags}
                   </div>;
                 } else if (n.type == NodeType.Heading) {
                   const headingNode = n as Node as HeadingNode;
@@ -585,14 +595,15 @@ export default function EditorPane() {
 
                   content = <div className={className}>
                     <div className='content heading-node' style={{ 'fontSize': fontSize + 'em' }}>{inlineNodeToElement(headingNode.content)}</div>
-                    <div className='tags'>{tagNames?.join(' ')}</div>
+                    {tags}
                   </div>;
                 } else if (n.type == NodeType.Quote) {
+                  className += ' block';
                   const quoteNode = n as Node as QuoteNode;
 
                   content = <div className={className}>
                     <div className='content quote-node'>{inlineNodeToElement(quoteNode.content)}</div>
-                    <div className='tags'>{tagNames?.join(' ')}</div>
+                    {tags}
                   </div>;
                 }
 
