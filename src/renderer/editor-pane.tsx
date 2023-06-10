@@ -487,12 +487,6 @@ export default function EditorPane() {
                 }
 
                 const id = n.id;
-                /*
-                const visible = intersecting.has(id);
-
-                if (!visible) {
-                  return <tr key={id} data-id={id} className='invisible'></tr>;
-                }*/
 
                 let className = 'node';
 
