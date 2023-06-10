@@ -197,7 +197,7 @@ export default function EditorPane() {
         last: length
       });
     }
-  }, [writeOnly]);
+  }, [writeOnly, view]);
 
   React.useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
