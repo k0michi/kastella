@@ -265,6 +265,7 @@ body,
   gap: 8px;
   margin-top: auto;
   margin-bottom: auto;
+  user-select: none;
 }
 
 #editor-area .tags .tag {
