@@ -10,6 +10,7 @@ html {
 
 :root {
   --color: white;
+  --color-secondary: rgb(168, 168, 168);
   --color-border: hsl(230, 10%, 28%);
   --color-editor: hsl(230, 11%, 16%);
   --color-tool-bar: hsl(230, 8%, 10%);
@@ -27,11 +28,13 @@ html {
   --color-button-1-back: rgb(63, 114, 226);
   --color-button-1-fore: rgb(255, 255, 255);
   --color-math-preview-border: #eee;
+  --color-anchor-border: hsl(220, 2%, 33%);
 }
 
 @media (prefers-color-scheme: light) {
   :root {
     --color: black;
+    --color-secondary: rgb(97, 97, 97);
     --color-border: hsl(206, 5%, 74%);
     --color-editor: hsl(0, 0%, 100%);
     --color-tool-bar: hsl(210, 7%, 95%);
@@ -47,6 +50,7 @@ html {
     --color-button-1-back: rgb(63, 114, 226);
     --color-button-1-fore: rgb(255, 255, 255);
     --color-math-preview-border: #eee;
+    --color-anchor-border: rgb(219, 219, 219);
   }
 }
 
@@ -267,6 +271,10 @@ body,
   display: flex;
   flex-direction: row;
   gap: 12px;
+  border: 1px solid var(--color-anchor-border);
+  border-radius: 6px;
+  padding: 14px;
+  margin: 4px;
 }
 
 #editor-area .anchor-node .image {
@@ -275,7 +283,8 @@ body,
 }
 
 #editor-area .anchor-node .url {
-  font-family: monospace;
+  font-size: 12px;
+  color: var(--color-secondary)
 }
 
 #editor-area .anchor-node .title {
