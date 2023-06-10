@@ -183,7 +183,7 @@ export default function EditorPane() {
   }
 
   React.useEffect(() => {
-    if (selected != undefined && !filtered.includes(model.library.getNode(selected))) {
+    if (selected != undefined && !filtered.find(n => n.id == selected)) {
       model.selected.set(undefined);
     }
   }, [filtered]);
