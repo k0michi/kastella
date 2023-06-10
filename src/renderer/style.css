@@ -194,10 +194,6 @@ body,
   width: 100%;
 }
 
-#editor-area #nodes tr.invisible {
-  height: 16px;
-}
-
 #editor-area #nodes td {
   padding: 0;
   vertical-align: top;

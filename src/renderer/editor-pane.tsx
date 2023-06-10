@@ -609,7 +609,7 @@ export default function EditorPane() {
                   listStyleType = `${(n.parent?.children.indexOf(n)! + 1)}.`;
                 }
 
-                return <tr key={n.id} data-type="node" data-id={id} data-index={i} className='visible'>
+                return <tr key={n.id} data-type="node" data-id={id} data-index={i}>
                   <td className='grip'>{n.id == hovered ?
                     <div draggable
                       onDragStart={e => {
