@@ -193,11 +193,11 @@ export default function EditorPane() {
 
     if (!writeOnly) {
       model.setViewRange({
-        first: length,
-        last: length
+        first: length - 1,
+        last: length - 1
       });
     }
-  }, [writeOnly, view]);
+  }, [writeOnly, view, search]);
 
   React.useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
