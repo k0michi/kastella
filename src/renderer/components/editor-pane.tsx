@@ -13,6 +13,7 @@ import { IconGripVertical } from '@tabler/icons';
 import Katex from 'katex';
 import { inlineNodeToElement, inlineNodeToString, visit } from '../tree';
 import { AnchorNode, DirectoryNode, File, HeadingNode, ImageNode, ItemStyle, MathNode, Node, NodeType, PageNode, QuoteNode, ReservedID, TextEmbedNode, TextNode } from '../node';
+import { Row } from './row';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -458,8 +459,7 @@ export default function EditorPane() {
   }, []);
 
   const last = filtered.at(-1);
-  const lastIndex = last != null ? last.index! + 1 : 1;
-  const lastIndexDigits = Math.ceil(Math.log10(lastIndex));
+  const nextIndex = last != null ? last.index! + 1 : 1;
   const baseDepth = filtered[0]?.depth!;
 
   const PADDINGS = 32;
@@ -614,47 +614,33 @@ export default function EditorPane() {
                   listStyleType = `${(n.parent?.children.indexOf(n)! + 1)}.`;
                 }
 
-                return <tr key={n.id} data-type="node" data-id={id} data-index={i}>
-                  <td className='grip'>{n.id == hovered ?
-                    <div draggable
-                      onDragStart={e => {
-                        const parent = (e.target as HTMLElement).parentElement?.parentElement!;
-                        e.dataTransfer.setDragImage(parent, 0, 0);
-                        e.dataTransfer.setData('text/plain', n.id);
-                        e.dataTransfer.effectAllowed = 'move';
-                      }}>
-                      <IconGripVertical width={16} />
-                    </div>
-                    : null}</td>
-                  {lineNumberVisibility ? <td className='index'>{n.index!}</td> : null}
-                  {dateVisibility ? <td className='date'>{n.created!.asString()}</td> : null}
-                  <td className='node-wrapper' style={{
-                    marginLeft: `${(n.depth! - baseDepth) * 16}px`,
-                    display: itemStyle == undefined ? 'block' : 'list-item',
-                    listStyleType: listStyleType != undefined ? `'${listStyleType}'` : 'initial'
-                  }}>
-                    {content}
-                  </td>
-                </tr>;
+                return <Row
+                  id={id}
+                  index={n.index!}
+                  depth={n.depth! - baseDepth}
+                  itemStyle={itemStyle}
+                  listStyleType={listStyleType}
+                >
+                  {content}
+                </Row>;
               })
             }
-            <tr>
-              <td className='grip'></td>
-              {lineNumberVisibility ? <td className='index'>{'-'.repeat(lastIndexDigits)}</td> : null}
-              {dateVisibility ? <td className='date'></td> : null}
-              <td>
-                <textarea ref={inputRef} rows={1} onChange={e => model.setInput(e.target.value)}
-                  onFocus={e => {
-                    model.setSelected(undefined);
-                  }}
-                  onKeyDown={e => {
-                    if (e.key == 'Enter' && !e.nativeEvent.isComposing) {
-                      e.preventDefault();
-                      confirm();
-                    }
-                  }} value={input} />
-              </td>
-            </tr>
+            <Row
+              id={"input"}
+              index={nextIndex}
+              depth={0}
+              empty={true}>
+              <textarea ref={inputRef} rows={1} onChange={e => model.setInput(e.target.value)}
+                onFocus={e => {
+                  model.setSelected(undefined);
+                }}
+                onKeyDown={e => {
+                  if (e.key == 'Enter' && !e.nativeEvent.isComposing) {
+                    e.preventDefault();
+                    confirm();
+                  }
+                }} value={input} />
+            </Row>
           </tbody>
         </table></div>
     </div>

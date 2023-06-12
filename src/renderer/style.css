@@ -17,6 +17,7 @@ html {
   --color-tool: hsl(230, 12%, 18%);
   --color-editor-bar: hsl(230, 10%, 14%);
   --color-editor-index: hsl(230, 7%, 44%);
+  --color-editor-index-empty: hsl(223, 4%, 34%);
   --color-editor-selected: rgba(121, 221, 252, 0.371);
   --color-editor-quote: rgb(232, 232, 232);
   --color-error: red;
@@ -42,6 +43,7 @@ html {
     --color-tool: hsl(0, 0%, 100%);
     --color-editor-bar: hsl(204, 11%, 91%);
     --color-editor-index: hsl(200, 7%, 44%);
+    --color-editor-index-empty: hsl(229, 15%, 78%);
     --color-editor-selected: rgba(121, 221, 252, 0.371);
     --color-editor-quote: rgb(26, 26, 26);
     --color-explorer: rgba(0, 0, 0, 0);
@@ -220,6 +222,10 @@ body,
   font-family: monospace;
   user-select: none;
   width: 0px;
+}
+
+#editor-area #nodes td.empty {
+  color: var(--color-editor-index-empty);
 }
 
 #editor-area #nodes td.date {
