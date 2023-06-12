@@ -1,4 +1,4 @@
-import { Instant, ZonedDateTime, ZoneId, DateTimeFormatter, DateTimeFormatterBuilder, ChronoField, ResolverStyle } from "@js-joda/core";
+import { Instant, ZonedDateTime, ZoneId, DateTimeFormatter, DateTimeFormatterBuilder, ChronoField, ResolverStyle, LocalDate, LocalDateTime, LocalTime } from "@js-joda/core";
 
 // Immutable class to store a date string
 export default class Timestamp {
@@ -35,6 +35,10 @@ export default class Timestamp {
   }
 
   asZonedDateTime() {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(this._timeStamp)) {
+      return ZonedDateTime.of(LocalDate.parse(this._timeStamp), LocalTime.of(0, 0, 0, 0), ZoneId.systemDefault());
+    }
+
     return ZonedDateTime.parse(this._timeStamp);
   }
 
