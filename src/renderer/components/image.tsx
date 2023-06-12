@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { File } from './node';
+import { File } from '../node';
 
 export interface ImageProps {
   file: File;

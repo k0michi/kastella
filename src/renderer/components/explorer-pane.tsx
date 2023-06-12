@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { useModel, useObservable } from 'kyoka';
-import Model, { DateView, DirectoryView, TagView, ViewType } from './model';
-import { isDirectory, visit } from './tree';
-import { DirectoryNode } from './node';
-import { toDateString } from './utils';
+import Model, { DateView, DirectoryView, TagView, ViewType } from '../model';
+import { isDirectory, visit } from '../tree';
+import { DirectoryNode } from '../node';
+import { toDateString } from '../utils';
 
 export default function ExplorerPane() {
   const model = useModel<Model>();

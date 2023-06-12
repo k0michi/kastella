@@ -1,18 +1,18 @@
 import * as React from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime';
-import { findStringIgnoreCase, isHTTPURL } from './utils';
+import { findStringIgnoreCase, isHTTPURL } from '../utils';
 import { useModel, useObservable } from 'kyoka';
-import Model, { DateView, DirectoryView, TagView, ViewType } from './model.js';
+import Model, { DateView, DirectoryView, TagView, ViewType } from '../model.js';
 import EditorBar from './editor-bar';
 import Image from './image';
 import { DateTimeFormatter } from '@js-joda/core';
-import Timestamp from './timestamp';
+import Timestamp from '../timestamp';
 import TextEmbed from './text-embed';
 import { IconGripVertical } from '@tabler/icons';
 import Katex from 'katex';
-import { inlineNodeToElement, inlineNodeToString, visit } from './tree';
-import { AnchorNode, DirectoryNode, File, HeadingNode, ImageNode, ItemStyle, MathNode, Node, NodeType, PageNode, QuoteNode, ReservedID, TextEmbedNode, TextNode } from './node';
+import { inlineNodeToElement, inlineNodeToString, visit } from '../tree';
+import { AnchorNode, DirectoryNode, File, HeadingNode, ImageNode, ItemStyle, MathNode, Node, NodeType, PageNode, QuoteNode, ReservedID, TextEmbedNode, TextNode } from '../node';
 
 export default function EditorPane() {
   const model = useModel<Model>();

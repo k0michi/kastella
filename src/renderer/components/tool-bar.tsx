@@ -2,11 +2,11 @@ import * as React from 'react';
 import Katex from 'katex';
 import { v4 as uuidv4 } from 'uuid';
 import { useModel, useObservable } from 'kyoka';
-import Model, { DirectoryView, TagView, ViewType } from './model';
-import Timestamp from './timestamp';
-import { File, ItemStyle, NodeType } from './node';
+import Model, { DirectoryView, TagView, ViewType } from '../model';
+import Timestamp from '../timestamp';
+import { File, ItemStyle, NodeType } from '../node';
 import { IconMathFunction, IconHeading, IconQuote, IconList, IconListNumbers, IconMenu2, IconPhoto, IconFileText, IconCode, IconBold, IconAnchor, IconLink } from '@tabler/icons';
-import { FileType } from '../common/fetch';
+import { FileType } from '../../common/fetch';
 import mime from 'mime';
 
 export default function ToolBar() {

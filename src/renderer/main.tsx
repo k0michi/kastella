@@ -1,14 +1,14 @@
 import { ModelProvider } from 'kyoka';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import EditorPane from './editor-pane';
-import ExplorerPane from './explorer-pane';
+import EditorPane from './components/editor-pane';
+import ExplorerPane from './components/explorer-pane';
 import Model from './model';
-import StatusBar from './status-bar';
+import StatusBar from './components/status-bar';
 import './style.css';
 import 'katex/dist/katex.css'
 import 'modern-normalize/modern-normalize.css';
-import ToolBar from './tool-bar';
+import ToolBar from './components/tool-bar';
 
 const model = new Model();
 model.loadLibrary();

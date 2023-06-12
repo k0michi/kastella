@@ -1,6 +1,6 @@
 import { useModel, useObservable } from 'kyoka';
 import * as React from 'react';
-import Model, { DateView, DirectoryView, TagView, ViewType } from './model';
+import Model, { DateView, DirectoryView, TagView, ViewType } from '../model';
 
 export default function EditorBar() {
   const model = useModel<Model>();
