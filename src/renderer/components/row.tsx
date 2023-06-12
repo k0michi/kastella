@@ -6,6 +6,7 @@ import Model from '../model';
 interface RowProps {
   id: string;
   index: number;
+  pseudoIndex: number;
   depth: number;
   itemStyle?: string;
   listStyleType?: string;
@@ -18,7 +19,7 @@ export function Row(props: RowProps) {
   const hovered = useObservable(model.hovered);
   const lineNumberVisibility = useObservable(model.lineNumberVisibility);
 
-  return <tr key={props.id} data-type="node" data-id={props.id} data-index={props.index}>
+  return <tr key={props.id} data-type="node" data-id={props.id} data-index={props.pseudoIndex}>
     <td className='grip'>{props.id == hovered ?
       <div draggable
         onDragStart={e => {

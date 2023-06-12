@@ -619,6 +619,7 @@ export default function EditorPane() {
                 return <Row
                   id={id}
                   index={n.index!}
+                  pseudoIndex={i}
                   depth={n.depth! - baseDepth}
                   itemStyle={itemStyle}
                   listStyleType={listStyleType}
@@ -630,6 +631,7 @@ export default function EditorPane() {
             <Row
               id={"input"}
               index={nextIndex}
+              pseudoIndex={filtered.length}
               depth={0}
               empty={true}>
               <textarea ref={inputRef} rows={1} onChange={e => model.setInput(e.target.value)}
