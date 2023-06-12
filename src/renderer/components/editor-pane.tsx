@@ -372,10 +372,12 @@ export default function EditorPane() {
       }
     }
 
-    if (selected != null) {
-      inputRef.current?.blur();
-    } else {
-      inputRef.current?.focus();
+    if (selected != 'input') {
+      if (selected != null) {
+        inputRef.current?.blur();
+      } else {
+        inputRef.current?.focus();
+      }
     }
   }, [selected]);
 
