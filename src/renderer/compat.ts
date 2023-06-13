@@ -37,14 +37,14 @@ export namespace Version5 {
 
   export function convert(data: any) {
     const root = {
-      type: NodeType.Directory,
-      id: ReservedID.Master,
+      type: 'directory',
+      id: 'master',
       children: convertArrayToTree(data.nodes, undefined)
     } as DirectoryNode;
 
     const trash = {
-      type: NodeType.Directory,
-      id: ReservedID.Trash,
+      type: 'directory',
+      id: 'trash',
       children: convertArrayToTree(data.nodes, 'trash')
     } as DirectoryNode;
 
@@ -69,8 +69,8 @@ export namespace Version9 {
 export namespace Version10 {
   export function convert(data: any) {
     data.nodes = {
-      type: NodeType.Directory,
-      id: ReservedID.Root,
+      type: 'directory',
+      id: 'root',
       children: data.nodes
     };
 
