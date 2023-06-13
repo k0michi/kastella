@@ -16,6 +16,8 @@ import { AnchorNode, DirectoryNode, File, HeadingNode, ImageNode, ItemStyle, Mat
 import Row from './row';
 import TextContent from './text-content';
 import ImageContent from './image-content';
+import DirectoryContent from './directory-content';
+import PageContent from './page-content';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -507,7 +509,7 @@ export default function EditorPane() {
                 let content;
 
                 if (n.type == NodeType.Text) {
-                  const textNode = n as Node as TextNode;
+                  const textNode = n as TextNode;
 
                   content = <div className={className}>
                     <TextContent node={textNode} />
@@ -516,30 +518,30 @@ export default function EditorPane() {
                 } else if (n.type == NodeType.Image) {
                   className += ' block';
 
-                  const imageNode = n as Node as ImageNode;
+                  const imageNode = n as ImageNode;
 
                   content = <div className={className}>
                     <ImageContent node={imageNode} />
                     {tags}
                   </div>
                 } else if (n.type == NodeType.Directory) {
-                  const dNode = n as Node as DirectoryNode;
+                  const dNode = n as DirectoryNode;
 
                   content = <div className={className}>
-                    <div className='content directory-node'>[dir] {dNode.name as string}</div>
+                    <DirectoryContent node={dNode} />
                     {tags}
                   </div>;
                 } else if (n.type == NodeType.Page) {
-                  const pNode = n as Node as PageNode;
+                  const pNode = n as PageNode;
 
                   content = <div className={className}>
-                    <div className='content page-node'>[page] {pNode.name as string}</div>
+                    <PageContent node={pNode} />
                     {tags}
                   </div>;
                 } else if (n.type == NodeType.Anchor) {
                   className += ' block';
 
-                  const anchor = n as Node as AnchorNode;
+                  const anchor = n as AnchorNode;
                   const imageFile = anchor.contentImageFileID != null ? model.library.getFile(anchor.contentImageFileID) : null;
                   const description = anchor.contentDescription;
 
@@ -560,7 +562,7 @@ export default function EditorPane() {
                   </div>;
                 } else if (n.type == NodeType.TextEmbed) {
                   className += ' block';
-                  const textEmbedNode = n as Node as TextEmbedNode;
+                  const textEmbedNode = n as TextEmbedNode;
                   const file = model.library.getFile(textEmbedNode.fileID);
 
                   if (file != null) {
@@ -575,7 +577,7 @@ export default function EditorPane() {
                   }
                 } else if (n.type == NodeType.Math) {
                   className += ' block';
-                  const mathNode = n as Node as MathNode;
+                  const mathNode = n as MathNode;
 
                   content = <div className={className}>
                     <div className='content math-node' dangerouslySetInnerHTML={{
@@ -585,7 +587,7 @@ export default function EditorPane() {
                     {tags}
                   </div>;
                 } else if (n.type == NodeType.Heading) {
-                  const headingNode = n as Node as HeadingNode;
+                  const headingNode = n as HeadingNode;
                   const headingDepth = model.library.getHeadingDepth(headingNode);
                   const COEFF = 2 ** (1 / 6);
                   const fontSize = Math.max(2 / COEFF ** headingDepth, 1);
@@ -596,7 +598,7 @@ export default function EditorPane() {
                   </div>;
                 } else if (n.type == NodeType.Quote) {
                   className += ' block';
-                  const quoteNode = n as Node as QuoteNode;
+                  const quoteNode = n as QuoteNode;
 
                   content = <div className={className}>
                     <div className='content quote-node'>{inlineNodeToElement(quoteNode.content)}</div>
