@@ -1,7 +1,7 @@
-import { v4 as uuidv4 } from 'uuid';
-import { DirectoryNode, NodeType, ReservedID } from './node';
+import { DirectoryNode } from './node';
 import { visit } from './tree';
 
+// Version5 to Version6
 export namespace Version5 {
   export function findNode(nodes: any, id: string | undefined) {
     return nodes.find((n: any) => n.id == id);
