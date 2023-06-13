@@ -13,7 +13,7 @@ import { IconGripVertical } from '@tabler/icons';
 import Katex from 'katex';
 import { inlineNodeToElement, inlineNodeToString, visit } from '../tree';
 import { AnchorNode, DirectoryNode, File, HeadingNode, ImageNode, ItemStyle, MathNode, Node, NodeType, PageNode, QuoteNode, ReservedID, TextEmbedNode, TextNode } from '../node';
-import { Row } from './row';
+import Row from './row';
 
 export default function EditorPane() {
   const model = useModel<Model>();

@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useModel, useObservable } from 'kyoka';
 import Model from '../model';
 
-interface RowProps {
+export interface RowProps {
   id: string;
   index: number;
   pseudoIndex: number;
@@ -14,7 +14,7 @@ interface RowProps {
   children: any;
 }
 
-export function Row(props: RowProps) {
+export default function Row(props: RowProps) {
   const model = useModel<Model>();
   const hovered = useObservable(model.hovered);
   const lineNumberVisibility = useObservable(model.lineNumberVisibility);
