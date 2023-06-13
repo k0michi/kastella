@@ -596,7 +596,7 @@ export default function EditorPane() {
               })
             }
             <Row
-              id={"input"}
+              id={null}
               index={nextIndex}
               pseudoIndex={filtered.length}
               depth={0}

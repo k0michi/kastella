@@ -4,7 +4,7 @@ import { useModel, useObservable } from 'kyoka';
 import Model from '../model';
 
 export interface RowProps {
-  id: string;
+  id: string | null;
   index: number;
   pseudoIndex: number;
   depth: number;
@@ -24,9 +24,11 @@ export default function Row(props: RowProps) {
       <div draggable
         onDragStart={e => {
           const parent = (e.target as HTMLElement).parentElement?.parentElement!;
-          e.dataTransfer.setDragImage(parent, 0, 0);
-          e.dataTransfer.setData('text/plain', props.id);
-          e.dataTransfer.effectAllowed = 'move';
+          if (props.id != null) {
+            e.dataTransfer.setDragImage(parent, 0, 0);
+            e.dataTransfer.setData('text/plain', props.id);
+            e.dataTransfer.effectAllowed = 'move';
+          }
         }}>
         <IconGripVertical width={16} />
       </div>
