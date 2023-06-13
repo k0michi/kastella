@@ -1,7 +1,7 @@
 import { useModel } from 'kyoka';
 import * as React from 'react';
 import Model from '../../model';
-import { PageNode, TextEmbedNode } from '../../node';
+import { TextEmbedNode } from '../../node';
 import TextEmbed from '../text-embed';
 
 interface TextEmbedNodeContentProps {

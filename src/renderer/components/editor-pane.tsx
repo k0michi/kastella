@@ -1,17 +1,11 @@
 import * as React from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime';
-import { findStringIgnoreCase, isHTTPURL } from '../utils';
+import { isHTTPURL } from '../utils';
 import { useModel, useObservable } from 'kyoka';
-import Model, { DateView, DirectoryView, TagView, ViewType } from '../model.js';
+import Model, { DirectoryView, ViewType } from '../model.js';
 import EditorBar from './editor-bar';
-import Image from './image';
-import { DateTimeFormatter } from '@js-joda/core';
 import Timestamp from '../timestamp';
-import TextEmbed from './text-embed';
-import { IconGripVertical } from '@tabler/icons';
-import Katex from 'katex';
-import { inlineNodeToElement, inlineNodeToString, visit } from '../tree';
 import { AnchorNode, DirectoryNode, File, HeadingNode, ImageNode, ItemStyle, MathNode, Node, NodeType, PageNode, QuoteNode, ReservedID, TextEmbedNode, TextNode } from '../node';
 import Row from './row';
 import TextNodeContent from './node-content/text-node-content';
@@ -26,16 +20,12 @@ import QuoteNodeContent from './node-content/quote-node-content';
 
 export default function EditorPane() {
   const model = useModel<Model>();
-  const nodes = useObservable(model.library.nodes);
-  const tags = useObservable(model.library.tags);
   const view = useObservable(model.view);
   const input = useObservable(model.input);
   const atBottom = useObservable(model.atBottom);
   const selected = useObservable(model.selected);
   const writeOnly = useObservable(model.writeOnly);
   const search = useObservable(model.search);
-  const lineNumberVisibility = useObservable(model.lineNumberVisibility);
-  const dateVisibility = useObservable(model.dateVisibility);
   const hovered = useObservable(model.hovered);
   const filtered = useObservable(model.flattened);
   const range = useObservable(model.range);

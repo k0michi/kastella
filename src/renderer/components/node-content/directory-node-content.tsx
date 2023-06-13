@@ -1,6 +1,4 @@
-import { useModel } from 'kyoka';
 import * as React from 'react';
-import Model from '../../model';
 import { DirectoryNode } from '../../node';
 
 interface DirectoryNodeContentProps {
