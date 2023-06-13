@@ -6,11 +6,10 @@ export enum NodeType {
   Anchor = 'anchor',
   Directory = 'directory',
   Page = 'page', // not yet implemented
-  TextEmbed = 'text-embed',
+  Code = 'code',
   Math = 'math',
   Heading = 'heading',
   Quote = 'quote',
-  Code = 'code', // not yet implemented
   Table = 'table', // not yet implemented
   Canvas = 'canvas', // not yet implemented
 }
@@ -63,7 +62,7 @@ export interface TextNode extends Node {
 export interface ImageNode extends Node {
   type: NodeType.Image;
   fileID: string;
-  description?: string;
+  // description?: string;
 }
 
 export interface AnchorNode extends Node {
@@ -87,10 +86,12 @@ export interface PageNode extends Node {
   name: string | undefined;
 }
 
-export interface TextEmbedNode extends Node {
-  type: NodeType.TextEmbed;
-  fileID: string;
-  description?: string;
+export interface CodeNode extends Node {
+  type: NodeType.Code;
+  fileID?: string;
+  content?: string;
+  language?: string;
+  // description?: string;
 }
 
 export interface MathNode extends Node {

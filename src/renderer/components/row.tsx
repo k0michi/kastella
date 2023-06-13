@@ -41,5 +41,5 @@ export default function Row(props: RowProps) {
     }}>
       {props.children}
     </td>
-  </tr>;;
+  </tr>;
 }

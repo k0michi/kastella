@@ -77,3 +77,15 @@ export namespace Version10 {
     return data;
   }
 }
+
+export namespace Version11 {
+  export function convert(data: any) {
+    for (const node of visit(data.nodes) as any) {
+      if (node.type == 'text-embed') {
+        node.type = 'code';
+      }
+    }
+
+    return data;
+  }
+}

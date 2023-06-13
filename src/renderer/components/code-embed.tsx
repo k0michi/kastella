@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { File } from '../node';
 
-export interface TextEmbedProps {
+export interface CodeEmbedProps {
   file: File;
 }
 
-export default function TextEmbed(props: TextEmbedProps) {
+export default function CodeEmbed(props: CodeEmbedProps) {
   const [text, setText] = React.useState<string>();
 
   React.useEffect(() => {

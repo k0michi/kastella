@@ -2,12 +2,12 @@ import { Observable } from "kyoka";
 import { v4 as uuidv4 } from 'uuid';
 import Timestamp from "./timestamp";
 import { arrayInsertBefore, arrayRemove, round } from "./utils";
-import { Version10, Version5, Version9 } from "./compat";
+import { Version10, Version11, Version5, Version9 } from "./compat";
 import { visit } from "./tree";
-import { AnchorNode, DirectoryNode, File, ImageNode, ItemStyle as ListStyle, MathNode, Node, NodeType, ReservedID, Tag, TextEmbedNode, TextNode } from "./node";
+import { AnchorNode, DirectoryNode, File, ImageNode, ItemStyle as ListStyle, MathNode, Node, NodeType, ReservedID, Tag, CodeNode, TextNode } from "./node";
 import EventHandler from "./event-handler";
 
-export const LIBRARY_VERSION = 11;
+export const LIBRARY_VERSION = 12;
 
 export interface Library {
   nodes: Node;
@@ -33,6 +33,30 @@ export default class LibraryModel {
     });
   }
 
+  migrateLibrary(data: any) {
+    if (data.version <= 5) {
+      console.log(`Migrating from version 5...`);
+      data = Version5.convert(data);
+    }
+
+    if (data.version <= 9) {
+      console.log(`Migrating from version 9...`);
+      data = Version9.convert(data);
+    }
+
+    if (data.version <= 10) {
+      console.log(`Migrating from version 10...`);
+      data = Version10.convert(data);
+    }
+
+    if (data.version <= 11) {
+      console.log(`Migrating from version 11...`);
+      data = Version11.convert(data);
+    }
+
+    return data as Library;
+  }
+
   initializeFromJSON(json: string) {
     let data = JSON.parse(json, (key, value) => {
       if (key == 'created' || key == 'modified' || key == 'accessed' || key == 'contentModified' || key == 'contentAccessed') {
@@ -40,22 +64,12 @@ export default class LibraryModel {
       }
 
       return value;
-    }) as Library;
+    });
 
     // validateLibrary(data);
 
     // Migrate older format
-    if (data.version <= 5) {
-      data = Version5.convert(data);
-    }
-
-    if (data.version <= 9) {
-      data = Version9.convert(data);
-    }
-
-    if (data.version <= 10) {
-      data = Version10.convert(data);
-    }
+    data = this.migrateLibrary(data);
 
     this.initialize(data);
   }
@@ -205,15 +219,15 @@ export default class LibraryModel {
     return node;
   }
 
-  addTextEmbedNode(file: File, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
+  addCodeNode(file: File, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
     const id = uuidv4()
 
     if (tags?.length == 0) {
       tags = undefined;
     }
 
-    const node: TextEmbedNode = {
-      type: NodeType.TextEmbed,
+    const node: CodeNode = {
+      type: NodeType.Code,
       fileID: file.id,
       tags,
       created: timeStamp,
@@ -657,9 +671,9 @@ export default class LibraryModel {
     return node.type == NodeType.Directory;
   }
 
-  isTextEmbed(node: Node | string) {
+  isCode(node: Node | string) {
     node = this.getNodeIfNeeded(node);
-    return node.type == NodeType.TextEmbed;
+    return node.type == NodeType.Code;
   }
 
   isMath(node: Node | string) {

@@ -129,7 +129,7 @@ export default class Model {
     const parentID = this.getViewDirectory();
     const tagIDs = this.getViewTags();
 
-    this.library.addTextEmbedNode(image, accessed, parentID, tagIDs);
+    this.library.addCodeNode(image, accessed, parentID, tagIDs);
   }
 
 

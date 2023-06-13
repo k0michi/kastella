@@ -6,14 +6,14 @@ import { useModel, useObservable } from 'kyoka';
 import Model, { DirectoryView, ViewType } from '../model.js';
 import EditorBar from './editor-bar';
 import Timestamp from '../timestamp';
-import { AnchorNode, DirectoryNode, File, HeadingNode, ImageNode, ItemStyle, MathNode, Node, NodeType, PageNode, QuoteNode, ReservedID, TextEmbedNode, TextNode } from '../node';
+import { AnchorNode, DirectoryNode, File, HeadingNode, ImageNode, ItemStyle, MathNode, Node, NodeType, PageNode, QuoteNode, ReservedID, CodeNode, TextNode } from '../node';
 import Row from './row';
 import TextNodeContent from './node-content/text-node-content';
 import ImageNodeContent from './node-content/image-node-content';
 import DirectoryNodeContent from './node-content/directory-node-content';
 import PageNodeContent from './node-content/page-node-content';
 import AnchorNodeContent from './node-content/anchor-node-content';
-import TextEmbedNodeContent from './node-content/text-embed-node-content';
+import CodeNodeContent from './node-content/code-node-content';
 import MathNodeContent from './node-content/math-node-content';
 import HeadingNodeContent from './node-content/heading-node-content';
 import QuoteNodeContent from './node-content/quote-node-content';
@@ -542,12 +542,12 @@ export default function EditorPane() {
                     <AnchorNodeContent node={anchor} />
                     {tags}
                   </div>;
-                } else if (n.type == NodeType.TextEmbed) {
+                } else if (n.type == NodeType.Code) {
                   className += ' block';
-                  const textEmbedNode = n as TextEmbedNode;
+                  const codeNode = n as CodeNode;
 
                   content = <div className={className}>
-                    <TextEmbedNodeContent node={textEmbedNode} />
+                    <CodeNodeContent node={codeNode} />
                     {tags}
                   </div>;
                 } else if (n.type == NodeType.Math) {

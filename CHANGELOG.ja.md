@@ -1,5 +1,8 @@
 # Library Versions
 
+## Version 12
+TextEmbedをCodeに変更
+
 ## Version 11
 `nodes`をノードの配列ではなくルートノードに変更
 
