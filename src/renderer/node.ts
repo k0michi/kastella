@@ -10,7 +10,9 @@ export enum NodeType {
   Math = 'math',
   Heading = 'heading',
   Quote = 'quote',
-  Code = 'code' // not yet implemented
+  Code = 'code', // not yet implemented
+  Table = 'table', // not yet implemented
+  Canvas = 'canvas', // not yet implemented
 }
 
 export enum InlineNodeType { // display-only
@@ -24,11 +26,13 @@ export enum InlineNodeType { // display-only
   InlineMath = 'inline-math', // not yet implemented
   InlineCode = 'inline-code', // not yet implemented
   FootAnchor = 'foot-anchor', // not yet implemented
+  Mark = 'mark', // not yet implemented
 }
 
 export enum ItemStyle {
   Unordered = 'unordered',
-  Ordered = 'ordered'
+  Ordered = 'ordered',
+  // Checkbox = 'checkbox',
 }
 
 export interface Node {
