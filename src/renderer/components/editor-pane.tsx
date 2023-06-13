@@ -14,10 +14,10 @@ import Katex from 'katex';
 import { inlineNodeToElement, inlineNodeToString, visit } from '../tree';
 import { AnchorNode, DirectoryNode, File, HeadingNode, ImageNode, ItemStyle, MathNode, Node, NodeType, PageNode, QuoteNode, ReservedID, TextEmbedNode, TextNode } from '../node';
 import Row from './row';
-import TextContent from './text-content';
-import ImageContent from './image-content';
-import DirectoryContent from './directory-content';
-import PageContent from './page-content';
+import TextContent from './node-content/text-node-content';
+import ImageNodeContent from './node-content/image-node-content';
+import DirectoryNodeContent from './node-content/directory-node-content';
+import PageNodeContent from './node-content/page-node-content';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -521,21 +521,21 @@ export default function EditorPane() {
                   const imageNode = n as ImageNode;
 
                   content = <div className={className}>
-                    <ImageContent node={imageNode} />
+                    <ImageNodeContent node={imageNode} />
                     {tags}
                   </div>
                 } else if (n.type == NodeType.Directory) {
                   const dNode = n as DirectoryNode;
 
                   content = <div className={className}>
-                    <DirectoryContent node={dNode} />
+                    <DirectoryNodeContent node={dNode} />
                     {tags}
                   </div>;
                 } else if (n.type == NodeType.Page) {
                   const pNode = n as PageNode;
 
                   content = <div className={className}>
-                    <PageContent node={pNode} />
+                    <PageNodeContent node={pNode} />
                     {tags}
                   </div>;
                 } else if (n.type == NodeType.Anchor) {
