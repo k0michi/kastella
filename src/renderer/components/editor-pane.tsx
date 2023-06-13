@@ -14,6 +14,8 @@ import Katex from 'katex';
 import { inlineNodeToElement, inlineNodeToString, visit } from '../tree';
 import { AnchorNode, DirectoryNode, File, HeadingNode, ImageNode, ItemStyle, MathNode, Node, NodeType, PageNode, QuoteNode, ReservedID, TextEmbedNode, TextNode } from '../node';
 import Row from './row';
+import TextContent from './text-content';
+import ImageContent from './image-content';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -508,25 +510,18 @@ export default function EditorPane() {
                   const textNode = n as Node as TextNode;
 
                   content = <div className={className}>
-                    <div className='content text-node'>{inlineNodeToElement(textNode.content)}</div>
+                    <TextContent node={textNode} />
                     {tags}
                   </div>;
                 } else if (n.type == NodeType.Image) {
                   className += ' block';
 
                   const imageNode = n as Node as ImageNode;
-                  const file = model.library.getFile(imageNode.fileID);
 
-                  if (file != null) {
-                    content = <div className={className}>
-                      <div className='content image-node'>
-                        <Image file={file} />
-                      </div>
-                      {tags}
-                    </div>;
-                  } else {
-                    content = <div className='error'>{`Failed to read ${imageNode.fileID}`}</div>;
-                  }
+                  content = <div className={className}>
+                    <ImageContent node={imageNode} />
+                    {tags}
+                  </div>
                 } else if (n.type == NodeType.Directory) {
                   const dNode = n as Node as DirectoryNode;
 
