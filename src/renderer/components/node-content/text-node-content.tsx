@@ -6,6 +6,6 @@ export interface TextNodeContentProps {
   node: TextNode;
 }
 
-export default function TextContent(props: TextNodeContentProps) {
+export default function TextNodeContent(props: TextNodeContentProps) {
   return <div className='content text-node'>{inlineNodeToElement(props.node.content)}</div>;
 }

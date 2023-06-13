@@ -14,10 +14,15 @@ import Katex from 'katex';
 import { inlineNodeToElement, inlineNodeToString, visit } from '../tree';
 import { AnchorNode, DirectoryNode, File, HeadingNode, ImageNode, ItemStyle, MathNode, Node, NodeType, PageNode, QuoteNode, ReservedID, TextEmbedNode, TextNode } from '../node';
 import Row from './row';
-import TextContent from './node-content/text-node-content';
+import TextNodeContent from './node-content/text-node-content';
 import ImageNodeContent from './node-content/image-node-content';
 import DirectoryNodeContent from './node-content/directory-node-content';
 import PageNodeContent from './node-content/page-node-content';
+import AnchorNodeContent from './node-content/anchor-node-content';
+import TextEmbedNodeContent from './node-content/text-embed-node-content';
+import MathNodeContent from './node-content/math-node-content';
+import HeadingNodeContent from './node-content/heading-node-content';
+import QuoteNodeContent from './node-content/quote-node-content';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -512,7 +517,7 @@ export default function EditorPane() {
                   const textNode = n as TextNode;
 
                   content = <div className={className}>
-                    <TextContent node={textNode} />
+                    <TextNodeContent node={textNode} />
                     {tags}
                   </div>;
                 } else if (n.type == NodeType.Image) {
@@ -542,58 +547,32 @@ export default function EditorPane() {
                   className += ' block';
 
                   const anchor = n as AnchorNode;
-                  const imageFile = anchor.contentImageFileID != null ? model.library.getFile(anchor.contentImageFileID) : null;
-                  const description = anchor.contentDescription;
 
                   content = <div className={className}>
-                    <div className='content anchor-node'>
-                      {imageFile != null ? <div className='image'><Image file={imageFile}></Image></div> : null}
-                      <div className='details'>
-                        <div className='url'>{decodeURI(anchor.contentURL)}</div>
-                        <div className='title'><a draggable={false} href={anchor.contentURL}>{anchor.contentTitle}</a></div>
-                        {
-                          description != undefined ?
-                            <div className='description'>{formatFetchedText(description)}</div>
-                            : null
-                        }
-                      </div>
-                    </div>
+                    <AnchorNodeContent node={anchor} />
                     {tags}
                   </div>;
                 } else if (n.type == NodeType.TextEmbed) {
                   className += ' block';
                   const textEmbedNode = n as TextEmbedNode;
-                  const file = model.library.getFile(textEmbedNode.fileID);
 
-                  if (file != null) {
-                    content = <div className={className}>
-                      <div className='content text-embed-node'>
-                        <TextEmbed file={file} />
-                      </div>
-                      {tags}
-                    </div>;
-                  } else {
-                    content = <div className='error'>{`Failed to read ${textEmbedNode.fileID}`}</div>;
-                  }
+                  content = <div className={className}>
+                    <TextEmbedNodeContent node={textEmbedNode} />
+                    {tags}
+                  </div>;
                 } else if (n.type == NodeType.Math) {
                   className += ' block';
                   const mathNode = n as MathNode;
 
                   content = <div className={className}>
-                    <div className='content math-node' dangerouslySetInnerHTML={{
-                      __html: Katex.renderToString(mathNode.expression, { displayMode: true })
-                    }}>
-                    </div>
+                    <MathNodeContent node={mathNode} />
                     {tags}
                   </div>;
                 } else if (n.type == NodeType.Heading) {
                   const headingNode = n as HeadingNode;
-                  const headingDepth = model.library.getHeadingDepth(headingNode);
-                  const COEFF = 2 ** (1 / 6);
-                  const fontSize = Math.max(2 / COEFF ** headingDepth, 1);
 
                   content = <div className={className}>
-                    <div className='content heading-node' style={{ 'fontSize': fontSize + 'em' }}>{inlineNodeToElement(headingNode.content)}</div>
+                    <HeadingNodeContent node={headingNode} />
                     {tags}
                   </div>;
                 } else if (n.type == NodeType.Quote) {
@@ -601,7 +580,7 @@ export default function EditorPane() {
                   const quoteNode = n as QuoteNode;
 
                   content = <div className={className}>
-                    <div className='content quote-node'>{inlineNodeToElement(quoteNode.content)}</div>
+                    <QuoteNodeContent node={quoteNode} />
                     {tags}
                   </div>;
                 }
@@ -674,10 +653,4 @@ function getAncestorID(element: HTMLElement | null): string | null {
   }
 
   return getAncestorID(element.parentElement);
-}
-
-const TEXT_LIMIT = 120;
-
-function formatFetchedText(string: string) {
-  return string.replaceAll(/\n+/g, '\n').substring(0, TEXT_LIMIT);
 }
