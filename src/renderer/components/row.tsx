@@ -19,7 +19,7 @@ export default function Row(props: RowProps) {
   const hovered = useObservable(model.hovered);
   const lineNumberVisibility = useObservable(model.lineNumberVisibility);
 
-  return <tr key={props.id} data-type="node" data-id={props.id} data-index={props.pseudoIndex}>
+  return <tr data-type="node" data-id={props.id} data-index={props.pseudoIndex}>
     <td className='grip'>{props.id == hovered ?
       <div draggable
         onDragStart={e => {

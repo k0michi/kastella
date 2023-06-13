@@ -503,7 +503,7 @@ export default function EditorPane() {
                 const tagNames = n.tags?.map(t => '#' + model.library.getTag(t)?.name);
 
                 const tags = <div className='tags'>
-                  {tagNames?.map(t => <div className='tag'>{t}</div>)}
+                  {tagNames?.map(t => <div className='tag' key={t}>{t}</div>)}
                 </div>;
 
                 let content;
@@ -614,6 +614,7 @@ export default function EditorPane() {
                 }
 
                 return <Row
+                  key={id}
                   id={id}
                   index={n.index!}
                   pseudoIndex={i}
