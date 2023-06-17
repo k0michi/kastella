@@ -678,6 +678,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@excalidraw/excalidraw@npm:^0.15.2":
+  version: 0.15.2
+  resolution: "@excalidraw/excalidraw@npm:0.15.2"
+  peerDependencies:
+    react: ^17.0.2 || ^18.2.0
+    react-dom: ^17.0.2 || ^18.2.0
+  checksum: f35ea7cd40c6a19745f0b0c1ddbaf7a6a8580e917120b41851ded508cc1489267c406b7bd70cdec208cc0663cd154516a2dd53bdd510da5375943cf5a1da86b6
+  languageName: node
+  linkType: hard
+
 "@gar/promisify@npm:^1.1.3":
   version: 1.1.3
   resolution: "@gar/promisify@npm:1.1.3"
@@ -4390,6 +4400,7 @@ __metadata:
     "@electron-forge/maker-rpm": ^6.0.0-beta.65
     "@electron-forge/maker-squirrel": ^6.0.0-beta.65
     "@electron-forge/maker-zip": ^6.0.0-beta.65
+    "@excalidraw/excalidraw": ^0.15.2
     "@js-joda/core": ^5.4.2
     "@js-joda/locale": ^4.8.6
     "@js-joda/timezone": ^2.15.0

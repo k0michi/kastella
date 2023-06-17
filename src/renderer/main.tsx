@@ -10,6 +10,8 @@ import 'katex/dist/katex.css'
 import 'modern-normalize/modern-normalize.css';
 import ToolBar from './components/tool-bar';
 
+(window as any).EXCALIDRAW_ASSET_PATH = "/";
+
 const model = new Model();
 model.loadLibrary();
 

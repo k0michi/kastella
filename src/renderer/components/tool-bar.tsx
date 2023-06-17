@@ -5,9 +5,11 @@ import { useModel, useObservable } from 'kyoka';
 import Model, { DirectoryView, TagView, ViewType } from '../model';
 import Timestamp from '../timestamp';
 import { File, ItemStyle, NodeType } from '../node';
-import { IconMathFunction, IconHeading, IconQuote, IconList, IconListNumbers, IconMenu2, IconPhoto, IconFileText, IconCode, IconBold, IconAnchor, IconLink } from '@tabler/icons';
+import { IconMathFunction, IconHeading, IconQuote, IconList, IconListNumbers, IconMenu2, IconPhoto, IconFileText, IconCode, IconBold, IconAnchor, IconLink, IconBrush } from '@tabler/icons';
 import { FileType } from '../../common/fetch';
+import { Excalidraw, MainMenu, exportToSvg, serializeAsJSON } from "@excalidraw/excalidraw";
 import mime from 'mime';
+import { ExcalidrawAPIRefValue, ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types/types';
 
 export default function ToolBar() {
   const model = useModel<Model>();
@@ -15,6 +17,9 @@ export default function ToolBar() {
 
   const mathModalRef = React.useRef<HTMLDialogElement>(null);
   const [exp, setExp] = React.useState<string>('');
+
+  const [excalidrawAPI, setExcalidrawAPI] = React.useState<ExcalidrawAPIRefValue | null>(null);
+  const canvasModalRef = React.useRef<HTMLDialogElement>(null);
 
   const rendered = React.useMemo(() => {
     let result;
@@ -97,6 +102,9 @@ export default function ToolBar() {
             }
           }
         }}><IconFileText stroke={2} size={16} /></button>
+        <button className='tool' onClick={async e => {
+          canvasModalRef.current?.showModal();
+        }}><IconBrush stroke={2} size={16} /></button>
       </div>
       <dialog ref={mathModalRef}>
         <div className='dialog-container'>
@@ -129,6 +137,29 @@ export default function ToolBar() {
 
               mathModalRef.current?.close();
             }}>OK</button></div>
+          </div>
+        </div>
+      </dialog>
+      <dialog ref={canvasModalRef} style={{ height: "100%", width: "100%", margin: 0 }}>
+        <div className='dialog-container' style={{ height: "100%", width: "100%" }}>
+          <div style={{ height: "100%", width: "100%" }}>
+            <Excalidraw ref={(api) => setExcalidrawAPI(api)}>
+              <MainMenu>
+                <MainMenu.Item onSelect={async () => {
+                  if (excalidrawAPI?.ready) {
+                    const elements = excalidrawAPI.getSceneElements();
+                    const appState = excalidrawAPI.getAppState();
+                    const files = excalidrawAPI.getFiles();
+                    const json = serializeAsJSON(elements, appState, files, 'local');
+                    const svg = await exportToSvg({ elements, appState, files });
+                  }
+                }}>
+                  Close
+                </MainMenu.Item>
+                <MainMenu.DefaultItems.ClearCanvas />
+                <MainMenu.DefaultItems.ChangeCanvasBackground />
+              </MainMenu>
+            </Excalidraw>
           </div>
         </div>
       </dialog>

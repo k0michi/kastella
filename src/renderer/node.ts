@@ -11,7 +11,7 @@ export enum NodeType {
   Heading = 'heading',
   Quote = 'quote',
   Table = 'table', // not yet implemented
-  Canvas = 'canvas', // not yet implemented
+  Canvas = 'canvas',
 }
 
 export enum InlineNodeType { // display-only
@@ -48,11 +48,19 @@ export interface Node {
   depth?: number; // memoization
 }
 
-/*
-export interface RootNode extends Node {
-  type: undefined;
+// File nodes
+
+export interface DirectoryNode extends Node {
+  type: NodeType.Directory;
+  name: string | undefined;
 }
-*/
+
+export interface PageNode extends Node {
+  type: NodeType.Page;
+  name: string | undefined;
+}
+
+// Block nodes
 
 export interface TextNode extends Node {
   type: NodeType.Text;
@@ -74,16 +82,6 @@ export interface AnchorNode extends Node {
   contentImageFileID?: string;
   contentModified?: Timestamp;
   contentAccessed: Timestamp;
-}
-
-export interface DirectoryNode extends Node {
-  type: NodeType.Directory;
-  name: string | undefined;
-}
-
-export interface PageNode extends Node {
-  type: NodeType.Page;
-  name: string | undefined;
 }
 
 export interface CodeNode extends Node {
@@ -108,6 +106,14 @@ export interface QuoteNode extends Node {
   type: NodeType.Quote;
   content: (InlineNode | string)[];
 }
+
+export interface CanvasNode extends Node {
+  type: NodeType.Canvas;
+  fileID: string;
+  previewFileID: string;
+}
+
+// Inline nodes
 
 export interface InlineNode {
   type: InlineNodeType;
@@ -154,6 +160,8 @@ export interface InlineCode extends InlineNode {
 export interface FootAnchor extends InlineNode {
   type: InlineNodeType.FootAnchor;
 }
+
+// Misc
 
 export interface File {
   id: string;
