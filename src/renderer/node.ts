@@ -5,7 +5,7 @@ export enum NodeType {
   Image = 'image',
   Anchor = 'anchor',
   Directory = 'directory',
-  Page = 'page', // not yet implemented
+  Page = 'page', // display-only
   Code = 'code',
   Math = 'math',
   Heading = 'heading',
@@ -20,10 +20,10 @@ export enum InlineNodeType { // display-only
   Italic = 'italic',
   Underline = 'underline',
   Strikethrough = 'strikethrough',
-  Subscript = 'subscript', // not yet implemented
-  Superscript = 'superscript', // not yet implemented
-  InlineMath = 'inline-math', // not yet implemented
-  InlineCode = 'inline-code', // not yet implemented
+  Subscript = 'subscript',
+  Superscript = 'superscript',
+  InlineMath = 'inline-math',
+  InlineCode = 'inline-code',
   FootAnchor = 'foot-anchor', // not yet implemented
   Mark = 'mark', // not yet implemented
 }
@@ -107,6 +107,11 @@ export interface QuoteNode extends Node {
   content: (InlineNode | string)[];
 }
 
+export interface TableNode extends Node {
+  type: NodeType.Table;
+  // TODO
+}
+
 export interface CanvasNode extends Node {
   type: NodeType.Canvas;
   fileID: string;
@@ -159,6 +164,12 @@ export interface InlineCode extends InlineNode {
 
 export interface FootAnchor extends InlineNode {
   type: InlineNodeType.FootAnchor;
+  // TODO
+}
+
+export interface Mark extends InlineNode {
+  type: InlineNodeType.Mark;
+  // TODO
 }
 
 // Misc
