@@ -14,6 +14,7 @@ export class Bridge {
   fetchMeta = (url: string): Promise<FetchedMeta> => ipcRenderer.invoke('fetch-meta', url);
   fetchFile = (url: string): Promise<FetchedFile> => ipcRenderer.invoke('fetch-file', url);
   writeFile = (id: string, data: Uint8Array, type: string): Promise<void> => ipcRenderer.invoke('write-file', id, data, type);
+  writeTextFile = (id: string, data: string, type: string): Promise<void> => ipcRenderer.invoke('write-text-file', id, data, type);
   openFile = (fileType: FileType): Promise<string[] | null> => ipcRenderer.invoke('open-file', fileType);
   setEdited = (edited: boolean): Promise<void> => ipcRenderer.invoke('set-edited', edited);
 }

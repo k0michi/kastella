@@ -168,6 +168,7 @@ export interface File {
   type: string;
   name?: string;
   url?: string;
+  created?: Timestamp;
   modified?: Timestamp;
   accessed: Timestamp;
 }

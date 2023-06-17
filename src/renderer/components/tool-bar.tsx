@@ -151,7 +151,41 @@ export default function ToolBar() {
                     const appState = excalidrawAPI.getAppState();
                     const files = excalidrawAPI.getFiles();
                     const json = serializeAsJSON(elements, appState, files, 'local');
-                    const svg = await exportToSvg({ elements, appState, files });
+                    const xmlSerializer = new XMLSerializer();
+                    const svg = xmlSerializer.serializeToString(await exportToSvg({ elements, appState, files }));
+
+                    const fileID = uuidv4();
+                    await bridge.writeTextFile(fileID, json, 'application/json');
+                    const now = await bridge.now();
+
+                    const file = {
+                      id: fileID,
+                      type: 'application/json',
+                      modified: Timestamp.fromNs(now),
+                      created: Timestamp.fromNs(now),
+                    } as File;
+
+                    model.library.addFile(file);
+
+                    const previewFileID = uuidv4();
+                    await bridge.writeTextFile(previewFileID, svg, 'image/svg+xml');
+
+                    const previewFile = {
+                      id: previewFileID,
+                      type: 'image/svg+xml',
+                      modified: Timestamp.fromNs(now),
+                      created: Timestamp.fromNs(now),
+                    } as File;
+
+                    model.library.addFile(previewFile);
+
+                    let tagIDs: string[] = model.getViewTags();
+                    const parentID = model.getViewDirectory();
+
+                    model.library.addCanvasNode(fileID, previewFileID, Timestamp.fromNs(now), parentID, tagIDs);
+
+                    excalidrawAPI.resetScene();
+                    canvasModalRef.current?.close();
                   }
                 }}>
                   Close

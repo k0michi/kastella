@@ -4,10 +4,10 @@ import Timestamp from "./timestamp";
 import { arrayInsertBefore, arrayRemove, round } from "./utils";
 import { Version10, Version11, Version5, Version9 } from "./compat";
 import { visit } from "./tree";
-import { AnchorNode, DirectoryNode, File, ImageNode, ItemStyle as ListStyle, MathNode, Node, NodeType, ReservedID, Tag, CodeNode, TextNode } from "./node";
+import { AnchorNode, DirectoryNode, File, ImageNode, ItemStyle as ListStyle, MathNode, Node, NodeType, ReservedID, Tag, CodeNode, TextNode, CanvasNode } from "./node";
 import EventHandler from "./event-handler";
 
-export const LIBRARY_VERSION = 12;
+export const LIBRARY_VERSION = 13;
 
 export interface Library {
   nodes: Node;
@@ -303,6 +303,28 @@ export default class LibraryModel {
     const node: MathNode = {
       type: NodeType.Math,
       expression: exp,
+      tags,
+      created: timeStamp,
+      modified: timeStamp,
+      id,
+      children: []
+    };
+
+    this.addNode(parent, node);
+    return node;
+  }
+
+  addCanvasNode(fileID: string, previewFileID: string, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
+    const id = uuidv4()
+
+    if (tags?.length == 0) {
+      tags = undefined;
+    }
+
+    const node: CanvasNode = {
+      type: NodeType.Canvas,
+      fileID,
+      previewFileID,
       tags,
       created: timeStamp,
       modified: timeStamp,

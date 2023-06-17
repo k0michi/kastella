@@ -6,7 +6,7 @@ import { useModel, useObservable } from 'kyoka';
 import Model, { DirectoryView, ViewType } from '../model.js';
 import EditorBar from './editor-bar';
 import Timestamp from '../timestamp';
-import { AnchorNode, DirectoryNode, File, HeadingNode, ImageNode, ItemStyle, MathNode, Node, NodeType, PageNode, QuoteNode, ReservedID, CodeNode, TextNode } from '../node';
+import { AnchorNode, DirectoryNode, File, HeadingNode, ImageNode, ItemStyle, MathNode, Node, NodeType, PageNode, QuoteNode, ReservedID, CodeNode, TextNode, CanvasNode } from '../node';
 import Row from './row';
 import TextNodeContent from './node-content/text-node-content';
 import ImageNodeContent from './node-content/image-node-content';
@@ -17,6 +17,7 @@ import CodeNodeContent from './node-content/code-node-content';
 import MathNodeContent from './node-content/math-node-content';
 import HeadingNodeContent from './node-content/heading-node-content';
 import QuoteNodeContent from './node-content/quote-node-content';
+import CanvasNodeContent from './node-content/canvas-node-content';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -573,6 +574,15 @@ export default function EditorPane() {
                     <QuoteNodeContent node={quoteNode} />
                     {tags}
                   </div>;
+                } else if (n.type == NodeType.Canvas) {
+                  className += ' block';
+
+                  const canvasNode = n as CanvasNode;
+
+                  content = <div className={className}>
+                    <CanvasNodeContent node={canvasNode} />
+                    {tags}
+                  </div>
                 }
 
                 const itemStyle = n.parent?.list;

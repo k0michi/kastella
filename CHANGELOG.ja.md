@@ -1,5 +1,8 @@
 # Library Versions
 
+## Version 13
+Canvasを追加
+
 ## Version 12
 TextEmbedをCodeに変更
 

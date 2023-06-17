@@ -30,7 +30,7 @@ function getConfigPath() {
 async function loadConfig() {
   const configPath = getConfigPath();
   let configContent: string;
-  
+
   try {
     configContent = await fs.readFile(configPath, 'utf-8');
   } catch (error) {
@@ -184,7 +184,14 @@ ipcMain.handle('fetch-file', async (e, url: string) => {
 });
 
 ipcMain.handle('write-file', async (e, id: string, data: Uint8Array, type: string) => {
-  const ext = mime.getExtension(type)
+  const ext = mime.getExtension(type);
+  await fs.mkdir(path.join(libraryPath, 'files'), { recursive: true });
+  const destPath = path.join(libraryPath, 'files', id + '.' + ext);
+  return await fs.writeFile(destPath, data);
+});
+
+ipcMain.handle('write-text-file', async (e, id: string, data: string, type: string) => {
+  const ext = mime.getExtension(type);
   await fs.mkdir(path.join(libraryPath, 'files'), { recursive: true });
   const destPath = path.join(libraryPath, 'files', id + '.' + ext);
   return await fs.writeFile(destPath, data);
