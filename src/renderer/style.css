@@ -12,7 +12,7 @@ html {
   --color: white;
   --color-secondary: rgb(168, 168, 168);
   --color-border: hsl(230, 10%, 28%);
-  --color-editor: hsl(230, 11%, 16%);
+  --color-editor: hsl(240, 3%, 13%);
   --color-tool-bar: hsl(230, 8%, 10%);
   --color-tool: hsl(230, 12%, 18%);
   --color-editor-bar: hsl(230, 10%, 14%);
@@ -23,7 +23,7 @@ html {
   --color-error: red;
   --color-editor-tag-back: rgb(233, 233, 233);
   --color-editor-tag-fore: rgb(0, 0, 0);
-  --color-explorer: rgba(0, 0, 0, 0);
+  --color-explorer: hsl(230, 11%, 16%);
   --color-explorer-header: rgb(234, 234, 234);
   --color-explorer-selected: rgb(63, 123, 200);
   --color-status: hsl(230, 8%, 10%);
@@ -46,7 +46,7 @@ html {
     --color-editor-index-empty: hsl(229, 15%, 78%);
     --color-editor-selected: rgba(121, 221, 252, 0.371);
     --color-editor-quote: rgb(26, 26, 26);
-    --color-explorer: rgba(0, 0, 0, 0);
+    --color-explorer: hsl(210, 5%, 93%);
     --color-explorer-header: rgb(0, 0, 0);
     --color-explorer-selected: rgb(63, 123, 200);
     --color-status: hsl(195, 14%, 95%);
