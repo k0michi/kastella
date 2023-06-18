@@ -10,6 +10,7 @@ import { FileType } from '../../common/fetch';
 import { Excalidraw, MainMenu, exportToSvg, serializeAsJSON } from "@excalidraw/excalidraw";
 import mime from 'mime';
 import { ExcalidrawAPIRefValue, ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types/types';
+import ToolButton from './tool-button';
 
 export default function ToolBar() {
   const model = useModel<Model>();
@@ -38,10 +39,10 @@ export default function ToolBar() {
   return (
     <>
       <div id="tool-bar">
-        <button className='tool' onClick={e => {
+        <ToolButton onClick={e => {
           mathModalRef.current?.showModal();
-        }}><IconMathFunction stroke={2} size={16} /></button>
-        <button className='tool' onClick={e => {
+        }}><IconMathFunction stroke={2} size={16} /></ToolButton>
+        <ToolButton onClick={e => {
           const selected = model.selected.get();
 
           if (selected != undefined) {
@@ -51,8 +52,8 @@ export default function ToolBar() {
               model.library.changeNodeType(selected, NodeType.Heading);
             }
           }
-        }}><IconHeading stroke={2} size={16} /></button>
-        <button className='tool' onClick={e => {
+        }}><IconHeading stroke={2} size={16} /></ToolButton>
+        <ToolButton onClick={e => {
           const selected = model.selected.get();
 
           if (selected != undefined) {
@@ -62,29 +63,29 @@ export default function ToolBar() {
               model.library.changeNodeType(selected, NodeType.Quote);
             }
           }
-        }}><IconQuote stroke={2} size={16} /></button>
-        <button className='tool' onClick={e => {
+        }}><IconQuote stroke={2} size={16} /></ToolButton>
+        <ToolButton onClick={e => {
           const selected = model.selected.get();
 
           if (selected != undefined) {
             model.library.setListStyle(selected, undefined);
           }
-        }}><IconMenu2 stroke={2} size={16} /></button>
-        <button className='tool' onClick={e => {
+        }}><IconMenu2 stroke={2} size={16} /></ToolButton>
+        <ToolButton onClick={e => {
           const selected = model.selected.get();
 
           if (selected != undefined) {
             model.library.setListStyle(selected, ItemStyle.Unordered);
           }
-        }}><IconList stroke={2} size={16} /></button>
-        <button className='tool' onClick={e => {
+        }}><IconList stroke={2} size={16} /></ToolButton>
+        <ToolButton onClick={e => {
           const selected = model.selected.get();
 
           if (selected != undefined) {
             model.library.setListStyle(selected, ItemStyle.Ordered);
           }
-        }}><IconListNumbers stroke={2} size={16} /></button>
-        <button className='tool' onClick={async e => {
+        }}><IconListNumbers stroke={2} size={16} /></ToolButton>
+        <ToolButton onClick={async e => {
           const result = await bridge.openFile(FileType.Image);
 
           if (result != null) {
@@ -92,8 +93,8 @@ export default function ToolBar() {
               await model.importImageFile(filePath);
             }
           }
-        }}><IconPhoto stroke={2} size={16} /></button>
-        <button className='tool' onClick={async e => {
+        }}><IconPhoto stroke={2} size={16} /></ToolButton>
+        <ToolButton onClick={async e => {
           const result = await bridge.openFile(FileType.Text);
 
           if (result != null) {
@@ -101,32 +102,32 @@ export default function ToolBar() {
               await model.importTextFile(filePath);
             }
           }
-        }}><IconFileCode stroke={2} size={16} /></button>
-        <button className='tool' onClick={async e => {
+        }}><IconFileCode stroke={2} size={16} /></ToolButton>
+        <ToolButton onClick={async e => {
           canvasModalRef.current?.showModal();
-        }}><IconBrush stroke={2} size={16} /></button>
-        <button className='tool' onClick={e => {
+        }}><IconBrush stroke={2} size={16} /></ToolButton>
+        <ToolButton onClick={e => {
           document.execCommand('bold');
-        }}><IconBold stroke={2} size={16} /></button>
-        <button className='tool' onClick={e => {
+        }}><IconBold stroke={2} size={16} /></ToolButton>
+        <ToolButton onClick={e => {
           document.execCommand('italic');
-        }}><IconItalic stroke={2} size={16} /></button>
-        <button className='tool' onClick={e => {
+        }}><IconItalic stroke={2} size={16} /></ToolButton>
+        <ToolButton onClick={e => {
           document.execCommand('underline');
-        }}><IconUnderline stroke={2} size={16} /></button>
-        <button className='tool' onClick={e => {
+        }}><IconUnderline stroke={2} size={16} /></ToolButton>
+        <ToolButton onClick={e => {
           document.execCommand('strikeThrough');
-        }}><IconStrikethrough stroke={2} size={16} /></button>
-        <button className='tool' onClick={e => {
+        }}><IconStrikethrough stroke={2} size={16} /></ToolButton>
+        <ToolButton onClick={e => {
           document.execCommand('subscript');
-        }}><IconSubscript stroke={2} size={16} /></button>
-        <button className='tool' onClick={e => {
+        }}><IconSubscript stroke={2} size={16} /></ToolButton>
+        <ToolButton onClick={e => {
           document.execCommand('superscript');
-        }}><IconSuperscript stroke={2} size={16} /></button>
-        <button className='tool' onClick={e => {
+        }}><IconSuperscript stroke={2} size={16} /></ToolButton>
+        <ToolButton onClick={e => {
           document.execCommand('removeFormat');
-        }}><IconClearFormatting stroke={2} size={16} /></button>
-        <button className='tool' onClick={e => {
+        }}><IconClearFormatting stroke={2} size={16} /></ToolButton>
+        <ToolButton onClick={e => {
           const selection = window.getSelection();
           const range = selection?.getRangeAt(0);
 
@@ -147,7 +148,7 @@ export default function ToolBar() {
               anc.dispatchEvent(event);
             }
           }
-        }}><IconCode stroke={2} size={16} /></button>
+        }}><IconCode stroke={2} size={16} /></ToolButton>
       </div>
       <dialog ref={mathModalRef}>
         <div className='dialog-container'>
