@@ -13,6 +13,7 @@ Kastella is still unstable and incomplete, however, I'll maintain this as long a
 - Automatically saved, and each note is automatically timestamped.
 - Scalability.
 - Tags.
+- Excalidraw integration.
 
 ## License
 
