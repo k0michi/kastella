@@ -3,6 +3,7 @@ import * as React from 'react';
 import Model from '../../model';
 import { CanvasNode, ImageNode } from '../../node';
 import Image from '../image';
+import SVGImage from '../svg-image';
 
 interface CanvasNodeContentProps {
   node: CanvasNode;
@@ -14,7 +15,7 @@ export default function CanvasNodeContent(props: CanvasNodeContentProps) {
 
   if (file != null) {
     return <div className='content image-node'>
-      <Image file={file} />
+      <SVGImage file={file} />
     </div>
   } else {
     return <div className='content image-node'>
