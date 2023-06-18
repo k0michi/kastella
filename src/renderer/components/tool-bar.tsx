@@ -5,7 +5,7 @@ import { useModel, useObservable } from 'kyoka';
 import Model, { DirectoryView, TagView, ViewType } from '../model';
 import Timestamp from '../timestamp';
 import { File, ItemStyle, NodeType } from '../node';
-import { IconMathFunction, IconHeading, IconQuote, IconList, IconListNumbers, IconMenu2, IconPhoto, IconFileText, IconCode, IconBold, IconAnchor, IconLink, IconBrush, IconItalic, IconStrikethrough, IconUnderline, IconSubscript, IconSuperscript, IconClearFormatting } from '@tabler/icons';
+import { IconMathFunction, IconHeading, IconQuote, IconList, IconListNumbers, IconMenu2, IconPhoto, IconFileText, IconCode, IconBold, IconAnchor, IconLink, IconBrush, IconItalic, IconStrikethrough, IconUnderline, IconSubscript, IconSuperscript, IconClearFormatting, IconFileCode } from '@tabler/icons';
 import { FileType } from '../../common/fetch';
 import { Excalidraw, MainMenu, exportToSvg, serializeAsJSON } from "@excalidraw/excalidraw";
 import mime from 'mime';
@@ -101,7 +101,7 @@ export default function ToolBar() {
               await model.importTextFile(filePath);
             }
           }
-        }}><IconFileText stroke={2} size={16} /></button>
+        }}><IconFileCode stroke={2} size={16} /></button>
         <button className='tool' onClick={async e => {
           canvasModalRef.current?.showModal();
         }}><IconBrush stroke={2} size={16} /></button>
