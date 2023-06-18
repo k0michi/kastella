@@ -1,6 +1,6 @@
 {
-  "name": "notist",
-  "productName": "Notist",
+  "name": "kastella",
+  "productName": "Kastella",
   "private": true,
   "version": "0.0.0",
   "main": "dist/main/main/main.js",
@@ -62,7 +62,7 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "icon": "assets/notist.icns"
+        "icon": "assets/kastella.icns"
       },
       "makers": [
         {
