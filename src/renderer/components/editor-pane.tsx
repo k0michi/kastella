@@ -475,12 +475,8 @@ export default function EditorPane() {
   let nextIndex: number | undefined;
 
   if (view?.type == ViewType.Directory) {
-    if (last != null) {
-      nextIndex = last.index! + 1;
-    } else {
-      const dirView = view as DirectoryView;
-      nextIndex = model.library.getNode(dirView.parentID).index! + 1;
-    }
+    const dirView = view as DirectoryView;
+    nextIndex = model.library.getLastNode(model.library.getNode(dirView.parentID))?.index! + 1;
   } else {
     nextIndex = model.library.getLastNode(model.library.getNode(ReservedID.Master))?.index! + 1;
   }
