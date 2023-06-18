@@ -23,7 +23,7 @@ export enum InlineNodeType {
   Subscript = 'subscript',
   Superscript = 'superscript',
   InlineMath = 'inline-math', // display-only
-  InlineCode = 'inline-code', // display-only
+  InlineCode = 'inline-code',
   FootAnchor = 'foot-anchor', // not yet implemented
   Mark = 'mark', // not yet implemented
 }

@@ -126,6 +126,28 @@ export default function ToolBar() {
         <button className='tool' onClick={e => {
           document.execCommand('removeFormat');
         }}><IconClearFormatting stroke={2} size={16} /></button>
+        <button className='tool' onClick={e => {
+          const selection = window.getSelection();
+          const range = selection?.getRangeAt(0);
+
+          if (range != null) {
+            const anc = getContentEditableAncestor(range);
+
+            if (anc != null) {
+              const selectedContent = range.extractContents();
+              const codeElem = document.createElement('code');
+              const textContent = selectedContent.textContent;
+
+              if (selectedContent != undefined && textContent != null) {
+                codeElem.append(textContent);
+              }
+
+              range.insertNode(codeElem);
+              const event = new Event('input', { bubbles: true, cancelable: true });
+              anc.dispatchEvent(event);
+            }
+          }
+        }}><IconCode stroke={2} size={16} /></button>
       </div>
       <dialog ref={mathModalRef}>
         <div className='dialog-container'>
@@ -220,4 +242,18 @@ export default function ToolBar() {
       </dialog>
     </>
   );
+}
+
+function getContentEditableAncestor(range: Range) {
+  let node: Node | null = range.commonAncestorContainer;
+
+  while (node) {
+    if (node.nodeType === Node.ELEMENT_NODE && (node as HTMLElement).isContentEditable) {
+      return node;
+    }
+
+    node = node.parentNode;
+  }
+
+  return null;
 }

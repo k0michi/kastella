@@ -62,6 +62,8 @@ export function inlineNodeToElement(node: InlineNode | string | (InlineNode | st
         return React.createElement('sub', {}, ...children);
       } else if (node.type == InlineNodeType.Superscript) {
         return React.createElement('sup', {}, ...children);
+      } else if (node.type == InlineNodeType.InlineCode) {
+        return React.createElement('code', {}, ...children);
       }
     }
   }
@@ -93,18 +95,31 @@ export function elementToInlineNode(element: Element): InlineNode | (InlineNode 
     case 'sup':
       nodeType = InlineNodeType.Superscript;
       break;
+    case 'code':
+      nodeType = InlineNodeType.InlineCode;
+      break;
     case 'body':
       break;
     default:
-      throw new Error('Not supported');
+      throw new Error('Not supported: ' + tagName);
   }
+
+  const hasOnlyPlain = nodeType == InlineNodeType.InlineCode;
 
   for (const childNode of element.childNodes) {
     if (childNode.nodeType === Node.ELEMENT_NODE) {
+      if (hasOnlyPlain) {
+        throw new Error('This node should only contain plain content');
+      }
+
       const child = elementToInlineNode(childNode as Element);
       children.push(child as InlineNode);
     } else if (childNode.nodeType === Node.TEXT_NODE) {
-      children.push(childNode.textContent ?? '');
+      const textContent = childNode.textContent;
+
+      if (textContent != null) {
+        children.push(textContent);
+      }
     }
   }
 
