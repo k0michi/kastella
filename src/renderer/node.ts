@@ -14,16 +14,16 @@ export enum NodeType {
   Canvas = 'canvas',
 }
 
-export enum InlineNodeType { // display-only
-  InlineAnchor = 'inline-anchor',
+export enum InlineNodeType {
+  InlineAnchor = 'inline-anchor', // display-only
   Bold = 'bold',
   Italic = 'italic',
   Underline = 'underline',
   Strikethrough = 'strikethrough',
   Subscript = 'subscript',
   Superscript = 'superscript',
-  InlineMath = 'inline-math',
-  InlineCode = 'inline-code',
+  InlineMath = 'inline-math', // display-only
+  InlineCode = 'inline-code', // display-only
   FootAnchor = 'foot-anchor', // not yet implemented
   Mark = 'mark', // not yet implemented
 }

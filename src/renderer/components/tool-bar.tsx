@@ -5,7 +5,7 @@ import { useModel, useObservable } from 'kyoka';
 import Model, { DirectoryView, TagView, ViewType } from '../model';
 import Timestamp from '../timestamp';
 import { File, ItemStyle, NodeType } from '../node';
-import { IconMathFunction, IconHeading, IconQuote, IconList, IconListNumbers, IconMenu2, IconPhoto, IconFileText, IconCode, IconBold, IconAnchor, IconLink, IconBrush } from '@tabler/icons';
+import { IconMathFunction, IconHeading, IconQuote, IconList, IconListNumbers, IconMenu2, IconPhoto, IconFileText, IconCode, IconBold, IconAnchor, IconLink, IconBrush, IconItalic, IconStrikethrough, IconUnderline, IconSubscript, IconSuperscript, IconClearFormatting } from '@tabler/icons';
 import { FileType } from '../../common/fetch';
 import { Excalidraw, MainMenu, exportToSvg, serializeAsJSON } from "@excalidraw/excalidraw";
 import mime from 'mime';
@@ -105,6 +105,27 @@ export default function ToolBar() {
         <button className='tool' onClick={async e => {
           canvasModalRef.current?.showModal();
         }}><IconBrush stroke={2} size={16} /></button>
+        <button className='tool' onClick={e => {
+          document.execCommand('bold');
+        }}><IconBold stroke={2} size={16} /></button>
+        <button className='tool' onClick={e => {
+          document.execCommand('italic');
+        }}><IconItalic stroke={2} size={16} /></button>
+        <button className='tool' onClick={e => {
+          document.execCommand('underline');
+        }}><IconUnderline stroke={2} size={16} /></button>
+        <button className='tool' onClick={e => {
+          document.execCommand('strikeThrough');
+        }}><IconStrikethrough stroke={2} size={16} /></button>
+        <button className='tool' onClick={e => {
+          document.execCommand('subscript');
+        }}><IconSubscript stroke={2} size={16} /></button>
+        <button className='tool' onClick={e => {
+          document.execCommand('superscript');
+        }}><IconSuperscript stroke={2} size={16} /></button>
+        <button className='tool' onClick={e => {
+          document.execCommand('removeFormat');
+        }}><IconClearFormatting stroke={2} size={16} /></button>
       </div>
       <dialog ref={mathModalRef}>
         <div className='dialog-container'>

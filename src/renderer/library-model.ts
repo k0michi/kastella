@@ -4,7 +4,7 @@ import Timestamp from "./timestamp";
 import { arrayInsertBefore, arrayRemove, round } from "./utils";
 import { Version10, Version11, Version5, Version9 } from "./compat";
 import { visit } from "./tree";
-import { AnchorNode, DirectoryNode, File, ImageNode, ItemStyle as ListStyle, MathNode, Node, NodeType, ReservedID, Tag, CodeNode, TextNode, CanvasNode } from "./node";
+import { AnchorNode, DirectoryNode, File, ImageNode, ItemStyle as ListStyle, MathNode, Node, NodeType, ReservedID, Tag, CodeNode, TextNode, CanvasNode, InlineNode } from "./node";
 import EventHandler from "./event-handler";
 
 export const LIBRARY_VERSION = 13;
@@ -186,6 +186,31 @@ export default class LibraryModel {
     const node: TextNode = {
       type: NodeType.Text,
       content: [text],
+      tags,
+      created: timeStamp,
+      modified: timeStamp,
+      id,
+      children: []
+    };
+
+    this.addNode(parent, node);
+    return node;
+  }
+
+  addTextNodeWithFormat(text: InlineNode | (InlineNode | string)[], timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
+    if (!Array.isArray(text)) {
+      text = [text];
+    }
+
+    const id = uuidv4();
+
+    if (tags?.length == 0) {
+      tags = undefined;
+    }
+
+    const node: TextNode = {
+      type: NodeType.Text,
+      content: text,
       tags,
       created: timeStamp,
       modified: timeStamp,

@@ -1,12 +1,14 @@
 import * as React from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime';
-import { isHTTPURL } from '../utils';
 import { useModel, useObservable } from 'kyoka';
+import ContentEditable from 'react-contenteditable'
+
+import { isHTTPURL } from '../utils';
 import Model, { DirectoryView, ViewType } from '../model.js';
 import EditorBar from './editor-bar';
 import Timestamp from '../timestamp';
-import { AnchorNode, DirectoryNode, File, HeadingNode, ImageNode, ItemStyle, MathNode, Node, NodeType, PageNode, QuoteNode, ReservedID, CodeNode, TextNode, CanvasNode } from '../node';
+import { AnchorNode, DirectoryNode, File, HeadingNode, ImageNode, ItemStyle, MathNode, NodeType, PageNode, QuoteNode, ReservedID, CodeNode, TextNode, CanvasNode } from '../node';
 import Row from './row';
 import TextNodeContent from './node-content/text-node-content';
 import ImageNodeContent from './node-content/image-node-content';
@@ -18,6 +20,7 @@ import MathNodeContent from './node-content/math-node-content';
 import HeadingNodeContent from './node-content/heading-node-content';
 import QuoteNodeContent from './node-content/quote-node-content';
 import CanvasNodeContent from './node-content/canvas-node-content';
+import { elementToInlineNode } from '../tree';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -124,11 +127,18 @@ export default function EditorPane() {
     };
   }, [model.library.nodes.getSnapShot()]);
 
-  async function confirm() {
+  async function confirm(input: string) {
     if (input.length == 0) {
       return;
     }
 
+    const parser = new DOMParser();
+    const frag = parser.parseFromString(input, 'text/html');
+    const bodyNode = frag.body as HTMLElement;
+    const plainInput = bodyNode.innerHTML;
+
+    const tagIDs: string[] = [];
+    /*
     const [content, tags] = splitTags(input);
 
     let tagIDs = tags.map(t => {
@@ -140,15 +150,16 @@ export default function EditorPane() {
 
       return found.id;
     });
+    */
 
     const parentID = model.getViewDirectory();
-    tagIDs = tagIDs.concat(model.getViewTags());
+    //tagIDs = tagIDs.concat(model.getViewTags());
 
     model.setInput('');
 
-    if (!content.includes(' ') && isHTTPURL(content)) {
+    if (!plainInput.includes(' ') && isHTTPURL(plainInput)) {
       const accessed = Timestamp.fromNs(await bridge.now());
-      const meta = await bridge.fetchMeta(content);
+      const meta = await bridge.fetchMeta(plainInput);
       let imageFileID: string | undefined;
 
       if (meta.imageURL != undefined) {
@@ -170,7 +181,7 @@ export default function EditorPane() {
       }
 
       model.library.addAnchorNode({
-        contentURL: content,
+        contentURL: plainInput,
         contentType: meta.type,
         contentTitle: meta.title,
         contentDescription: meta.description,
@@ -179,7 +190,7 @@ export default function EditorPane() {
         contentAccessed: accessed
       }, accessed, parentID, tagIDs);
     } else {
-      model.library.addTextNode(content, Timestamp.fromNs(await bridge.now()), parentID, tagIDs);
+      model.library.addTextNodeWithFormat(elementToInlineNode(bodyNode), Timestamp.fromNs(await bridge.now()), parentID, tagIDs);
     }
   }
 
@@ -611,16 +622,22 @@ export default function EditorPane() {
               pseudoIndex={filtered.length}
               depth={0}
               empty={true}>
-              <textarea ref={inputRef} rows={1} onChange={e => model.setInput(e.target.value)}
+              <ContentEditable innerRef={inputRef} onChange={e => model.setInput(e.target.value)}
                 onFocus={e => {
                   model.setSelected(undefined);
                 }}
                 onKeyDown={e => {
                   if (e.key == 'Enter' && !e.nativeEvent.isComposing) {
                     e.preventDefault();
-                    confirm();
+                    confirm(model.input.get());
                   }
-                }} value={input} />
+                }}
+                onPaste={e => {
+                  e.preventDefault();
+                  let paste = e.clipboardData.getData('text');
+                  document.execCommand('insertText', false, paste);
+                }}
+                html={input} />
             </Row>
           </tbody>
         </table></div>

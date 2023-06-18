@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { InlineAnchor, InlineNode, InlineNodeType, Node, NodeType } from "./node";
+import { InlineAnchor, InlineNode, InlineNodeType, Node as KNode, NodeType } from "./node";
 
-export function* visit(node: Node[] | Node, filter = (node: Node) => true): Generator<Node> {
+export function* visit(node: KNode[] | KNode, filter = (node: KNode) => true): Generator<KNode> {
   let children;
 
   if (!Array.isArray(node)) {
@@ -21,7 +21,7 @@ export function* visit(node: Node[] | Node, filter = (node: Node) => true): Gene
   }
 }
 
-export function isDirectory(node: Node) {
+export function isDirectory(node: KNode) {
   return node.type == NodeType.Directory;
 }
 
@@ -58,9 +58,62 @@ export function inlineNodeToElement(node: InlineNode | string | (InlineNode | st
         return React.createElement('u', {}, ...children);
       } else if (node.type == InlineNodeType.Strikethrough) {
         return React.createElement('s', {}, ...children);
+      } else if (node.type == InlineNodeType.Subscript) {
+        return React.createElement('sub', {}, ...children);
+      } else if (node.type == InlineNodeType.Superscript) {
+        return React.createElement('sup', {}, ...children);
       }
     }
   }
 
-  throw new Error();
+  throw new Error('Not supported: ' + node.type);
+}
+
+export function elementToInlineNode(element: Element): InlineNode | (InlineNode | string)[] {
+  const children: (InlineNode | string)[] = [];
+  let nodeType: InlineNodeType | undefined;
+  const tagName = element.tagName.toLowerCase();
+
+  switch (tagName) {
+    case 'b':
+      nodeType = InlineNodeType.Bold;
+      break;
+    case 'i':
+      nodeType = InlineNodeType.Italic;
+      break;
+    case 'u':
+      nodeType = InlineNodeType.Underline;
+      break;
+    case 'strike':
+      nodeType = InlineNodeType.Strikethrough;
+      break;
+    case 'sub':
+      nodeType = InlineNodeType.Subscript;
+      break;
+    case 'sup':
+      nodeType = InlineNodeType.Superscript;
+      break;
+    case 'body':
+      break;
+    default:
+      throw new Error('Not supported');
+  }
+
+  for (const childNode of element.childNodes) {
+    if (childNode.nodeType === Node.ELEMENT_NODE) {
+      const child = elementToInlineNode(childNode as Element);
+      children.push(child as InlineNode);
+    } else if (childNode.nodeType === Node.TEXT_NODE) {
+      children.push(childNode.textContent ?? '');
+    }
+  }
+
+  if (tagName == 'body') {
+    return children;
+  } else {
+    return {
+      type: nodeType!,
+      children
+    } as InlineNode;
+  }
 }
