@@ -490,6 +490,17 @@ export default class LibraryModel {
     return node;
   }
 
+  // Returns the node under n with maximum index
+  getLastNode(n: Node) {
+    let m: Node | undefined = n;
+
+    while (m?.children.at(-1) != null) {
+      m = m.children.at(-1);
+    }
+
+    return m;
+  }
+
   getNodeIfNeeded(node: string | Node) {
     if (typeof node == 'string') {
       return this.getNode(node);

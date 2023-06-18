@@ -472,7 +472,19 @@ export default function EditorPane() {
   }, []);
 
   const last = filtered.at(-1);
-  const nextIndex = last != null ? last.index! + 1 : 1;
+  let nextIndex: number | undefined;
+
+  if (view?.type == ViewType.Directory) {
+    if (last != null) {
+      nextIndex = last.index! + 1;
+    } else {
+      const dirView = view as DirectoryView;
+      nextIndex = model.library.getNode(dirView.parentID).index! + 1;
+    }
+  } else {
+    nextIndex = model.library.getLastNode(model.library.getNode(ReservedID.Master))?.index! + 1;
+  }
+
   const baseDepth = filtered[0]?.depth!;
 
   const PADDINGS = 32;
