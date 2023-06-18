@@ -1,12 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Notist</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/renderer/main.tsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src data: blob:">
+  <title>Notist</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script>
+    window.EXCALIDRAW_ASSET_PATH = "/";
+  </script>
+  <script type="module" src="/src/renderer/main.tsx"></script>
+</body>
+
 </html>
