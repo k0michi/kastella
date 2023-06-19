@@ -624,7 +624,7 @@ export default function EditorPane() {
                 </Row>;
               })
             }
-            <Row
+            {view?.type == ViewType.Directory ? <Row
               id={null}
               index={nextIndex}
               pseudoIndex={filtered.length}
@@ -643,11 +643,12 @@ export default function EditorPane() {
                 }}
                 onPaste={e => {
                   e.preventDefault();
+                  // Paste as plain text
                   let paste = e.clipboardData.getData('text');
                   document.execCommand('insertText', false, paste);
                 }}
                 html={input} />
-            </Row>
+            </Row> : null}
           </tbody>
         </table></div>
     </div>
