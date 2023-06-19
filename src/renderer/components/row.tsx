@@ -11,6 +11,7 @@ export interface RowProps {
   itemStyle?: string;
   listStyleType?: string;
   empty?: boolean;
+  disallowDrag?: boolean;
   children: any;
 }
 
@@ -20,7 +21,7 @@ export default function Row(props: RowProps) {
   const lineNumberVisibility = useObservable(model.lineNumberVisibility);
 
   return <tr data-type="node" data-id={props.id} data-index={props.pseudoIndex}>
-    <td className='grip'>{props.id == hovered ?
+    <td className='grip'>{props.disallowDrag != true && props.id == hovered ?
       <div draggable
         onDragStart={e => {
           const parent = (e.target as HTMLElement).parentElement?.parentElement!;

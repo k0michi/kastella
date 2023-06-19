@@ -629,7 +629,8 @@ export default function EditorPane() {
               index={nextIndex}
               pseudoIndex={filtered.length}
               depth={0}
-              empty={true}>
+              empty={true}
+              disallowDrag={true}>
               <ContentEditable style={{ outline: 'none' }} innerRef={inputRef} onChange={e => model.setInput(e.target.value)}
                 onFocus={e => {
                   model.setSelected(undefined);
