@@ -5,7 +5,7 @@
   "version": "0.0.0",
   "main": "dist/main/main/main.js",
   "scripts": {
-    "copy-assets": "cp -r node_modules/@excalidraw/excalidraw/dist/excalidraw-assets dist && cp -r node_modules/@excalidraw/excalidraw/dist/excalidraw-assets-dev dist",
+    "copy-assets": "copyfiles node_modules/@excalidraw/excalidraw/dist/excalidraw-assets dist && copyfiles node_modules/@excalidraw/excalidraw/dist/excalidraw-assets-dev dist",
     "dev": "yarn copy-assets && concurrently \"tsc --project tsconfig.main.json --watch\" \"vite\"",
     "build": "yarn copy-assets && concurrently \"tsc --project tsconfig.main.json\" \"vite build\"",
     "start": "electron-forge start",
@@ -52,6 +52,7 @@
     "@types/uuid": "^8.3.4",
     "@vitejs/plugin-react": "^2.0.0",
     "concurrently": "^7.3.0",
+    "copyfiles": "^2.4.1",
     "electron": "^22.0.0",
     "typescript": "^4.6.4",
     "vite": "^3.0.0"
@@ -59,7 +60,7 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "icon": "assets/kastella.icns"
+        "icon": "assets/kastella"
       },
       "makers": [
         {
