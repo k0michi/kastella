@@ -77,7 +77,11 @@
         },
         {
           "name": "@electron-forge/maker-deb",
-          "config": {}
+          "config": {
+            "options": {
+              "icon": "assets/kastella_512.png"
+            }
+          }
         },
         {
           "name": "@electron-forge/maker-rpm",
