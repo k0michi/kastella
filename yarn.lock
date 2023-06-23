@@ -754,18 +754,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@js-joda/locale@npm:^4.8.6":
-  version: 4.8.6
-  resolution: "@js-joda/locale@npm:4.8.6"
-  peerDependencies:
-    "@js-joda/core": ">=3.2.0"
-    "@js-joda/timezone": ^2.3.0
-    cldr-data: "*"
-    cldrjs: ^0.5.4
-  checksum: 09fd1ce8e690f827297c92e0e2941112577a3671f2cfc9ab2ebee0a9fc22486a00ec61d88ec0b6aae57f4b1a184cd4257adc33f3b25c4252f9ca4b98ebb2ff2e
-  languageName: node
-  linkType: hard
-
 "@js-joda/timezone@npm:^2.15.0":
   version: 2.15.0
   resolution: "@js-joda/timezone@npm:2.15.0"
@@ -1362,15 +1350,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^0.26.0":
-  version: 0.26.1
-  resolution: "axios@npm:0.26.1"
-  dependencies:
-    follow-redirects: ^1.14.8
-  checksum: d9eb58ff4bc0b36a04783fc9ff760e9245c829a5a1052ee7ca6013410d427036b1d10d04e7380c02f3508c5eaf3485b1ae67bd2adbfec3683704745c8d7a6e1a
-  languageName: node
-  linkType: hard
-
 "balanced-match@npm:^1.0.0":
   version: 1.0.2
   resolution: "balanced-match@npm:1.0.2"
@@ -1630,38 +1609,6 @@ __metadata:
   version: 0.2.0
   resolution: "chromium-pickle-js@npm:0.2.0"
   checksum: 5ccacc538b0a1ecf3484c8fb3327eae129ceee858db0f64eb0a5ff87bda096a418d0d3e6f6e0967c6334d336a2c7463f7b683ec0e1cafbe736907fa2ee2f58ca
-  languageName: node
-  linkType: hard
-
-"cldr-data-downloader@npm:1.0.0-1":
-  version: 1.0.0-1
-  resolution: "cldr-data-downloader@npm:1.0.0-1"
-  dependencies:
-    axios: ^0.26.0
-    mkdirp: 0.5.5
-    nopt: 3.0.x
-    q: 1.0.1
-    yauzl: ^2.10.0
-  bin:
-    cldr-data-downloader: bin/download.sh
-  checksum: b508709a16addea629977fcc6bf54edf25193d2452641696995512ffa98fa097ec949d3a3bacb9f14f367f233c7e7b360d85920be2081b8a88666c6714cac38f
-  languageName: node
-  linkType: hard
-
-"cldr-data@npm:^36.0.1":
-  version: 36.0.1
-  resolution: "cldr-data@npm:36.0.1"
-  dependencies:
-    cldr-data-downloader: 1.0.0-1
-    glob: 5.x.x
-  checksum: 4553c5cc0c30da7e236925bd1e6cacdc23f4e5283d66d424306acc5ab83fcb6f3d73e4e984a9a1b6be604a3032a5553a0bc2f64120ff2e3dd66649720cbc426b
-  languageName: node
-  linkType: hard
-
-"cldrjs@npm:^0.5.5":
-  version: 0.5.5
-  resolution: "cldrjs@npm:0.5.5"
-  checksum: 308892e57eb399b98c7025d185ef34b2dfce7f8132f39660eeb10298cd16370f56ee3b8b0d19dc3e53413ceb11e9c8649320509f803d1bfd765a58a4a6c72ebf
   languageName: node
   linkType: hard
 
@@ -2881,16 +2828,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.14.8":
-  version: 1.15.2
-  resolution: "follow-redirects@npm:1.15.2"
-  peerDependenciesMeta:
-    debug:
-      optional: true
-  checksum: faa66059b66358ba65c234c2f2a37fcec029dc22775f35d9ad6abac56003268baf41e55f9ee645957b32c7d9f62baf1f0b906e68267276f54ec4b4c597c2b190
-  languageName: node
-  linkType: hard
-
 "form-data@npm:^3.0.0":
   version: 3.0.1
   resolution: "form-data@npm:3.0.1"
@@ -3127,19 +3064,6 @@ __metadata:
   dependencies:
     is-glob: ^4.0.1
   checksum: f4f2bfe2425296e8a47e36864e4f42be38a996db40420fe434565e4480e3322f18eb37589617a98640c5dc8fdec1a387007ee18dbb1f3f5553409c34d17f425e
-  languageName: node
-  linkType: hard
-
-"glob@npm:5.x.x":
-  version: 5.0.15
-  resolution: "glob@npm:5.0.15"
-  dependencies:
-    inflight: ^1.0.4
-    inherits: 2
-    minimatch: 2 || 3
-    once: ^1.3.0
-    path-is-absolute: ^1.0.0
-  checksum: f9742448303460672607e569457f1b57e486a79a985e269b69465834d2075b243378225f65dc54c09fcd4b75e4fb34442aec88f33f8c65fa4abccc8ee2dc2f5d
   languageName: node
   linkType: hard
 
@@ -3763,7 +3687,6 @@ __metadata:
     "@electron-forge/maker-zip": ^6.0.0-beta.65
     "@excalidraw/excalidraw": ^0.15.2
     "@js-joda/core": ^5.4.2
-    "@js-joda/locale": ^4.8.6
     "@js-joda/timezone": ^2.15.0
     "@k0michi/now": ^0.0.1
     "@tabler/icons": ^1.111.0
@@ -3779,8 +3702,6 @@ __metadata:
     "@types/uuid": ^8.3.4
     "@vitejs/plugin-react": ^2.0.0
     charset: ^1.0.1
-    cldr-data: ^36.0.1
-    cldrjs: ^0.5.5
     concurrently: ^7.3.0
     content-type: ^1.0.4
     electron: ^22.0.0
@@ -4120,21 +4041,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimatch@npm:2 || 3, minimatch@npm:^3.0.4, minimatch@npm:^3.1.1":
-  version: 3.1.2
-  resolution: "minimatch@npm:3.1.2"
-  dependencies:
-    brace-expansion: ^1.1.7
-  checksum: c154e566406683e7bcb746e000b84d74465b3a832c45d59912b9b55cd50dee66e5c4b1e5566dba26154040e51672f9aa450a9aef0c97cfc7336b78b7afb9540a
-  languageName: node
-  linkType: hard
-
 "minimatch@npm:3.0.4":
   version: 3.0.4
   resolution: "minimatch@npm:3.0.4"
   dependencies:
     brace-expansion: ^1.1.7
   checksum: 66ac295f8a7b59788000ea3749938b0970344c841750abd96694f80269b926ebcafad3deeb3f1da2522978b119e6ae3a5869b63b13a7859a456b3408bd18a078
+  languageName: node
+  linkType: hard
+
+"minimatch@npm:^3.0.4, minimatch@npm:^3.1.1":
+  version: 3.1.2
+  resolution: "minimatch@npm:3.1.2"
+  dependencies:
+    brace-expansion: ^1.1.7
+  checksum: c154e566406683e7bcb746e000b84d74465b3a832c45d59912b9b55cd50dee66e5c4b1e5566dba26154040e51672f9aa450a9aef0c97cfc7336b78b7afb9540a
   languageName: node
   linkType: hard
 
@@ -4151,13 +4072,6 @@ __metadata:
   version: 1.2.6
   resolution: "minimist@npm:1.2.6"
   checksum: d15428cd1e11eb14e1233bcfb88ae07ed7a147de251441d61158619dfb32c4d7e9061d09cab4825fdee18ecd6fce323228c8c47b5ba7cd20af378ca4048fb3fb
-  languageName: node
-  linkType: hard
-
-"minimist@npm:^1.2.5":
-  version: 1.2.7
-  resolution: "minimist@npm:1.2.7"
-  checksum: 7346574a1038ca23c32e02252f603801f09384dd1d78b69a943a4e8c2c28730b80e96193882d3d3b22a063445f460e48316b29b8a25addca2d7e5e8f75478bec
   languageName: node
   linkType: hard
 
@@ -4228,17 +4142,6 @@ __metadata:
     minipass: ^3.0.0
     yallist: ^4.0.0
   checksum: f1fdeac0b07cf8f30fcf12f4b586795b97be856edea22b5e9072707be51fc95d41487faec3f265b42973a304fe3a64acd91a44a3826a963e37b37bafde0212c3
-  languageName: node
-  linkType: hard
-
-"mkdirp@npm:0.5.5":
-  version: 0.5.5
-  resolution: "mkdirp@npm:0.5.5"
-  dependencies:
-    minimist: ^1.2.5
-  bin:
-    mkdirp: bin/cmd.js
-  checksum: 3bce20ea525f9477befe458ab85284b0b66c8dc3812f94155af07c827175948cdd8114852ac6c6d82009b13c1048c37f6d98743eb019651ee25c39acc8aabe7d
   languageName: node
   linkType: hard
 
@@ -4396,17 +4299,6 @@ __metadata:
   version: 2.0.6
   resolution: "node-releases@npm:2.0.6"
   checksum: e86a926dc9fbb3b41b4c4a89d998afdf140e20a4e8dbe6c0a807f7b2948b42ea97d7fd3ad4868041487b6e9ee98409829c6e4d84a734a4215dff060a7fbeb4bf
-  languageName: node
-  linkType: hard
-
-"nopt@npm:3.0.x":
-  version: 3.0.6
-  resolution: "nopt@npm:3.0.6"
-  dependencies:
-    abbrev: 1
-  bin:
-    nopt: ./bin/nopt.js
-  checksum: 7f8579029a0d7cb3341c6b1610b31e363f708b7aaaaf3580e3ec5ae8528d1f3a79d350d8bfa331776e6c6703a5a148b72edd9b9b4c1dd55874d8e70e963d1e20
   languageName: node
   linkType: hard
 
@@ -4921,13 +4813,6 @@ __metadata:
   version: 2.1.1
   resolution: "punycode@npm:2.1.1"
   checksum: 823bf443c6dd14f669984dea25757b37993f67e8d94698996064035edd43bed8a5a17a9f12e439c2b35df1078c6bec05a6c86e336209eb1061e8025c481168e8
-  languageName: node
-  linkType: hard
-
-"q@npm:1.0.1":
-  version: 1.0.1
-  resolution: "q@npm:1.0.1"
-  checksum: a45fd7039d69b1fdfdff78e3863e11839298d0ba3ff9aeb2bc737ef05d1931cbc40c60c93e3d2a5a1b90ad69051f317f026f2281d0dfd86b4af67c4f713e1bbf
   languageName: node
   linkType: hard
 

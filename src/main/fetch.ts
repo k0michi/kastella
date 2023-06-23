@@ -3,7 +3,6 @@ import { JSDOM } from 'jsdom';
 import * as contentType from 'content-type';
 import charset from 'charset';
 import { FetchedFile, FetchedMeta } from '../common/fetch';
-import '@js-joda/locale';
 import { DateTimeFormatter, LocalDateTime, ZonedDateTime } from '@js-joda/core';
 
 const USER_AGENT = 'WhatsApp/2';
