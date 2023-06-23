@@ -1,4 +1,4 @@
-# Library Versions
+# Version History
 
 ## Version 13
 Canvasを追加
@@ -23,3 +23,21 @@ Headingを追加
 
 ## Version 6
 ノードをツリーとして保存するように
+
+## Version 5
+Mathを追加
+
+## Version 4
+TextEmbedを追加
+
+## Version 3
+AnchorにcontentAccessedを追加
+
+## Version 2
+Anchorを追加
+
+## Version 1
+Fileにmodified, accessedを追加
+
+## Version 0
+ライブラリにバージョンを含むように変更
