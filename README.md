@@ -1,6 +1,8 @@
 # Kastella
 
-Kastella is my personal note app. Built on TypeScript, React, Electron, and Vite. This app was named after [Zettelkasten](https://en.wikipedia.org/wiki/Zettelkasten) and [Castella](https://en.wikipedia.org/wiki/Castella) (カステラ; which is a Japanese confectionery).
+![](assets/kastella_256.png)
+
+Kastella is my personal note app. Built on TypeScript, React, Electron, and Vite. This app was named after [Zettelkasten](https://en.wikipedia.org/wiki/Zettelkasten) and [Castella](https://en.wikipedia.org/wiki/Castella) (カステラ; a Japanese confectionery).
 
 Kastella is still unstable and incomplete, however, I'll maintain this as long as I continue to use this app.
 
