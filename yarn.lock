@@ -326,7 +326,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/cli@npm:^6.0.0-beta.65":
+"@electron-forge/cli@npm:^6.2.1":
   version: 6.2.1
   resolution: "@electron-forge/cli@npm:6.2.1"
   dependencies:
@@ -417,7 +417,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/maker-deb@npm:^6.0.0-beta.65":
+"@electron-forge/maker-deb@npm:^6.2.1":
   version: 6.2.1
   resolution: "@electron-forge/maker-deb@npm:6.2.1"
   dependencies:
@@ -431,7 +431,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/maker-rpm@npm:^6.0.0-beta.65":
+"@electron-forge/maker-rpm@npm:^6.2.1":
   version: 6.2.1
   resolution: "@electron-forge/maker-rpm@npm:6.2.1"
   dependencies:
@@ -445,7 +445,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/maker-squirrel@npm:^6.0.0-beta.65":
+"@electron-forge/maker-squirrel@npm:^6.2.1":
   version: 6.2.1
   resolution: "@electron-forge/maker-squirrel@npm:6.2.1"
   dependencies:
@@ -460,7 +460,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/maker-zip@npm:^6.0.0-beta.65":
+"@electron-forge/maker-zip@npm:^6.2.1":
   version: 6.2.1
   resolution: "@electron-forge/maker-zip@npm:6.2.1"
   dependencies:
@@ -470,6 +470,16 @@ __metadata:
     fs-extra: ^10.0.0
     got: ^11.8.5
   checksum: d78468fad71895bf794983e9e7f77aaa95c962a3e59e7d40266ab4aa27f23f65ca288ffaa8db025e7b6c108c41108fabbfbdc6c6297a085be50fa9a06d330a66
+  languageName: node
+  linkType: hard
+
+"@electron-forge/plugin-auto-unpack-natives@npm:^6.2.1":
+  version: 6.2.1
+  resolution: "@electron-forge/plugin-auto-unpack-natives@npm:6.2.1"
+  dependencies:
+    "@electron-forge/plugin-base": 6.2.1
+    "@electron-forge/shared-types": 6.2.1
+  checksum: dc8b72ce3646f488975f27ce8190ba55dc269ac40dc4fc4f0d92c303177b6092fcc93a8318546fe2246364e5395ce819d1d5466f09910fa8bb820651e73534fd
   languageName: node
   linkType: hard
 
@@ -1075,13 +1085,6 @@ __metadata:
   version: 20.3.1
   resolution: "@types/node@npm:20.3.1"
   checksum: 63a393ab6d947be17320817b35d7277ef03728e231558166ed07ee30b09fd7c08861be4d746f10fdc63ca7912e8cd023939d4eab887ff6580ff704ff24ed810c
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^16.11.26":
-  version: 16.18.36
-  resolution: "@types/node@npm:16.18.36"
-  checksum: a9d138fa1269079c60daad6984713dc0b713983f8b34a83edbc6d7957b2e38beab9b2598c9fe99f19d073e20bc212a18aaf82eabdc23ef64dce7d2089a9aab2a
   languageName: node
   linkType: hard
 
@@ -2217,7 +2220,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:*":
+"electron@npm:*, electron@npm:^25.2.0":
   version: 25.2.0
   resolution: "electron@npm:25.2.0"
   dependencies:
@@ -2227,19 +2230,6 @@ __metadata:
   bin:
     electron: cli.js
   checksum: 264b19af3077da70fc137a244cec24a7674b0938695fcbf8b22a48164d43efe58c597e189501ee48d02bb52ff26e6952a8c69e4c50bb42686f117d6e10a33aa4
-  languageName: node
-  linkType: hard
-
-"electron@npm:^22.0.0":
-  version: 22.3.14
-  resolution: "electron@npm:22.3.14"
-  dependencies:
-    "@electron/get": ^2.0.0
-    "@types/node": ^16.11.26
-    extract-zip: ^2.0.1
-  bin:
-    electron: cli.js
-  checksum: 9a26ccf8a966b1f292d98a4e6af4b43aef42f338fe54d4ae577658eaf91b4c9e05ad547567d3222daa908c35f6026c538f47d4eb18df8c3c7d03c328ef0ffc4e
   languageName: node
   linkType: hard
 
@@ -3590,11 +3580,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "kastella@workspace:."
   dependencies:
-    "@electron-forge/cli": ^6.0.0-beta.65
-    "@electron-forge/maker-deb": ^6.0.0-beta.65
-    "@electron-forge/maker-rpm": ^6.0.0-beta.65
-    "@electron-forge/maker-squirrel": ^6.0.0-beta.65
-    "@electron-forge/maker-zip": ^6.0.0-beta.65
+    "@electron-forge/cli": ^6.2.1
+    "@electron-forge/maker-deb": ^6.2.1
+    "@electron-forge/maker-rpm": ^6.2.1
+    "@electron-forge/maker-squirrel": ^6.2.1
+    "@electron-forge/maker-zip": ^6.2.1
+    "@electron-forge/plugin-auto-unpack-natives": ^6.2.1
     "@excalidraw/excalidraw": ^0.15.2
     "@js-joda/core": ^5.4.2
     "@js-joda/timezone": ^2.15.0
@@ -3617,7 +3608,7 @@ __metadata:
     concurrently: ^7.3.0
     content-type: ^1.0.4
     copyfiles: ^2.4.1
-    electron: ^22.0.0
+    electron: ^25.2.0
     electron-squirrel-startup: ^1.0.0
     immer: ^9.0.15
     jsdom: ^20.0.2
