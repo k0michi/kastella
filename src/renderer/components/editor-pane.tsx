@@ -21,6 +21,7 @@ import HeadingNodeContent from './node-content/heading-node-content';
 import QuoteNodeContent from './node-content/quote-node-content';
 import CanvasNodeContent from './node-content/canvas-node-content';
 import { elementToInlineNode } from '../tree';
+import { isHTMLEmpty, parseHTMLFragment } from '../html';
 
 export default function EditorPane() {
   const model = useModel<Model>();
@@ -132,10 +133,8 @@ export default function EditorPane() {
       return;
     }
 
-    const parser = new DOMParser();
-    const frag = parser.parseFromString(input, 'text/html');
-    const bodyNode = frag.body as HTMLElement;
-    const plainInput = bodyNode.innerHTML;
+    const fragment = parseHTMLFragment(input);
+    const plainInput = fragment.innerHTML;
 
     const tagIDs: string[] = [];
     /*
@@ -190,7 +189,7 @@ export default function EditorPane() {
         contentAccessed: accessed
       }, accessed, parentID, tagIDs);
     } else {
-      model.library.addTextNodeWithFormat(elementToInlineNode(bodyNode), Timestamp.fromNs(await bridge.now()), parentID, tagIDs);
+      model.library.addTextNodeWithFormat(elementToInlineNode(fragment), Timestamp.fromNs(await bridge.now()), parentID, tagIDs);
     }
   }
 
@@ -629,7 +628,7 @@ export default function EditorPane() {
               index={nextIndex}
               pseudoIndex={filtered.length}
               depth={0}
-              empty={true}
+              empty={isHTMLEmpty(input)}
               disallowDrag={true}>
               <ContentEditable style={{ outline: 'none' }} innerRef={inputRef} onChange={e => model.setInput(e.target.value)}
                 onFocus={e => {
