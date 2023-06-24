@@ -9,6 +9,7 @@ import Dialog from './dialog';
 import { CommonDialog, CommonDialogButton, CommonDialogButtons, CommonDialogButtonsLeft, CommonDialogButtonsRight, CommonDialogTextInput, CommonDialogTitle } from './common-dialog';
 
 const pathExp = /^\/(([^\/]+)\/)*([^\/]+)?$/;
+const tagExp = /^\S+$/;
 
 const DivExplorerPane = styled.div`
   flex: 0 0 200px;
@@ -57,9 +58,15 @@ export default function ExplorerPane() {
   const nodes = useObservable(model.library.nodes);
   const tags = useObservable(model.library.tags);
   const view = useObservable(model.view);
+
   const [modalOpen, setModalOpen] = React.useState(false);
-  const [directoryPath, setDirectoryPath] = React.useState<string>();
+  const [directoryPath, setDirectoryPath] = React.useState<string>('');
   const [validPath, setValidPath] = React.useState<boolean>(false);
+
+  const [tagModalOpen, setTagModalOpen] = React.useState(false);
+  const [tagInput, setTagInput] = React.useState('');
+  const [validTag, setValidTag] = React.useState<boolean>(false);
+
   const [dates, setDates] = React.useState<string[]>([]);
   const [draggedOver, setDraggedOver] = React.useState<string | undefined | boolean>(false);
 
@@ -84,10 +91,12 @@ export default function ExplorerPane() {
     <>
       <DivExplorerPane>
         <DivSection>
-          <DivSectionHeader><DivSectionName>TREE</DivSectionName><DivSectionMenu onClick={e => {
-            setDirectoryPath(undefined);
-            setModalOpen(true);
-          }}>+</DivSectionMenu></DivSectionHeader>
+          <DivSectionHeader>
+            <DivSectionName>TREE</DivSectionName>
+            <DivSectionMenu onClick={e => {
+              setModalOpen(true);
+            }}>+</DivSectionMenu>
+          </DivSectionHeader>
           <div className="container">
             {directories.map(d => <DivItem
               key={d.id}
@@ -116,7 +125,12 @@ export default function ExplorerPane() {
           </div>
         </DivSection>
         <DivSection>
-          <DivSectionHeader><DivSectionName>TAGS</DivSectionName></DivSectionHeader>
+          <DivSectionHeader>
+            <DivSectionName>TAGS</DivSectionName>
+            <DivSectionMenu onClick={e => {
+              setTagModalOpen(true);
+            }}>+</DivSectionMenu>
+          </DivSectionHeader>
           <div className="container">
             {tags.map(t => <DivItem
               key={t.id}
@@ -158,16 +172,47 @@ export default function ExplorerPane() {
           value={directoryPath} />
         <CommonDialogButtons>
           <CommonDialogButtonsLeft>
-            <CommonDialogButton onClick={e => setModalOpen(false)}>Cancel</CommonDialogButton>
+            <CommonDialogButton onClick={e => {
+              setModalOpen(false);
+              setDirectoryPath('');
+            }}>Cancel</CommonDialogButton>
           </CommonDialogButtonsLeft>
           <CommonDialogButtonsRight>
             <CommonDialogButton highlighted onClick={e => {
-              if (directoryPath != null && pathExp.test(directoryPath)) {
+              if (pathExp.test(directoryPath)) {
                 model.library.createDirectory(directoryPath);
               }
 
+              setDirectoryPath('');
               setModalOpen(false);
             }} disabled={!validPath}>OK</CommonDialogButton>
+          </CommonDialogButtonsRight>
+        </CommonDialogButtons>
+      </CommonDialog>
+      <CommonDialog open={tagModalOpen}>
+        <CommonDialogTitle>Create New Tag</CommonDialogTitle>
+        Tag name <CommonDialogTextInput invalid={!validTag} placeholder='#tag'
+          onChange={e => {
+            setValidTag(tagExp.test(e.target.value));
+            setTagInput(e.target.value);
+          }}
+          value={tagInput} />
+        <CommonDialogButtons>
+          <CommonDialogButtonsLeft>
+            <CommonDialogButton onClick={e => {
+              setTagInput('');
+              setTagModalOpen(false)
+            }}>Cancel</CommonDialogButton>
+          </CommonDialogButtonsLeft>
+          <CommonDialogButtonsRight>
+            <CommonDialogButton highlighted onClick={e => {
+              if (tagExp.test(tagInput)) {
+                model.library.createTag(tagInput);
+              }
+
+              setTagInput('');
+              setTagModalOpen(false);
+            }} disabled={!validTag}>OK</CommonDialogButton>
           </CommonDialogButtonsRight>
         </CommonDialogButtons>
       </CommonDialog>
