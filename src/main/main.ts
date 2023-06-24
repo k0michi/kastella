@@ -119,7 +119,7 @@ app.on('window-all-closed', function () {
 
 ipcMain.handle('read-library', async e => {
   const filePath = path.join(libraryPath, 'data.json');
-  return fs.readFile(filePath, 'utf-8');
+  return await fs.readFile(filePath, 'utf-8');
 });
 
 ipcMain.handle('write-library', async (e, content: string) => {
