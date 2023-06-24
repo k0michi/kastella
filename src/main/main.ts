@@ -1,12 +1,13 @@
 // Modules to control application life and create native browser window
 
-import { app, BrowserWindow, dialog, Event, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, dialog, Event, ipcMain, shell, nativeTheme, IpcMainInvokeEvent } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { now } from '@k0michi/now';
 import { fetchFile, fetchMeta } from './fetch.js';
 import * as mime from 'mime';
 import { FileType } from '../common/fetch.js';
+import { ChannelTypes, Channels, Handler } from '../common/ipc.js';
 
 // Paths
 const devURL = `http://localhost:5173/`;
@@ -58,7 +59,7 @@ function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, '../../preload/preload.js')
     },
     icon: path.join(__dirname, '../../../assets/kastella_512.png')
   });
@@ -117,18 +118,22 @@ app.on('window-all-closed', function () {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
-ipcMain.handle('read-library', async e => {
+function handle<C extends keyof ChannelTypes>(channel: C, handler: Handler<ChannelTypes[C]>) {
+  ipcMain.handle(channel, handler as (event: IpcMainInvokeEvent, ...args: any[]) => (Promise<void>) | (any));
+}
+
+handle(Channels.readLibrary, async e => {
   const filePath = path.join(libraryPath, 'data.json');
   return await fs.readFile(filePath, 'utf-8');
 });
 
-ipcMain.handle('write-library', async (e, content: string) => {
+handle(Channels.writeLibrary, async (e, content: string) => {
   const filePath = path.join(libraryPath, 'data.json');
   await fs.mkdir(libraryPath, { recursive: true });
   return await fs.writeFile(filePath, content);
 });
 
-ipcMain.handle('copy-file', async (e, id: string, filePath: string) => {
+handle(Channels.copyFile, async (e, id: string, filePath: string) => {
   const ext = path.extname(filePath);
   await fs.mkdir(path.join(libraryPath, 'files'), { recursive: true });
   const destPath = path.join(libraryPath, 'files', id + ext);
@@ -147,57 +152,57 @@ async function findFile(id: string) {
   throw new Error('Not found');
 }
 
-ipcMain.handle('read-file', async (e, id: string) => {
+handle(Channels.readFile, async (e, id: string) => {
   const found = await findFile(id);
   return await fs.readFile(found);
 });
 
-ipcMain.handle('read-text-file', async (e, id: string) => {
+handle(Channels.readTextFile, async (e, id: string) => {
   const found = await findFile(id);
   return await fs.readFile(found, 'utf-8');
 });
 
-ipcMain.handle('remove-file', async (e, id: string) => {
+handle(Channels.removeFile, async (e, id: string) => {
   const found = await findFile(id);
   return await fs.rm(found);
 });
 
-ipcMain.handle('basename', (e, filePath: string) => {
+handle(Channels.basename, (e, filePath: string) => {
   return path.basename(filePath);
 });
 
-ipcMain.handle('get-mtime', async (e, filePath: string) => {
+handle(Channels.getMTime, async (e, filePath: string) => {
   const stat = await fs.stat(filePath, { bigint: true });
   return stat.mtimeNs;
 });
 
-ipcMain.handle('now', (e) => {
+handle(Channels.now, (e) => {
   return now();
 });
 
-ipcMain.handle('fetch-meta', async (e, url: string) => {
+handle(Channels.fetchMeta, async (e, url: string) => {
   return await fetchMeta(url);
 });
 
-ipcMain.handle('fetch-file', async (e, url: string) => {
+handle(Channels.fetchFile, async (e, url: string) => {
   return await fetchFile(url);
 });
 
-ipcMain.handle('write-file', async (e, id: string, data: Uint8Array, type: string) => {
+handle(Channels.writeFile, async (e, id: string, data: Uint8Array, type: string) => {
   const ext = mime.getExtension(type);
   await fs.mkdir(path.join(libraryPath, 'files'), { recursive: true });
   const destPath = path.join(libraryPath, 'files', id + '.' + ext);
   return await fs.writeFile(destPath, data);
 });
 
-ipcMain.handle('write-text-file', async (e, id: string, data: string, type: string) => {
+handle(Channels.writeTextFile, async (e, id: string, data: string, type: string) => {
   const ext = mime.getExtension(type);
   await fs.mkdir(path.join(libraryPath, 'files'), { recursive: true });
   const destPath = path.join(libraryPath, 'files', id + '.' + ext);
   return await fs.writeFile(destPath, data);
 });
 
-ipcMain.handle('open-file', async (e, fileType: FileType) => {
+handle(Channels.openFile, async (e, fileType: FileType) => {
   if (fileType == FileType.Text) {
     const result = await dialog.showOpenDialog({
       properties: ['openFile', 'multiSelections']
@@ -229,6 +234,6 @@ ipcMain.handle('open-file', async (e, fileType: FileType) => {
   return null;
 });
 
-ipcMain.handle('set-edited', async (e, edited: boolean) => {
+handle(Channels.setEdited, (e, edited: boolean) => {
   mainWindow?.setDocumentEdited(edited);
 });

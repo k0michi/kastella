@@ -1,22 +1,27 @@
 import { ipcRenderer, contextBridge } from 'electron';
-import { FetchedFile, FetchedMeta, FileType } from '../common/fetch.js';
+import { ChannelTypes, Channels, Invoke } from '../common/ipc.js';
+
+function makeInvoke<K extends keyof ChannelTypes>(channel: K) {
+  const invoke = ((...args) => ipcRenderer.invoke(channel, ...args)) as Invoke<ChannelTypes[K]>;
+  return invoke;
+}
 
 export class Bridge {
-  readLibrary = (): Promise<string> => ipcRenderer.invoke('read-library');
-  writeLibrary = (content: string): Promise<void> => ipcRenderer.invoke('write-library', content);
-  copyFile = (id: string, filePath: string): Promise<void> => ipcRenderer.invoke('copy-file', id, filePath);
-  readFile = (id: string): Promise<Uint8Array> => ipcRenderer.invoke('read-file', id);
-  readTextFile = (id: string): Promise<string> => ipcRenderer.invoke('read-text-file', id);
-  removeFile = (id: string): Promise<Uint8Array> => ipcRenderer.invoke('remove-file', id);
-  basename = (filePath: string): Promise<string> => ipcRenderer.invoke('basename', filePath);
-  getMTime = (filePath: string): Promise<bigint> => ipcRenderer.invoke('get-mtime', filePath);
-  now = (): Promise<bigint> => ipcRenderer.invoke('now');
-  fetchMeta = (url: string): Promise<FetchedMeta> => ipcRenderer.invoke('fetch-meta', url);
-  fetchFile = (url: string): Promise<FetchedFile> => ipcRenderer.invoke('fetch-file', url);
-  writeFile = (id: string, data: Uint8Array, type: string): Promise<void> => ipcRenderer.invoke('write-file', id, data, type);
-  writeTextFile = (id: string, data: string, type: string): Promise<void> => ipcRenderer.invoke('write-text-file', id, data, type);
-  openFile = (fileType: FileType): Promise<string[] | null> => ipcRenderer.invoke('open-file', fileType);
-  setEdited = (edited: boolean): Promise<void> => ipcRenderer.invoke('set-edited', edited);
+  readLibrary = makeInvoke(Channels.readLibrary);
+  writeLibrary = makeInvoke(Channels.writeLibrary);
+  copyFile = makeInvoke(Channels.copyFile);
+  readFile = makeInvoke(Channels.readFile);
+  readTextFile = makeInvoke(Channels.readTextFile);
+  removeFile = makeInvoke(Channels.removeFile);
+  basename = makeInvoke(Channels.basename);
+  getMTime = makeInvoke(Channels.getMTime);
+  now = makeInvoke(Channels.now);
+  fetchMeta = makeInvoke(Channels.fetchMeta);
+  fetchFile = makeInvoke(Channels.fetchFile);
+  writeFile = makeInvoke(Channels.writeFile);
+  writeTextFile = makeInvoke(Channels.writeTextFile);
+  openFile = makeInvoke(Channels.openFile);
+  setEdited = makeInvoke(Channels.setEdited);
 }
 
 contextBridge.exposeInMainWorld('bridge', new Bridge());
