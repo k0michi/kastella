@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: 'dist/renderer',
-    target: 'es2021'
+    target: 'esnext'
   },
   publicDir: 'public'
 });
