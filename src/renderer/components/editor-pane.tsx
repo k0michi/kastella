@@ -572,7 +572,7 @@ export default function EditorPane() {
                 const tagNames = n.tags?.map(t => '#' + model.library.getTag(t)?.name);
 
                 const tags = <DivTags>
-                  {tagNames?.map(t => <DivTag className='tag' key={t}>{t}</DivTag>)}
+                  {tagNames?.map(t => <DivTag key={t}>{t}</DivTag>)}
                 </DivTags>;
 
                 let content;

@@ -5,6 +5,8 @@ import { isDirectory, visit } from '../tree';
 import { DirectoryNode } from '../node';
 import { toDateString } from '../utils';
 import styled from 'styled-components';
+import Dialog from './dialog';
+import { CommonDialog, CommonDialogButton, CommonDialogButtons, CommonDialogButtonsLeft, CommonDialogButtonsRight, CommonDialogTextInput, CommonDialogTitle } from './common-dialog';
 
 const pathExp = /^\/(([^\/]+)\/)*([^\/]+)?$/;
 
@@ -55,7 +57,7 @@ export default function ExplorerPane() {
   const nodes = useObservable(model.library.nodes);
   const tags = useObservable(model.library.tags);
   const view = useObservable(model.view);
-  const modalRef = React.useRef<HTMLDialogElement>(null);
+  const [modalOpen, setModalOpen] = React.useState(false);
   const [directoryPath, setDirectoryPath] = React.useState<string>();
   const [validPath, setValidPath] = React.useState<boolean>(false);
   const [dates, setDates] = React.useState<string[]>([]);
@@ -84,7 +86,7 @@ export default function ExplorerPane() {
         <DivSection>
           <DivSectionHeader><DivSectionName>TREE</DivSectionName><DivSectionMenu onClick={e => {
             setDirectoryPath(undefined);
-            modalRef.current?.showModal();
+            setModalOpen(true);
           }}>+</DivSectionMenu></DivSectionHeader>
           <div className="container">
             {directories.map(d => <DivItem
@@ -146,30 +148,29 @@ export default function ExplorerPane() {
           </div>
         </DivSection>
       </DivExplorerPane>
-      <dialog ref={modalRef}>
-        <div className='dialog-container'>
-          <div className='dialog-title'>Create New Directory</div>
-          Path <input type="text"
-            className={validPath != null ? validPath ? 'valid' : 'invalid' : ''} placeholder='/.../...'
-            onChange={e => {
-              setValidPath(pathExp.test(e.target.value));
-              setDirectoryPath(e.target.value);
-            }}
-            value={directoryPath} />
-          <div className='dialog-buttons'>
-            <div className='left'><button onClick={e => modalRef.current?.close()}>Cancel</button></div>
-            <div className='right'><button className='highlighted' onClick={e => {
+      <CommonDialog open={modalOpen}>
+        <CommonDialogTitle>Create New Directory</CommonDialogTitle>
+        Path <CommonDialogTextInput invalid={!validPath} placeholder='/.../...'
+          onChange={e => {
+            setValidPath(pathExp.test(e.target.value));
+            setDirectoryPath(e.target.value);
+          }}
+          value={directoryPath} />
+        <CommonDialogButtons>
+          <CommonDialogButtonsLeft>
+            <CommonDialogButton onClick={e => setModalOpen(false)}>Cancel</CommonDialogButton>
+          </CommonDialogButtonsLeft>
+          <CommonDialogButtonsRight>
+            <CommonDialogButton highlighted onClick={e => {
               if (directoryPath != null && pathExp.test(directoryPath)) {
                 model.library.createDirectory(directoryPath);
               }
 
-              modalRef.current?.close();
-            }} disabled={!validPath} style={validPath ? {} : {
-              backgroundColor: 'gray'
-            }}>OK</button></div>
-          </div>
-        </div>
-      </dialog>
+              setModalOpen(false);
+            }} disabled={!validPath}>OK</CommonDialogButton>
+          </CommonDialogButtonsRight>
+        </CommonDialogButtons>
+      </CommonDialog>
     </>
   );
 }
