@@ -65,6 +65,7 @@ const GlobalStyle = createGlobalStyle`
     font-family: sans-serif;
     color: ${props => props.theme.color};
     -webkit-font-smoothing: antialiased;
+    word-break: break-all;
   }
 
   html,
