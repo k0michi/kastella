@@ -5,6 +5,8 @@ import { isDirectory, visit } from '../tree';
 import { DirectoryNode } from '../node';
 import { toDateString } from '../utils';
 
+const pathExp = /^\/(([^\/]+)\/)*([^\/]+)?$/;
+
 export default function ExplorerPane() {
   const model = useModel<Model>();
   const nodes = useObservable(model.library.nodes);
@@ -113,7 +115,6 @@ export default function ExplorerPane() {
           Path <input type="text"
             className={validPath != null ? validPath ? 'valid' : 'invalid' : ''} placeholder='/.../...'
             onChange={e => {
-              const pathExp = /^\/(([^\/]+)\/)*([^\/]+)?$/;
               setValidPath(pathExp.test(e.target.value));
               setDirectoryPath(e.target.value);
             }}
@@ -121,11 +122,13 @@ export default function ExplorerPane() {
           <div className='dialog-buttons'>
             <div className='left'><button onClick={e => modalRef.current?.close()}>Cancel</button></div>
             <div className='right'><button className='highlighted' onClick={e => {
-              if (directoryPath != null) {
+              if (directoryPath != null && pathExp.test(directoryPath)) {
                 model.library.createDirectory(directoryPath);
               }
 
               modalRef.current?.close();
+            }} disabled={!validPath} style={validPath ? {} : {
+              backgroundColor: 'gray'
             }}>OK</button></div>
           </div>
         </div>
