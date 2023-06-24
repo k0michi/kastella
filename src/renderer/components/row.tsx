@@ -2,6 +2,34 @@ import { IconGripVertical } from '@tabler/icons';
 import * as React from 'react';
 import { useModel, useObservable } from 'kyoka';
 import Model from '../model';
+import styled from 'styled-components';
+
+const Td = styled.td`
+  padding: 0;
+  vertical-align: top;
+`;
+
+const TdGrip = styled(Td)`
+  color: ${props => props.theme.colorEditorIndex};
+  position: relative;
+  width: 16px;
+  min-width: 16px;
+
+  svg {
+    position: absolute;
+    cursor: grab;
+  }
+`;
+
+const TdIndex = styled(Td) <{ $empty?: boolean }>`
+  color: ${props => props.$empty ? props.theme.colorEditorIndexEmpty : props.theme.colorEditorIndex};
+  padding-right: 4px;
+  text-align: right;
+  white-space: nowrap;
+  font-family: monospace;
+  user-select: none;
+  width: 0px;
+`;
 
 export interface RowProps {
   id: string | null;
@@ -21,7 +49,7 @@ export default function Row(props: RowProps) {
   const lineNumberVisibility = useObservable(model.lineNumberVisibility);
 
   return <tr data-type="node" data-id={props.id} data-index={props.pseudoIndex}>
-    <td className='grip'>{props.disallowDrag != true && props.id == hovered ?
+    <TdGrip>{props.disallowDrag != true && props.id == hovered ?
       <div draggable
         onDragStart={e => {
           const parent = (e.target as HTMLElement).parentElement?.parentElement!;
@@ -33,8 +61,9 @@ export default function Row(props: RowProps) {
         }}>
         <IconGripVertical width={16} />
       </div>
-      : null}</td>
-    {lineNumberVisibility ? <td className={`index ${props.empty ? 'empty' : ''}`}>{props.index!}</td> : null}
+      : null}
+    </TdGrip>
+    {lineNumberVisibility ? <TdIndex $empty={props.empty}>{props.index!}</TdIndex> : null}
     <td className='node-wrapper' style={{
       marginLeft: `${(props.depth) * 16}px`,
       display: props.itemStyle == undefined ? 'block' : 'list-item',

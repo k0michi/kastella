@@ -4,8 +4,51 @@ import Model, { DateView, DirectoryView, TagView, ViewType } from '../model';
 import { isDirectory, visit } from '../tree';
 import { DirectoryNode } from '../node';
 import { toDateString } from '../utils';
+import styled from 'styled-components';
 
 const pathExp = /^\/(([^\/]+)\/)*([^\/]+)?$/;
+
+const DivExplorerPane = styled.div`
+  flex: 0 0 200px;
+  top: 0;
+  padding: 12px;
+  overflow-y: auto;
+  background-color: ${props => props.theme.colorExplorer};
+  border-right: solid 1px ${props => props.theme.colorBorder};
+  user-select: none;
+  font-size: 14px;
+`;
+
+const DivSection = styled.div`
+  margin-bottom: 24px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const DivSectionHeader = styled.div`
+  color: ${props => props.theme.colorExplorerHeader};
+  font-weight: lighter;
+  display: flex;
+  flex-direction: row;
+`;
+
+const DivSectionName = styled.div`
+  flex: 1 1 0;
+`;
+
+const DivSectionMenu = styled.div`
+  cursor: pointer;
+`;
+
+const DivItem = styled.div<{ $selected?: boolean, $dragged?: boolean }>`
+  cursor: default;
+  padding: 1px 4px;
+  border-radius: 3px;
+  border: 1px solid ${props => props.$dragged ? props.theme.colorExplorerSelected : 'transparent'};
+  background-color: ${props => props.$selected ? props.theme.colorExplorerSelected : 'unset'};
+`;
 
 export default function ExplorerPane() {
   const model = useModel<Model>();
@@ -37,20 +80,17 @@ export default function ExplorerPane() {
 
   return (
     <>
-      <div id="explorer-pane">
-        <div className="section">
-          <div className="header"><div className="name">TREE</div><div className="menu" onClick={e => {
+      <DivExplorerPane>
+        <DivSection>
+          <DivSectionHeader><DivSectionName>TREE</DivSectionName><DivSectionMenu onClick={e => {
             setDirectoryPath(undefined);
             modalRef.current?.showModal();
-          }}>+</div></div>
+          }}>+</DivSectionMenu></DivSectionHeader>
           <div className="container">
-            {directories.map(d => <div
+            {directories.map(d => <DivItem
               key={d.id}
-              className={[
-                view?.type == ViewType.Directory && (view as DirectoryView).parentID == d.id ? 'selected' : '',
-                draggedOver == d.id ? 'dragged' : '',
-                'item'
-              ].join(' ')}
+              $selected={ViewType.Directory && (view as DirectoryView).parentID == d.id}
+              $dragged={draggedOver == d.id}
               onDragOver={e => {
                 setDraggedOver(d.id);
               }}
@@ -70,19 +110,16 @@ export default function ExplorerPane() {
               onClick={e => model.changeView({ 'type': ViewType.Directory, parentID: d.id } as DirectoryView)}
             >
               {d.name == undefined ? model.library.getReservedDirName(d.id) : d.name}
-            </div>)}
+            </DivItem>)}
           </div>
-        </div>
-        <div className="section">
-          <div className="header">TAGS</div>
+        </DivSection>
+        <DivSection>
+          <DivSectionHeader><DivSectionName>TAGS</DivSectionName></DivSectionHeader>
           <div className="container">
-            {tags.map(t => <div
+            {tags.map(t => <DivItem
               key={t.id}
-              className={[
-                view?.type == 'tag' && (view as TagView).tag == t.id ? 'selected' : '',
-                draggedOver == t.id ? 'dragged' : '',
-                'item'
-              ].join(' ')}
+              $selected={view?.type == 'tag' && (view as TagView).tag == t.id}
+              $dragged={draggedOver == t.id}
               onDragOver={e => {
                 setDraggedOver(t.id);
               }}
@@ -96,19 +133,19 @@ export default function ExplorerPane() {
               }}
               onClick={e => model.changeView({ 'type': 'tag', tag: t.id } as TagView)}>
               {t.name}
-            </div>)}
+            </DivItem>)}
           </div>
-        </div>
-        <div className="section">
-          <div className="header">DATES</div>
+        </DivSection>
+        <DivSection>
+          <DivSectionHeader><DivSectionName>DATES</DivSectionName></DivSectionHeader>
           <div className="container">
-            {dates.map(d => <div
+            {dates.map(d => <DivItem
               key={d}
-              className={[view?.type == 'date' && (view as DateView).date == d ? 'selected' : '', 'item'].join(' ')}
-              onClick={e => model.changeView({ 'type': 'date', date: d } as DateView)}>{d}</div>)}
+              $selected={view?.type == 'date' && (view as DateView).date == d}
+              onClick={e => model.changeView({ 'type': 'date', date: d } as DateView)}>{d}</DivItem>)}
           </div>
-        </div>
-      </div>
+        </DivSection>
+      </DivExplorerPane>
       <dialog ref={modalRef}>
         <div className='dialog-container'>
           <div className='dialog-title'>Create New Directory</div>

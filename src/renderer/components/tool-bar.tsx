@@ -11,6 +11,21 @@ import { Excalidraw, MainMenu, exportToSvg, serializeAsJSON } from "@excalidraw/
 import mime from 'mime';
 import { ExcalidrawAPIRefValue, ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types/types';
 import ToolButton from './tool-button';
+import styled from 'styled-components';
+
+const DivToolBar = styled.div`
+  border-bottom: 1px solid ${props => props.theme.colorBorder};
+  box-sizing: content-box;
+  padding: 4px;
+  min-height: 1em;
+  line-height: 1;
+  flex: 0 0 fit-content;
+  background-color: ${props => props.theme.colorToolBar};
+
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+`;
 
 export default function ToolBar() {
   const model = useModel<Model>();
@@ -38,7 +53,7 @@ export default function ToolBar() {
 
   return (
     <>
-      <div id="tool-bar">
+      <DivToolBar>
         <ToolButton onClick={e => {
           mathModalRef.current?.showModal();
         }}><IconMathFunction stroke={2} size={16} /></ToolButton>
@@ -149,7 +164,7 @@ export default function ToolBar() {
             }
           }
         }}><IconCode stroke={2} size={16} /></ToolButton>
-      </div>
+      </DivToolBar>
       <dialog ref={mathModalRef}>
         <div className='dialog-container'>
           <div className='dialog-title'>Insert Math Block</div>

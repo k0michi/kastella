@@ -2,6 +2,7 @@ import * as React from 'react';
 import { File } from '../node';
 
 export interface ImageProps {
+  className?: string;
   file: File;
 }
 
@@ -22,7 +23,7 @@ export default function Image(props: ImageProps) {
     };
   }, [url]);
 
-  return <img draggable={false} src={url}></img>;
+  return <img draggable={false} src={url} className={props.className}></img>;
 }
 
 function uint8ArrayObjectURL(array: Uint8Array, mediaType: string) {

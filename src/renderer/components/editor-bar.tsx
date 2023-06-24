@@ -1,6 +1,41 @@
 import { useModel, useObservable } from 'kyoka';
 import * as React from 'react';
 import Model, { DateView, DirectoryView, TagView, ViewType } from '../model';
+import styled from 'styled-components';
+
+const TextAreaSearch = styled.textarea`
+  resize: none;
+  border: none;
+  border-bottom: 1px solid ${props => props.theme.colorBorder};
+  outline: none;
+  background-color: inherit;
+  color: inherit;
+  flex: 1 1 0;
+
+  &:focus {
+    border-bottom: 1px solid rgb(125, 210, 255);
+  }
+`;
+
+const DivEditorBarSection = styled.div`
+  background-color: ${props => props.theme.colorEditorBar};
+  border-bottom: 1px solid ${props => props.theme.colorBorder};
+  padding: 6px;
+
+  &:nth-child(2) {
+    flex: 0 0 32px;
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+  }
+
+  &:nth-child(2)>* {
+    display: block;
+    height: fit-content;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+`;
 
 export default function EditorBar() {
   const model = useModel<Model>();
@@ -11,7 +46,7 @@ export default function EditorBar() {
   const view = useObservable(model.view);
 
   return <div id='editor-bar'>
-    <div className='editor-bar-section'>
+    <DivEditorBarSection>
       {
         view?.type == ViewType.Directory ?
           `${model.library.getPath((view as DirectoryView).parentID!)}`
@@ -21,8 +56,8 @@ export default function EditorBar() {
               `@${(view as DateView).date}`
               : null
       }
-    </div>
-    <div className='editor-bar-section'>
+    </DivEditorBarSection>
+    <DivEditorBarSection>
       <div className='checkbox'>
         <input checked={writeOnly} type="checkbox" id="write-only" onChange={e => {
           model.setWriteOnly(e.target.checked);
@@ -41,7 +76,7 @@ export default function EditorBar() {
         }} />
         <label htmlFor="date-visibility">Date</label>
       </div>
-      <textarea rows={1} onChange={e => model.setSearch(e.target.value)} value={search} />
-    </div>
+      <TextAreaSearch rows={1} onChange={e => model.setSearch(e.target.value)} value={search} />
+    </DivEditorBarSection>
   </div>;
 }

@@ -22,6 +22,64 @@ import QuoteNodeContent from './node-content/quote-node-content';
 import CanvasNodeContent from './node-content/canvas-node-content';
 import { elementToInlineNode } from '../tree';
 import { isHTMLEmpty, parseHTMLFragment } from '../html';
+import styled from 'styled-components';
+
+const DivEditorPane = styled.div`
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  overflow-y: auto;
+  overflow-x: auto;
+  max-width: 100%;
+  background-color: ${props => props.theme.colorEditor};
+`;
+
+const DivEditorArea = styled.div`
+  flex: 1 1 0;
+  padding: 12px;
+  overflow-y: auto;
+  overflow-x: auto;
+  font-size: 14px;
+  line-height: 1.75;
+`;
+
+const DivNodes = styled.div`
+  white-space: pre-wrap;
+`;
+
+const Table = styled.table`
+  border-collapse: collapse;
+  width: 100%;
+`;
+
+const DivNode = styled.div<{ $block?: boolean, $selected?: boolean }>`
+  padding-left: 4px;
+  position: relative;
+  display: flex;
+  flex-direction: ${props => props.$block ? 'column' : 'row'};
+  gap: ${props => props.$block ? '4px' : '12px'};
+  width: 100%;
+  background-color: ${props => props.$selected ? props.theme.colorEditorSelected : 'unset'};
+`;
+
+const DivTags = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  margin-top: auto;
+  margin-bottom: auto;
+  user-select: none;
+`;
+
+const DivTag = styled.div`
+  background-color: ${props => props.theme.colorEditorTagBack};
+  color: ${props => props.theme.colorEditorTagFore};
+  padding: 0px 6px;
+  font-size: 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+`;
 
 // How many nodes below and above the intersection should be present
 const PADDINGS = 32;
@@ -486,11 +544,11 @@ export default function EditorPane() {
     nextIndex = model.library.getLastNode(model.library.getNode(ReservedID.Master))?.index! + 1;
   }
 
-  return <div id='editor-pane'>
+  return <DivEditorPane>
     <EditorBar />
-    <div id="editor-area" ref={editorRef}>
-      <div id="nodes" ref={nodesRef}>
-        <table>
+    <DivEditorArea ref={editorRef}>
+      <DivNodes ref={nodesRef}>
+        <Table>
           <tbody
             onMouseLeave={e => {
               model.setHovered(undefined);
@@ -509,100 +567,86 @@ export default function EditorPane() {
                 }
 
                 const id = n.id;
-
-                let className = 'node';
-
-                if (id == selected) {
-                  className += ' selected';
-                }
+                const isSelected = id == selected;
 
                 const tagNames = n.tags?.map(t => '#' + model.library.getTag(t)?.name);
 
-                const tags = <div className='tags'>
-                  {tagNames?.map(t => <div className='tag' key={t}>{t}</div>)}
-                </div>;
+                const tags = <DivTags>
+                  {tagNames?.map(t => <DivTag className='tag' key={t}>{t}</DivTag>)}
+                </DivTags>;
 
                 let content;
 
                 if (n.type == NodeType.Text) {
                   const textNode = n as TextNode;
 
-                  content = <div className={className}>
+                  content = <DivNode $selected={isSelected}>
                     <TextNodeContent node={textNode} />
                     {tags}
-                  </div>;
+                  </DivNode>;
                 } else if (n.type == NodeType.Image) {
-                  className += ' block';
-
                   const imageNode = n as ImageNode;
 
-                  content = <div className={className}>
+                  content = <DivNode $block $selected={isSelected}>
                     <ImageNodeContent node={imageNode} />
                     {tags}
-                  </div>
+                  </DivNode>
                 } else if (n.type == NodeType.Directory) {
                   const dNode = n as DirectoryNode;
 
-                  content = <div className={className}>
+                  content = <DivNode $selected={isSelected}>
                     <DirectoryNodeContent node={dNode} />
                     {tags}
-                  </div>;
+                  </DivNode>;
                 } else if (n.type == NodeType.Page) {
                   const pNode = n as PageNode;
 
-                  content = <div className={className}>
+                  content = <DivNode $selected={isSelected}>
                     <PageNodeContent node={pNode} />
                     {tags}
-                  </div>;
+                  </DivNode>;
                 } else if (n.type == NodeType.Anchor) {
-                  className += ' block';
-
                   const anchor = n as AnchorNode;
 
-                  content = <div className={className}>
+                  content = <DivNode $block $selected={isSelected}>
                     <AnchorNodeContent node={anchor} />
                     {tags}
-                  </div>;
+                  </DivNode>;
                 } else if (n.type == NodeType.Code) {
-                  className += ' block';
                   const codeNode = n as CodeNode;
 
-                  content = <div className={className}>
+                  content = <DivNode $block $selected={isSelected}>
                     <CodeNodeContent node={codeNode} />
                     {tags}
-                  </div>;
+                  </DivNode>;
                 } else if (n.type == NodeType.Math) {
-                  className += ' block';
                   const mathNode = n as MathNode;
 
-                  content = <div className={className}>
+                  content = <DivNode $block $selected={isSelected}>
                     <MathNodeContent node={mathNode} />
                     {tags}
-                  </div>;
+                  </DivNode>;
                 } else if (n.type == NodeType.Heading) {
                   const headingNode = n as HeadingNode;
 
-                  content = <div className={className}>
+                  content = <DivNode $selected={isSelected}>
                     <HeadingNodeContent node={headingNode} />
                     {tags}
-                  </div>;
+                  </DivNode>;
                 } else if (n.type == NodeType.Quote) {
-                  className += ' block';
                   const quoteNode = n as QuoteNode;
 
-                  content = <div className={className}>
+                  content = <DivNode $block $selected={isSelected}>
                     <QuoteNodeContent node={quoteNode} />
                     {tags}
-                  </div>;
+                  </DivNode>;
                 } else if (n.type == NodeType.Canvas) {
-                  className += ' block';
-
                   const canvasNode = n as CanvasNode;
 
-                  content = <div className={className}>
+                  content = <DivNode $block $selected={isSelected}>
                     <CanvasNodeContent node={canvasNode} />
                     {tags}
-                  </div>
+                  </DivNode>
                 }
 
                 const itemStyle = n.parent?.list;
@@ -651,9 +695,10 @@ export default function EditorPane() {
                 html={input} />
             </Row> : null}
           </tbody>
-        </table></div>
-    </div>
-  </div>;
+        </Table>
+      </DivNodes>
+    </DivEditorArea>
+  </DivEditorPane>;
 }
 
 // '... #tagName' => ['...', ['tagName']]

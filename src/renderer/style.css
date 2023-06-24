@@ -1,9 +1,18 @@
+/*
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: sans-serif;
 }
 
+html,
+body,
+#root {
+  height: 100%;
+}
+*/
+
+/*
+ignored
 * {
   box-sizing: border-box;
 }
@@ -56,36 +65,39 @@ html {
     --color-anchor-border: rgb(219, 219, 219);
   }
 }
-
-html {
-  color: var(--color);
-}
-
+*/
+/* ignored
 textarea {
   font-size: inherit;
   font-family: inherit;
   color: inherit;
   background-color: inherit;
 }
-
+*/
+/* ignored
 body {
   margin: 0;
   word-break: break-all;
 }
-
+*/
+/*
 a {
   color: inherit;
 }
-
+*/
+/*
 pre {
   margin: 0;
 }
-
+*/
+/*
 #root {
   display: flex;
   flex-direction: column;
 }
+*/
 
+/*
 #main {
   display: flex;
   flex-direction: row;
@@ -93,15 +105,19 @@ pre {
   overflow-y: hidden;
   overflow-x: hidden;
 }
+*/
 
+/*
 html,
 body,
 #root {
   height: 100%;
 }
+*/
 
 /* Tool bar */
 
+/*
 #tool-bar {
   border-bottom: 1px solid var(--color-border);
   box-sizing: content-box;
@@ -115,7 +131,9 @@ body,
   flex-direction: row;
   gap: 4px;
 }
+*/
 
+/*
 #tool-bar .tool {
   border: 1px solid var(--color-border);
   padding: 0.15em 0.3em;
@@ -124,9 +142,11 @@ body,
   border-radius: 2px;
   line-height: 0;
 }
+*/
 
 /* Editor pane */
 
+/*
 #editor-pane {
   flex: 1 1 0;
   display: flex;
@@ -137,7 +157,9 @@ body,
   max-width: 100%;
   background-color: var(--color-editor);
 }
+*/
 
+/*
 #editor-pane textarea {
   resize: none;
   border: none;
@@ -148,10 +170,11 @@ body,
 #editor-pane textarea:focus {
   border-bottom: 1px solid rgb(125, 210, 255);
 }
-
+*/
 
 /* Editor bar */
 
+/*
 .editor-bar-section {
   background-color: var(--color-editor-bar);
   border-bottom: 1px solid var(--color-border);
@@ -175,10 +198,12 @@ body,
 .editor-bar-section:nth-child(2) textarea {
   flex: 1 1 0;
 }
+*/
 
 
 /* Editor area */
 
+/*
 #editor-area {
   flex: 1 1 0;
   padding: 12px;
@@ -201,6 +226,7 @@ body,
   padding: 0;
   vertical-align: top;
 }
+
 
 #editor-area #nodes td.grip {
   color: var(--color-editor-index);
@@ -227,7 +253,9 @@ body,
 #editor-area #nodes td.empty {
   color: var(--color-editor-index-empty);
 }
-
+*/
+/*
+ignored
 #editor-area #nodes td.date {
   color: var(--color-editor-index);
   padding-right: 4px;
@@ -235,6 +263,7 @@ body,
   white-space: nowrap;
   font-style: italic;
 }
+
 
 #editor-area #nodes .node {
   padding-left: 4px;
@@ -248,23 +277,34 @@ body,
 #editor-area #nodes .node.block {
   flex-direction: column;
   gap: 4px;
-}
+}*/
 
+/*
 #editor-area #nodes .node-wrapper {}
+*/
 
+/*
 #editor-area #nodes .node.selected {
   background-color: var(--color-editor-selected);
 }
+*/
 
+/*
+ignored
 #editor-area #nodes textarea {
   width: 100%;
   padding-left: 8px;
 }
+*/
 
+/*
+ignored
 #editor-area .error {
   color: var(--color-editor-error);
 }
+*/
 
+/*
 #editor-area .tags {
   display: flex;
   flex-direction: row;
@@ -282,7 +322,9 @@ body,
   border-radius: 6px;
   white-space: nowrap;
 }
+*/
 
+/*
 #editor-area .image-node img {
   max-width: 100%;
   border-radius: 4px;
@@ -299,6 +341,7 @@ body,
   margin: 4px;
 }
 
+
 #editor-area .anchor-node .image {
   display: flex;
   align-items: center;
@@ -308,7 +351,9 @@ body,
   font-size: 12px;
   color: var(--color-secondary)
 }
+*/
 
+/*
 #editor-area .anchor-node .title {
   font-size: 18px;
 }
@@ -317,7 +362,9 @@ body,
   width: 192px;
   display: block;
 }
+*/
 
+/*
 #editor-area .math-node .katex-display {
   margin: 0;
   padding: .25em 0;
@@ -326,20 +373,26 @@ body,
 #editor-area .math-node .katex-display>.katex>.katex-html {
   width: fit-content;
 }
+*/
 
+/*
 #editor-area .heading-node {
   font-size: 2em;
   font-weight: bold;
 }
+*/
 
+/*
 #editor-area .quote-node {
   border-left: 2px solid var(--color-editor-quote);
   padding-left: 12px;
 }
+*/
 
 
 /* Explorer pane */
 
+/*
 #explorer-pane {
   flex: 0 0 200px;
   top: 0;
@@ -359,6 +412,7 @@ body,
   margin-bottom: 0;
 }
 
+
 #explorer-pane .section .header {
   color: var(--color-explorer-header);
   font-weight: lighter;
@@ -374,6 +428,7 @@ body,
   cursor: pointer;
 }
 
+
 #explorer-pane .item {
   cursor: default;
   padding: 1px 4px;
@@ -388,10 +443,12 @@ body,
 #explorer-pane .dragged {
   border: 1px solid var(--color-explorer-selected);
 }
+*/
 
 
 /* Status bar */
 
+/*
 #status-bar {
   border-top: 1px solid var(--color-border);
   box-sizing: content-box;
@@ -401,7 +458,7 @@ body,
   flex: 0 0 fit-content;
   background-color: var(--color-status);
 }
-
+*/
 
 /* Dialog */
 
