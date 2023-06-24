@@ -11,7 +11,7 @@
     "start": "electron-forge start",
     "package": "yarn build && electron-forge package",
     "make": "yarn build && electron-forge make",
-    "clean": "rm -rf dist"
+    "clean": "ts-node -P tsconfig.main.json clean.ts"
   },
   "dependencies": {
     "@excalidraw/excalidraw": "^0.15.2",
