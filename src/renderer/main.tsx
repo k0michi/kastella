@@ -5,7 +5,6 @@ import EditorPane from './components/editor-pane';
 import ExplorerPane from './components/explorer-pane';
 import Model from './model';
 import StatusBar from './components/status-bar';
-import './style.css';
 import 'katex/dist/katex.css'
 import 'modern-normalize/modern-normalize.css';
 import ToolBar from './components/tool-bar';
