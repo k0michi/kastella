@@ -191,7 +191,7 @@ export default function ExplorerPane() {
       </CommonDialog>
       <CommonDialog open={tagModalOpen}>
         <CommonDialogTitle>Create New Tag</CommonDialogTitle>
-        Tag name <CommonDialogTextInput invalid={!validTag} placeholder='#tag'
+        Tag name <CommonDialogTextInput invalid={!validTag} placeholder='tag'
           onChange={e => {
             setValidTag(tagExp.test(e.target.value));
             setTagInput(e.target.value);
