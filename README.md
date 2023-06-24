@@ -17,6 +17,15 @@ Kastella is still unstable and incomplete, however, I'll maintain this as long a
 - Tags.
 - Excalidraw integration.
 
+## Build
+
+```
+$ git clone https://github.com/k0michi/kastella
+$ cd kastella
+$ yarn install
+$ yarn package
+```
+
 ## License
 
 MIT
