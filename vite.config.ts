@@ -9,5 +9,5 @@ export default defineConfig({
     outDir: 'dist/renderer',
     target: 'es2021'
   },
-  publicDir: 'dist'
+  publicDir: 'public'
 });

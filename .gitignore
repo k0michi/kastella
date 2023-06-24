@@ -208,3 +208,5 @@ dist
 
 # Project
 library/
+public/excalidraw-assets
+public/excalidraw-assets-dev
