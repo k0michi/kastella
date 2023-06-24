@@ -705,7 +705,7 @@ export default function EditorPane() {
 function splitTags(string: string): [string, string[]] {
   const tagExp = /\s+#(\S+)$/;
   let result: RegExpExecArray | null;
-  const tags = [];
+  const tags: string[] = [];
 
   while (string = string.trim(), result = tagExp.exec(string), result != null) {
     tags.push(result[1]);
