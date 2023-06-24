@@ -6,9 +6,8 @@
   "main": "dist/main/main/main.js",
   "scripts": {
     "copy-assets": "ts-node -P tsconfig.main.json copy-assets.ts",
-    "dev": "yarn copy-assets && concurrently \"tsc --project tsconfig.main.json --watch\" \"vite\"",
+    "start": "yarn copy-assets && tsc --project tsconfig.main.json && concurrently \"electron-forge start\" \"tsc --project tsconfig.main.json --watch\" \"vite\"",
     "build": "yarn copy-assets && concurrently \"tsc --project tsconfig.main.json\" \"vite build\"",
-    "start": "electron-forge start",
     "package": "yarn build && electron-forge package",
     "make": "yarn build && electron-forge make",
     "clean": "ts-node -P tsconfig.main.json clean.ts"
