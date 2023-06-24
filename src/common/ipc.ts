@@ -17,6 +17,7 @@ export interface ChannelTypes {
   writeTextFile: (id: string, data: string, type: string) => Promise<void>;
   openFile: (fileType: FileType) => Promise<string[] | null>;
   setEdited: (edited: boolean) => void;
+  shouldUseDarkColors: () => boolean;
 }
 
 export enum Channels {
@@ -35,6 +36,9 @@ export enum Channels {
   writeTextFile = 'writeTextFile',
   openFile = 'openFile',
   setEdited = 'setEdited',
+  shouldUseDarkColors = 'shouldUseDarkColors',
+
+  nativeThemeUpdate = 'nativeThemeUpdate',
 }
 
 type Params<F> = F extends (...args: infer A) => any ? A : never;

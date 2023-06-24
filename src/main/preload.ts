@@ -22,6 +22,13 @@ export class Bridge {
   writeTextFile = makeInvoke(Channels.writeTextFile);
   openFile = makeInvoke(Channels.openFile);
   setEdited = makeInvoke(Channels.setEdited);
+  shouldUseDarkColors = makeInvoke(Channels.shouldUseDarkColors);
+  onNativeThemeUpdate = (handler: () => void) => {
+    ipcRenderer.on(Channels.nativeThemeUpdate, handler);
+  };
+  offNativeThemeUpdate = (handler: () => void) => {
+    ipcRenderer.off(Channels.nativeThemeUpdate, handler);
+  };
 }
 
 contextBridge.exposeInMainWorld('bridge', new Bridge());

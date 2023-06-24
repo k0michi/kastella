@@ -71,6 +71,7 @@ export default class Model {
     last: 0
   });
   unsaved = new Observable<boolean>(false);
+  darkMode = new Observable<boolean>(false);
 
   constructor() {
     this.library = new LibraryModel();
@@ -301,5 +302,12 @@ export default class Model {
 
   clearStatus() {
     this.status.set(undefined);
+  }
+
+
+  // Theme
+
+  setDarkMode(darkMode: boolean) {
+    this.darkMode.set(darkMode);
   }
 }

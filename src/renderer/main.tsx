@@ -1,4 +1,4 @@
-import { ModelProvider } from 'kyoka';
+import { ModelProvider, useModel, useObservable } from 'kyoka';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
 import EditorPane from './components/editor-pane';
@@ -91,6 +91,12 @@ const DivMain = styled.div`
 const model = new Model();
 model.loadLibrary();
 
+bridge.onNativeThemeUpdate(async () => {
+  model.setDarkMode(await bridge.shouldUseDarkColors());
+});
+
+model.setDarkMode(await bridge.shouldUseDarkColors());
+
 window.addEventListener('beforeunload', e => {
   if (model.unsaved.get()) {
     e.preventDefault();
@@ -100,18 +106,25 @@ window.addEventListener('beforeunload', e => {
   }
 });
 
+function App() {
+  const model = useModel<Model>();
+  const darkMode = useObservable(model.darkMode);
+
+  return <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
+    <GlobalStyle />
+    <DivLayoutRoot>
+      <ToolBar />
+      <DivMain>
+        <ExplorerPane />
+        <EditorPane />
+      </DivMain>
+      <StatusBar />
+    </DivLayoutRoot>
+  </ThemeProvider>;
+}
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <ModelProvider model={model}>
-    <ThemeProvider theme={lightTheme}>
-      <GlobalStyle />
-      <DivLayoutRoot>
-        <ToolBar />
-        <DivMain>
-          <ExplorerPane />
-          <EditorPane />
-        </DivMain>
-        <StatusBar />
-      </DivLayoutRoot>
-    </ThemeProvider>
+    <App />
   </ModelProvider>
 );

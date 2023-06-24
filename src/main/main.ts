@@ -237,3 +237,11 @@ handle(Channels.openFile, async (e, fileType: FileType) => {
 handle(Channels.setEdited, (e, edited: boolean) => {
   mainWindow?.setDocumentEdited(edited);
 });
+
+handle(Channels.shouldUseDarkColors, (e) => {
+  return nativeTheme.shouldUseDarkColors;
+});
+
+nativeTheme.on('updated', () => {
+  mainWindow?.webContents.send(Channels.nativeThemeUpdate);
+});
