@@ -197,7 +197,7 @@ export default function EditorPane() {
     const fragment = parseHTMLFragment(input);
     const plainInput = fragment.innerHTML;
 
-    const tagIDs: string[] = [];
+    let tagIDs: string[] = [];
     /*
     const [content, tags] = splitTags(input);
 
@@ -213,7 +213,7 @@ export default function EditorPane() {
     */
 
     const parentID = model.getViewDirectory();
-    //tagIDs = tagIDs.concat(model.getViewTags());
+    tagIDs = tagIDs.concat(model.getViewTags());
 
     model.setInput('');
 
