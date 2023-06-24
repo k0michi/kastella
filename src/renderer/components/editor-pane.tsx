@@ -23,6 +23,9 @@ import CanvasNodeContent from './node-content/canvas-node-content';
 import { elementToInlineNode } from '../tree';
 import { isHTMLEmpty, parseHTMLFragment } from '../html';
 
+// How many nodes below and above the intersection should be present
+const PADDINGS = 32;
+
 export default function EditorPane() {
   const model = useModel<Model>();
   const view = useObservable(model.view);
@@ -471,6 +474,9 @@ export default function EditorPane() {
   }, []);
 
   const last = filtered.at(-1);
+
+  const baseDepth = filtered[0]?.depth!;
+  const showInputRow = view?.type != ViewType.Date && search == '';
   let nextIndex: number | undefined;
 
   if (view?.type == ViewType.Directory) {
@@ -479,10 +485,6 @@ export default function EditorPane() {
   } else {
     nextIndex = model.library.getLastNode(model.library.getNode(ReservedID.Master))?.index! + 1;
   }
-
-  const baseDepth = filtered[0]?.depth!;
-
-  const PADDINGS = 32;
 
   return <div id='editor-pane'>
     <EditorBar />
@@ -623,7 +625,7 @@ export default function EditorPane() {
                 </Row>;
               })
             }
-            {view?.type == ViewType.Directory ? <Row
+            {showInputRow ? <Row
               id={null}
               index={nextIndex}
               pseudoIndex={filtered.length}
