@@ -19,6 +19,7 @@ const darkTheme = {
   colorEditor: 'hsl(240, 3%, 13%)',
   colorToolBar: 'hsl(230, 8%, 10%)',
   colorTool: 'hsl(230, 12%, 18%)',
+  colorToolActive: 'hsl(227, 9%, 29%)',
   colorEditorBar: 'hsl(230, 10%, 14%)',
   colorEditorIndex: 'hsl(230, 7%, 44%)',
   colorEditorIndexEmpty: 'hsl(223, 4%, 34%)',
@@ -37,6 +38,7 @@ const darkTheme = {
   colorButton1Back: 'rgb(63, 114, 226)',
   colorButton1BackActive: 'rgb(54, 95, 183)',
   colorButton1Fore: 'rgb(255, 255, 255)',
+  colorMathPreviewBorder: '#eee',
   colorButtonDisabledBack: '#e8e8e8',
   colorButtonDisabledFore: '#b6b6b6',
   colorAnchorBorder: 'hsl(220, 2%, 33%)',
@@ -49,7 +51,8 @@ const lightTheme: Theme = {
   colorBorder: 'hsl(206, 5%, 74%)',
   colorEditor: 'hsl(0, 0%, 100%)',
   colorToolBar: 'hsl(210, 7%, 95%)',
-  colorTool: 'hsl(0, 0%, 100%)',
+  colorTool: 'hsl(0, 0%, 89.41176470588236%)',
+  colorToolActive: 'hsl(0, 0%, 83.13725490196079%)',
   colorEditorBar: 'hsl(204, 11%, 91%)',
   colorEditorIndex: 'hsl(200, 7%, 44%)',
   colorEditorIndexEmpty: 'hsl(229, 15%, 78%)',
@@ -61,7 +64,6 @@ const lightTheme: Theme = {
   colorStatus: 'hsl(195, 14%, 95%)',
   colorButton1Back: 'rgb(63, 114, 226)',
   colorButton1Fore: 'rgb(255, 255, 255)',
-  colorMathPreviewBorder: '#eee',
   colorAnchorBorder: 'rgb(219, 219, 219)',
 };
 
