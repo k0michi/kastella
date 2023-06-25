@@ -4,6 +4,8 @@ import { inlineNodeToElement } from '../../tree';
 import styled from 'styled-components';
 
 const DivTextNode = styled.div`
+  display: inline;
+
   a {
     color: inherit;
   }

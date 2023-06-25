@@ -56,7 +56,7 @@ const Table = styled.table`
 const DivNode = styled.div<{ $block?: boolean, $selected?: boolean }>`
   padding-left: 4px;
   position: relative;
-  display: flex;
+  display: ${props => props.$block ? 'flex' : 'block'};
   flex-direction: ${props => props.$block ? 'column' : 'row'};
   gap: ${props => props.$block ? '4px' : '12px'};
   width: 100%;
@@ -64,11 +64,12 @@ const DivNode = styled.div<{ $block?: boolean, $selected?: boolean }>`
 `;
 
 const DivTags = styled.div`
-  display: flex;
+  display: inline-flex;
+  margin-left: 8px;
   flex-direction: row;
   gap: 8px;
-  margin-top: auto;
-  margin-bottom: auto;
+  /* Temporary fix */
+  vertical-align: 0.1em;
   user-select: none;
 `;
 
