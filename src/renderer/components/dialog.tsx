@@ -2,6 +2,7 @@ import * as React from 'react';
 
 interface DialogProps extends React.DialogHTMLAttributes<HTMLDialogElement> {
   open: boolean;
+  onEscape?: (e: React.KeyboardEvent<HTMLDialogElement>) => void;
 }
 
 export default function Dialog(props: DialogProps) {
@@ -16,5 +17,17 @@ export default function Dialog(props: DialogProps) {
   }, [props.open]);
 
   const dialogProps = { ...props, open: undefined };
-  return <dialog {...dialogProps} ref={ref}>{props.children}</dialog>
+  return <dialog {...dialogProps} onKeyDown={e => {
+    if (e.key == 'Escape') {
+      e.preventDefault();
+
+      if (props.onEscape) {
+        props.onEscape(e);
+      }
+    }
+
+    if (props.onChange) {
+      props.onChange(e);
+    }
+  }} ref={ref}>{props.children}</dialog>
 }
