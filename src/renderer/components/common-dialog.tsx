@@ -7,9 +7,10 @@ export const CommonDialog = styled(Dialog)`
   border: none;
   border-radius: 8px;
   max-width: 100vw;
+  filter: drop-shadow(0 0 12px #00000042);
 
   &::backdrop {
-    backdrop-filter: blur(8px);
+    background-color: #5a5a5a63;
   }
 `;
 
