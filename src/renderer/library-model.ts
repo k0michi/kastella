@@ -791,6 +791,10 @@ export default class LibraryModel {
   // Tags
 
   createTag(name: string) {
+    if (this.tags.get().find(t => compareTag(t.name, name) == 0) != null) {
+      throw new Error(`Tag '${name}' already exists`);
+    }
+
     const id = uuidv4();
 
     this.tags.get().push({ id, name });
@@ -801,7 +805,7 @@ export default class LibraryModel {
   }
 
   findTag(name: string) {
-    return this.tags.get().find(t => t.name.localeCompare(name, undefined, { sensitivity: 'accent' }) == 0);
+    return this.tags.get().find(t => compareTag(t.name, name) == 0);
   }
 
   getTag(id: string) {
@@ -908,4 +912,8 @@ export default class LibraryModel {
       this.nodeMap.set(n.id, n);
     }
   }
+}
+
+function compareTag(tag1: string, tag2: string) {
+  return tag1.localeCompare(tag2, undefined, { sensitivity: 'accent' });
 }
