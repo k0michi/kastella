@@ -202,7 +202,7 @@ export default function EditorPane() {
     const tagIDs = new Set<string>();
 
     if (lastNode.nodeType == Node.TEXT_NODE) {
-      const [content, tags] = splitTags(input);
+      const [content, tags] = splitTags((lastNode as globalThis.Text).data);
       (lastNode as globalThis.Text).data = content;
 
       for (const t of tags) {

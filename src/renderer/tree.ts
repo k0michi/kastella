@@ -115,11 +115,8 @@ export function elementToInlineNode(element: Element): InlineNode | (InlineNode 
       const child = elementToInlineNode(childNode as Element);
       children.push(child as InlineNode);
     } else if (childNode.nodeType === Node.TEXT_NODE) {
-      const textContent = childNode.textContent;
-
-      if (textContent != null) {
-        children.push(textContent);
-      }
+      const data = (childNode as Text).data;
+      children.push(data);
     }
   }
 
