@@ -7,6 +7,7 @@ import { toDateString } from '../utils';
 import styled from 'styled-components';
 import Dialog from './dialog';
 import { CommonDialog, CommonDialogButton, CommonDialogButtons, CommonDialogButtonsLeft, CommonDialogButtonsRight, CommonDialogTextInput, CommonDialogTitle } from './common-dialog';
+import { TagMenu } from '../../common/menu';
 
 const pathExp = /^\/(([^\/]+)\/)*([^\/]+)?$/;
 const tagExp = /^\S+$/;
@@ -147,7 +148,23 @@ export default function ExplorerPane() {
                 model.library.appendTag(id, t.id);
                 setDraggedOver(false);
               }}
-              onClick={e => model.changeView({ 'type': 'tag', tag: t.id } as TagView)}>
+              onContextMenu={async e => {
+                e.preventDefault();
+                const selected = await bridge.showTagMenu();
+
+                switch (selected) {
+                  case TagMenu.editTag:
+                    // TODO
+                    break;
+                  case TagMenu.deleteTag:
+                    // TODO
+                    break;
+                }
+                console.log(selected);
+              }}
+              onClick={e => {
+                model.changeView({ 'type': 'tag', tag: t.id } as TagView);
+              }}>
               {t.name}
             </DivItem>)}
           </div>

@@ -23,6 +23,7 @@ export class Bridge {
   openFile = makeInvoke(Channels.openFile);
   setEdited = makeInvoke(Channels.setEdited);
   shouldUseDarkColors = makeInvoke(Channels.shouldUseDarkColors);
+  showTagMenu = makeInvoke(Channels.showTagMenu);
   onNativeThemeUpdate = (handler: () => void) => {
     ipcRenderer.on(Channels.nativeThemeUpdate, handler);
   };

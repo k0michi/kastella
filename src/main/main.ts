@@ -1,6 +1,6 @@
 // Modules to control application life and create native browser window
 
-import { app, BrowserWindow, dialog, Event, ipcMain, shell, nativeTheme, IpcMainInvokeEvent } from 'electron';
+import { app, BrowserWindow, dialog, Event, ipcMain, shell, nativeTheme, IpcMainInvokeEvent, Menu } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { now } from '@k0michi/now';
@@ -8,6 +8,7 @@ import { fetchFile, fetchMeta } from './fetch.js';
 import * as mime from 'mime';
 import { FileType } from '../common/fetch.js';
 import { ChannelTypes, Channels, Handler } from '../common/ipc.js';
+import { TagMenu } from '../common/menu.js';
 
 // Paths
 const devURL = `http://localhost:5173/`;
@@ -244,4 +245,24 @@ handle(Channels.shouldUseDarkColors, (e) => {
 
 nativeTheme.on('updated', () => {
   mainWindow?.webContents.send(Channels.nativeThemeUpdate);
+});
+
+handle(Channels.showTagMenu, (e) => {
+  return new Promise<TagMenu | null>((resolve, reject) => {
+    const tagMenu = Menu.buildFromTemplate([{
+      label: 'Edit Tag', click: () => {
+        resolve(TagMenu.editTag);
+      }
+    }, {
+      label: 'Delete Tag', click: () => {
+        resolve(TagMenu.deleteTag);
+      }
+    }]);
+    tagMenu.popup({
+      window: BrowserWindow.fromWebContents(e.sender) ?? undefined,
+      callback() {
+        resolve(null);
+      },
+    });
+  });
 });
