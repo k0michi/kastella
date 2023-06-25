@@ -197,23 +197,30 @@ export default function EditorPane() {
     const fragment = parseHTMLFragment(input);
     const plainInput = fragment.innerHTML;
 
-    let tagIDs: string[] = [];
-    /*
-    const [content, tags] = splitTags(input);
+    const lastNode = fragment.childNodes[fragment.childNodes.length - 1];
+    const tagIDs = new Set<string>();
 
-    let tagIDs = tags.map(t => {
-      const found = model.library.findTag(t);
+    if (lastNode.nodeType == Node.TEXT_NODE) {
+      const [content, tags] = splitTags(input);
+      (lastNode as globalThis.Text).data = content;
 
-      if (found == null) {
-        return model.library.createTag(t);
+      for (const t of tags) {
+        const found = model.library.findTag(t);
+
+        if (found == null) {
+          const tagID = model.library.createTag(t);
+          tagIDs.add(tagID);
+        } else {
+          tagIDs.add(found.id);
+        }
       }
-
-      return found.id;
-    });
-    */
+    }
 
     const parentID = model.getViewDirectory();
-    tagIDs = tagIDs.concat(model.getViewTags());
+
+    for (const t of model.getViewTags()) {
+      tagIDs.add(t);
+    }
 
     model.setInput('');
 
@@ -248,9 +255,9 @@ export default function EditorPane() {
         contentImageFileID: imageFileID,
         contentModified: meta.modified != undefined ? new Timestamp(meta.modified) : undefined,
         contentAccessed: accessed
-      }, accessed, parentID, tagIDs);
+      }, accessed, parentID, Array.from(tagIDs));
     } else {
-      model.library.addTextNodeWithFormat(elementToInlineNode(fragment), Timestamp.fromNs(await bridge.now()), parentID, tagIDs);
+      model.library.addTextNodeWithFormat(elementToInlineNode(fragment), Timestamp.fromNs(await bridge.now()), parentID, Array.from(tagIDs));
     }
   }
 
@@ -703,7 +710,7 @@ export default function EditorPane() {
 
 // '... #tagName' => ['...', ['tagName']]
 function splitTags(string: string): [string, string[]] {
-  const tagExp = /\s+#(\S+)$/;
+  const tagExp = /\s+#([a-zA-Z0-9]+)$/;
   let result: RegExpExecArray | null;
   const tags: string[] = [];
 
