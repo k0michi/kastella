@@ -37,8 +37,13 @@ export const ButtonCommonDialogButton = styled.button<{ $disabled?: boolean, $hi
   border-radius: 4px;
   min-width: 80px;
   border: none;
-  background-color: ${props => props.disabled ? 'gray' : (props.$highlighted ? props.theme.colorButton1Back : 'lightgray')};
-  color: ${props => props.disabled ? 'unset' : (props.$highlighted ? props.theme.colorButton1Fore : 'unset')};
+  user-select: none;
+  background-color: ${props => props.disabled ? props.theme.colorButtonDisabledBack : (props.$highlighted ? props.theme.colorButton1Back : props.theme.colorButton0Back)};
+  color: ${props => props.disabled ? props.theme.colorButtonDisabledFore : (props.$highlighted ? props.theme.colorButton1Fore : props.theme.colorButton0Fore)};
+
+  &:active:hover {
+    background-color: ${props => props.disabled ? props.theme.colorButtonDisabledBack : (props.$highlighted ? props.theme.colorButton1BackActive : props.theme.colorButton0BackActive)};
+  }
 `;
 
 export interface CommonDialogButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

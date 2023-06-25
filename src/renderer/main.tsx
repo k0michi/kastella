@@ -31,9 +31,14 @@ const darkTheme = {
   colorExplorerHeader: 'rgb(234, 234, 234)',
   colorExplorerSelected: 'rgb(63, 123, 200)',
   colorStatus: 'hsl(230, 8%, 10%)',
+  colorButton0Back: '#dcdcdc',
+  colorButton0BackActive: '#c5c5c5',
+  colorButton0Fore: 'rgb(6, 6, 6)',
   colorButton1Back: 'rgb(63, 114, 226)',
+  colorButton1BackActive: 'rgb(54, 95, 183)',
   colorButton1Fore: 'rgb(255, 255, 255)',
-  colorMathPreviewBorder: '#eee',
+  colorButtonDisabledBack: '#e8e8e8',
+  colorButtonDisabledFore: '#b6b6b6',
   colorAnchorBorder: 'hsl(220, 2%, 33%)',
 };
 
