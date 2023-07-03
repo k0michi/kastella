@@ -386,9 +386,7 @@ export default class LibraryModel {
     }
 
     const nodeIndex = node.index!;
-    console.log('nodeIndex', nodeIndex);
     const referenceIndex = reference?.index ?? LibraryModel.getLastNodeOf(parent).index! + 1;
-    console.log('referenceIndex', referenceIndex);
 
     // [begin, end) These nodes' indices will be updated
     let begin, end;
@@ -401,8 +399,6 @@ export default class LibraryModel {
       begin = node;
       end = this.nextIndexNode(LibraryModel.getLastNodeOf(node));
     }
-    console.log('begin', begin);
-    console.log('end', end);
 
     arrayRemove(node.parent!.children, node.parent!.children.indexOf(node));
     arrayInsertBefore(parent.children, node, reference != undefined ?
