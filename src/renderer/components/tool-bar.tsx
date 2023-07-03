@@ -7,13 +7,11 @@ import Timestamp from '../timestamp';
 import { File, ItemStyle, NodeType } from '../node';
 import { IconMathFunction, IconHeading, IconQuote, IconList, IconListNumbers, IconMenu2, IconPhoto, IconFileText, IconCode, IconBold, IconAnchor, IconLink, IconBrush, IconItalic, IconStrikethrough, IconUnderline, IconSubscript, IconSuperscript, IconClearFormatting, IconFileCode } from '@tabler/icons';
 import { FileType } from '../../common/fetch';
-import { Excalidraw, MainMenu, exportToSvg, serializeAsJSON } from "@excalidraw/excalidraw";
-import mime from 'mime';
 import { ExcalidrawAPIRefValue, ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types/types';
 import ToolButton from './tool-button';
 import styled from 'styled-components';
 import { CommonDialog, CommonDialogButton, CommonDialogButtons, CommonDialogButtonsLeft, CommonDialogButtonsRight, CommonDialogTitle } from './common-dialog';
-import Dialog from './dialog';
+import CanvasDialog from './excalidraw-dialog';
 
 const DivToolBar = styled.div`
   border-bottom: 1px solid ${props => props.theme.colorBorder};
@@ -215,59 +213,42 @@ export default function ToolBar() {
           </CommonDialogButtonsRight>
         </CommonDialogButtons>
       </CommonDialog>
-      <Dialog open={openCanvasModal} style={{ height: "100%", width: "100%" }}>
-        <Excalidraw ref={(api) => setExcalidrawAPI(api)}>
-          <MainMenu>
-            <MainMenu.Item onSelect={async () => {
-              if (excalidrawAPI?.ready) {
-                const elements = excalidrawAPI.getSceneElements();
-                const appState = excalidrawAPI.getAppState();
-                const files = excalidrawAPI.getFiles();
-                const json = serializeAsJSON(elements, appState, files, 'local');
-                const xmlSerializer = new XMLSerializer();
-                const svg = xmlSerializer.serializeToString(await exportToSvg({ elements, appState, files }));
+      <CanvasDialog open={openCanvasModal} onClose={async (e) => {
+        const json = e.json;
+        const svg = e.svg;
 
-                const fileID = uuidv4();
-                await bridge.writeTextFile(fileID, json, 'application/json');
-                const now = await bridge.now();
+        const fileID = uuidv4();
+        await bridge.writeTextFile(fileID, json, 'application/json');
+        const now = await bridge.now();
 
-                const file = {
-                  id: fileID,
-                  type: 'application/json',
-                  modified: Timestamp.fromNs(now),
-                  created: Timestamp.fromNs(now),
-                } as File;
+        const file = {
+          id: fileID,
+          type: 'application/json',
+          modified: Timestamp.fromNs(now),
+          created: Timestamp.fromNs(now),
+        } as File;
 
-                model.library.addFile(file);
+        model.library.addFile(file);
 
-                const previewFileID = uuidv4();
-                await bridge.writeTextFile(previewFileID, svg, 'image/svg+xml');
+        const previewFileID = uuidv4();
+        await bridge.writeTextFile(previewFileID, svg, 'image/svg+xml');
 
-                const previewFile = {
-                  id: previewFileID,
-                  type: 'image/svg+xml',
-                  modified: Timestamp.fromNs(now),
-                  created: Timestamp.fromNs(now),
-                } as File;
+        const previewFile = {
+          id: previewFileID,
+          type: 'image/svg+xml',
+          modified: Timestamp.fromNs(now),
+          created: Timestamp.fromNs(now),
+        } as File;
 
-                model.library.addFile(previewFile);
+        model.library.addFile(previewFile);
 
-                let tagIDs: string[] = model.getViewTags();
-                const parentID = model.getViewDirectory();
+        let tagIDs: string[] = model.getViewTags();
+        const parentID = model.getViewDirectory();
 
-                model.library.addCanvasNode(fileID, previewFileID, Timestamp.fromNs(now), parentID, tagIDs);
+        model.library.addCanvasNode(fileID, previewFileID, Timestamp.fromNs(now), parentID, tagIDs);
 
-                excalidrawAPI.resetScene();
-                setOpenCanvasModal(false);
-              }
-            }}>
-              Close
-            </MainMenu.Item>
-            <MainMenu.DefaultItems.ClearCanvas />
-            <MainMenu.DefaultItems.ChangeCanvasBackground />
-          </MainMenu>
-        </Excalidraw>
-      </Dialog>
+        setOpenCanvasModal(false);
+      }} />
     </>
   );
 }
