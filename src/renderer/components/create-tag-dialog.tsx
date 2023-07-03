@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { CommonDialog, CommonDialogButton, CommonDialogButtons, CommonDialogButtonsLeft, CommonDialogButtonsRight, CommonDialogTextInput, CommonDialogTitle } from './common-dialog';
 import * as chroma from 'chroma-js';
-import { DivDialogRow } from './explorer-pane';
 
-export const tagExp = /^\S+$/;
+import { CommonDialog, CommonDialogButton, CommonDialogButtons, CommonDialogButtonsLeft, CommonDialogButtonsRight, CommonDialogTextInput, CommonDialogTitle } from './common-dialog';
+import { DivDialogRow } from './explorer-pane';
+import { RegExpression } from '../reg-expression';
 
 export interface CreateTagDialogOKEvent {
   tagName: string;
@@ -26,7 +26,7 @@ export default function CreateTagDialog(props: CreateTagDialogProps) {
     <DivDialogRow>
       <label>Tag name</label><CommonDialogTextInput invalid={!validTag} placeholder='tag'
         onChange={e => {
-          setValidTag(tagExp.test(e.target.value));
+          setValidTag(RegExpression.tag.test(e.target.value));
           setTagInput(e.target.value);
         }}
         value={tagInput} />

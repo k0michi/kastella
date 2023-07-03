@@ -1,15 +1,15 @@
 import * as React from 'react';
 import { useModel, useObservable } from 'kyoka';
+import styled, { useTheme } from 'styled-components';
+
 import Model, { DateView, DirectoryView, TagView, ViewType } from '../model';
 import { isDirectory, visit } from '../tree';
 import { DirectoryNode } from '../node';
 import { toDateString } from '../utils';
-import styled, { useTheme } from 'styled-components';
 import { CommonDialog, CommonDialogButton, CommonDialogButtons, CommonDialogButtonsLeft, CommonDialogButtonsRight, CommonDialogTextInput, CommonDialogTitle } from './common-dialog';
 import { TagMenu } from '../../common/menu';
 import CreateTagDialog from './create-tag-dialog';
-
-const pathExp = /^\/(([^\/]+)\/)*([^\/]+)?$/;
+import { RegExpression } from '../reg-expression';
 
 const DivExplorerPane = styled.div`
   flex: 0 0 200px;
@@ -207,7 +207,7 @@ export default function ExplorerPane() {
         <DivDialogRow>
           <label>Path</label><CommonDialogTextInput invalid={!validPath} placeholder='/.../...'
             onChange={e => {
-              setValidPath(pathExp.test(e.target.value));
+              setValidPath(RegExpression.path.test(e.target.value));
               setDirectoryPath(e.target.value);
             }}
             value={directoryPath} />
@@ -221,7 +221,7 @@ export default function ExplorerPane() {
           </CommonDialogButtonsLeft>
           <CommonDialogButtonsRight>
             <CommonDialogButton highlighted onClick={e => {
-              if (pathExp.test(directoryPath)) {
+              if (RegExpression.path.test(directoryPath)) {
                 model.library.createDirectory(directoryPath);
               }
 
