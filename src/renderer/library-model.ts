@@ -4,15 +4,16 @@ import Timestamp from "./timestamp";
 import { arrayInsertBefore, arrayRemove, round } from "./utils";
 import { Version10, Version11, Version5, Version9 } from "./compat";
 import { visit } from "./tree";
-import { AnchorNode, DirectoryNode, File, ImageNode, ItemStyle as ListStyle, MathNode, Node, NodeType, ReservedID, Tag, CodeNode, TextNode, CanvasNode, InlineNode } from "./node";
+import { AnchorNode, DirectoryNode, File, ImageNode, ItemStyle as ListStyle, MathNode, Node, NodeType, ReservedID, Tag, CodeNode, TextNode, CanvasNode, InlineNode, Device } from "./node";
 import EventHandler from "./event-handler";
 
-export const LIBRARY_VERSION = 14;
+export const LIBRARY_VERSION = 15;
 
 export interface Library {
   nodes: Node;
   files: File[];
   tags: Tag[];
+  devices: Device[];
   version: number;
 }
 
@@ -20,6 +21,7 @@ export default class LibraryModel {
   nodes = new Observable<Node>(LibraryModel.blankTree()); // mutable
   files = new Observable<File[]>([]); // mutable
   tags = new Observable<Tag[]>([]); // mutable
+  devices = new Observable<Device[]>([]); // mutable
   nodeMap = new Map<string, Node>();
   saveHandler = new EventHandler();
   updateHandler = new EventHandler();
@@ -29,6 +31,7 @@ export default class LibraryModel {
       nodes: LibraryModel.blankTree(),
       files: [],
       tags: [],
+      devices: [],
       version: LIBRARY_VERSION
     });
   }
@@ -52,6 +55,11 @@ export default class LibraryModel {
     if (data.version <= 11) {
       console.log(`Migrating from version 11...`);
       data = Version11.convert(data);
+    }
+
+    if (data.version <= 14) {
+      console.log(`Migrating from version 14...`);
+      data.devices = [];
     }
 
     return data as Library;
@@ -79,6 +87,7 @@ export default class LibraryModel {
       nodes: this.nodes.get(),
       files: this.files.get(),
       tags: this.tags.get(),
+      devices: this.devices.get(),
       version: LIBRARY_VERSION
     };
 
@@ -110,6 +119,7 @@ export default class LibraryModel {
     this.nodes.set(data.nodes);
     this.files.set(data.files);
     this.tags.set(data.tags);
+    this.devices.set(data.devices);
     this.update();
   }
 
@@ -176,8 +186,9 @@ export default class LibraryModel {
     this.save();
   }
 
-  addTextNode(text: string, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
+  async addTextNode(text: string, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
     const id = uuidv4();
+    const deviceID = await this.getCurrentDeviceID();
 
     if (tags?.length == 0) {
       tags = undefined;
@@ -189,6 +200,8 @@ export default class LibraryModel {
       tags,
       created: timeStamp,
       modified: timeStamp,
+      createdBy: deviceID,
+      modifiedBy: deviceID,
       id,
       children: []
     };
@@ -197,12 +210,13 @@ export default class LibraryModel {
     return node;
   }
 
-  addTextNodeWithFormat(text: InlineNode | (InlineNode | string)[], timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
+  async addTextNodeWithFormat(text: InlineNode | (InlineNode | string)[], timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
     if (!Array.isArray(text)) {
       text = [text];
     }
 
     const id = uuidv4();
+    const deviceID = await this.getCurrentDeviceID();
 
     if (tags?.length == 0) {
       tags = undefined;
@@ -214,6 +228,8 @@ export default class LibraryModel {
       tags,
       created: timeStamp,
       modified: timeStamp,
+      createdBy: deviceID,
+      modifiedBy: deviceID,
       id,
       children: []
     };
@@ -222,8 +238,9 @@ export default class LibraryModel {
     return node;
   }
 
-  addImageNode(file: File, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
-    const id = uuidv4()
+  async addImageNode(file: File, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
+    const id = uuidv4();
+    const deviceID = await this.getCurrentDeviceID();
 
     if (tags?.length == 0) {
       tags = undefined;
@@ -235,6 +252,8 @@ export default class LibraryModel {
       tags,
       created: timeStamp,
       modified: timeStamp,
+      createdBy: deviceID,
+      modifiedBy: deviceID,
       id,
       children: []
     };
@@ -244,8 +263,9 @@ export default class LibraryModel {
     return node;
   }
 
-  addCodeNode(file: File, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
-    const id = uuidv4()
+  async addCodeNode(file: File, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
+    const id = uuidv4();
+    const deviceID = await this.getCurrentDeviceID();
 
     if (tags?.length == 0) {
       tags = undefined;
@@ -257,6 +277,8 @@ export default class LibraryModel {
       tags,
       created: timeStamp,
       modified: timeStamp,
+      createdBy: deviceID,
+      modifiedBy: deviceID,
       id,
       children: []
     };
@@ -266,8 +288,9 @@ export default class LibraryModel {
     return node;
   }
 
-  addDirectoryNode(name: string, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
-    const id = uuidv4()
+  async addDirectoryNode(name: string, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
+    const id = uuidv4();
+    const deviceID = await this.getCurrentDeviceID();
 
     if (tags?.length == 0) {
       tags = undefined;
@@ -279,6 +302,8 @@ export default class LibraryModel {
       tags,
       created: timeStamp,
       modified: timeStamp,
+      createdBy: deviceID,
+      modifiedBy: deviceID,
       id,
       children: []
     };
@@ -287,7 +312,7 @@ export default class LibraryModel {
     return node;
   }
 
-  addAnchorNode(anchor: {
+  async addAnchorNode(anchor: {
     contentURL: string,
     contentType: string,
     contentTitle?: string,
@@ -300,6 +325,7 @@ export default class LibraryModel {
     parent: Node | string,
     tags?: string[]) {
     const id = uuidv4();
+    const deviceID = await this.getCurrentDeviceID();
 
     if (tags?.length == 0) {
       tags = undefined;
@@ -310,6 +336,8 @@ export default class LibraryModel {
       ...anchor,
       created: timeStamp,
       modified: timeStamp,
+      createdBy: deviceID,
+      modifiedBy: deviceID,
       id,
       children: []
     };
@@ -318,8 +346,9 @@ export default class LibraryModel {
     return node;
   }
 
-  addMathNode(exp: string, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
-    const id = uuidv4()
+  async addMathNode(exp: string, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
+    const id = uuidv4();
+    const deviceID = await this.getCurrentDeviceID();
 
     if (tags?.length == 0) {
       tags = undefined;
@@ -331,6 +360,8 @@ export default class LibraryModel {
       tags,
       created: timeStamp,
       modified: timeStamp,
+      createdBy: deviceID,
+      modifiedBy: deviceID,
       id,
       children: []
     };
@@ -339,8 +370,9 @@ export default class LibraryModel {
     return node;
   }
 
-  addCanvasNode(fileID: string, previewFileID: string, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
-    const id = uuidv4()
+  async addCanvasNode(fileID: string, previewFileID: string, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
+    const id = uuidv4();
+    const deviceID = await this.getCurrentDeviceID();
 
     if (tags?.length == 0) {
       tags = undefined;
@@ -353,6 +385,8 @@ export default class LibraryModel {
       tags,
       created: timeStamp,
       modified: timeStamp,
+      createdBy: deviceID,
+      modifiedBy: deviceID,
       id,
       children: []
     };
@@ -845,7 +879,7 @@ export default class LibraryModel {
       const found = this.findDirectory(parentID, dir);
 
       if (found == null) {
-        parentID = this.addDirectoryNode(dir, Timestamp.fromNs(await bridge.now()), this.getNode(parentID) as DirectoryNode).id;
+        parentID = (await this.addDirectoryNode(dir, Timestamp.fromNs(await bridge.now()), this.getNode(parentID) as DirectoryNode)).id;
       } else {
         parentID = found.id;
       }
@@ -870,6 +904,34 @@ export default class LibraryModel {
     }
 
     return false;
+  }
+
+
+  // Devices
+
+  async getCurrentDeviceID() {
+    await this.registerCurrentDeviceIfNeeded();
+
+    return await bridge.getDeviceID();
+  }
+
+  async registerCurrentDeviceIfNeeded() {
+    const id = await bridge.getDeviceID();
+
+    if (this.findDeviceByID(id) == null) {
+      const hostname = await bridge.getHostname();
+      const now = await Timestamp.now();
+
+      this.devices.get().push({
+        id,
+        name: hostname,
+        registeredAt: now
+      });
+    }
+  }
+
+  findDeviceByID(id: string) {
+    return this.devices.get().find(d => d.id == id);
   }
 
 

@@ -39,6 +39,8 @@ export interface Node {
   id: string;
   created?: Timestamp;
   modified?: Timestamp;
+  createdBy?: string;
+  modifiedBy?: string;
   tags?: string[];
   children: Node[];
   list?: ItemStyle;
@@ -188,6 +190,12 @@ export interface Tag {
   id: string;
   name: string;
   color?: string;
+}
+
+export interface Device {
+  id: string;
+  name: string;
+  registeredAt: Timestamp;
 }
 
 export namespace ReservedID {

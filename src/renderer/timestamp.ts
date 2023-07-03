@@ -56,6 +56,10 @@ export default class Timestamp {
     t = t.plusNanos(Number(ns % 1_000_000_000n));
     return new Timestamp(t);
   }
+
+  static async now() {
+    return Timestamp.fromNs(await bridge.now());
+  }
 }
 
 // https://github.com/js-joda/js-joda/blob/main/packages/core/src/format/DateTimeFormatter.js

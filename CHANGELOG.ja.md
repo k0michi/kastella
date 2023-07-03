@@ -1,6 +1,9 @@
 # Version History
 
 ## Version 14
+書き込んだデバイスIDを記録するように
+
+## Version 14
 タグの色を追加
 
 ## Version 13
