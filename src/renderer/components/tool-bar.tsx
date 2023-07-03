@@ -218,24 +218,24 @@ export default function ToolBar() {
         await bridge.writeTextFile(fileID, json, 'application/json');
         const now = await bridge.now();
 
-        const file = {
+        const file: File = {
           id: fileID,
           type: 'application/json',
           modified: Timestamp.fromNs(now),
           created: Timestamp.fromNs(now),
-        } as File;
+        };
 
         model.library.addFile(file);
 
         const previewFileID = uuidv4();
         await bridge.writeTextFile(previewFileID, svg, 'image/svg+xml');
 
-        const previewFile = {
+        const previewFile: File = {
           id: previewFileID,
           type: 'image/svg+xml',
           modified: Timestamp.fromNs(now),
           created: Timestamp.fromNs(now),
-        } as File;
+        };
 
         model.library.addFile(previewFile);
 

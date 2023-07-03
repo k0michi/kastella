@@ -181,7 +181,7 @@ export interface File {
   url?: string;
   created?: Timestamp;
   modified?: Timestamp;
-  accessed: Timestamp;
+  accessed?: Timestamp;
 }
 
 export interface Tag {
