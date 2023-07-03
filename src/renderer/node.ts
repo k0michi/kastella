@@ -41,7 +41,7 @@ export interface Node {
   modified?: Timestamp;
   tags?: string[];
   children: Node[];
-  list?: string;
+  list?: ItemStyle;
 
   parent?: Node; // memoization
   index?: number; // memoization
