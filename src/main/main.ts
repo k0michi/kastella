@@ -4,8 +4,11 @@ import { app, BrowserWindow, dialog, Event, ipcMain, shell, nativeTheme, IpcMain
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { now } from '@k0michi/now';
-import { fetchFile, fetchMeta } from './fetch.js';
 import * as mime from 'mime';
+import * as os from 'os';
+import * as crypto from 'crypto';
+
+import { fetchFile, fetchMeta } from './fetch.js';
 import { FileType } from '../common/fetch.js';
 import { ChannelTypes, Channels, Handler } from '../common/ipc.js';
 import { TagMenu } from '../common/menu.js';
@@ -13,12 +16,14 @@ import { TagMenu } from '../common/menu.js';
 // Paths
 const devURL = `http://localhost:5173/`;
 const configFileName = 'config.json';
+const deviceIDFileName = 'device.json';
 const userDataPath = app.getPath('userData');
 let defaultLibraryPath = path.join(userDataPath, 'library');
 
 // Variables
 let mainWindow: BrowserWindow | undefined;
 let config: Config;
+let deviceID: string;
 let libraryPath: string;
 
 interface Config {
@@ -29,6 +34,10 @@ function getConfigPath() {
   return path.join(userDataPath, configFileName);
 }
 
+function getDeviceFilePath() {
+  return path.join(userDataPath, deviceIDFileName);
+}
+
 async function loadConfig() {
   const configPath = getConfigPath();
   let configContent: string;
@@ -37,11 +46,26 @@ async function loadConfig() {
     configContent = await fs.readFile(configPath, 'utf-8');
   } catch (error) {
     // Does not exist
-    configContent = `{}`;
+    configContent = JSON.stringify({});
     await fs.writeFile(configPath, configContent);
   }
 
   config = JSON.parse(configContent);
+}
+
+async function loadDeviceID() {
+  const devicePath = getDeviceFilePath();
+  let deviceContent: string;
+
+  try {
+    deviceContent = await fs.readFile(devicePath, 'utf-8');
+  } catch (error) {
+    // Does not exist
+    deviceContent = JSON.stringify(crypto.randomUUID());
+    await fs.writeFile(devicePath, deviceContent);
+  }
+
+  deviceID = JSON.parse(deviceContent);
 }
 
 function getLibraryPath() {
@@ -98,14 +122,15 @@ function createWindow() {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   await loadConfig();
+  await loadDeviceID();
   libraryPath = getLibraryPath();
 
-  createWindow()
+  createWindow();
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
   })
 })
 
@@ -265,4 +290,12 @@ handle(Channels.showTagMenu, (e) => {
       },
     });
   });
+});
+
+handle(Channels.getDeviceID, (e) => {
+  return deviceID;
+});
+
+handle(Channels.getHostname, (e) => {
+  return os.hostname();
 });

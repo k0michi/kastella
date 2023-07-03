@@ -20,6 +20,8 @@ export interface ChannelTypes {
   setEdited: (edited: boolean) => void;
   showTagMenu: () => Promise<TagMenu | null>;
   shouldUseDarkColors: () => boolean;
+  getDeviceID: () => string;
+  getHostname: () => string;
 }
 
 export enum Channels {
@@ -40,6 +42,8 @@ export enum Channels {
   setEdited = 'setEdited',
   shouldUseDarkColors = 'shouldUseDarkColors',
   showTagMenu = 'showTagMenu',
+  getDeviceID = 'getDeviceID',
+  getHostname = 'getHostname',
 
   nativeThemeUpdate = 'nativeThemeUpdate',
 }
