@@ -64,9 +64,9 @@ const DivNode = styled.div<{ $block?: boolean, $selected?: boolean }>`
   background-color: ${props => props.$selected ? props.theme.colorEditorSelected : 'unset'};
 `;
 
-const DivTags = styled.div`
+const DivTags = styled.div<{ $block: boolean }>`
   display: inline-flex;
-  margin-left: 8px;
+  margin-left: ${props => !props.$block ? '8px' : '0'};
   flex-direction: row;
   gap: 8px;
   /* Temporary fix */
@@ -577,8 +577,9 @@ export default function EditorPane() {
 
                 const id = n.id;
                 const isSelected = id == selected;
+                const tagInline = isTagInline(n.type);
 
-                const tags = <DivTags>
+                const tags = <DivTags $block={tagInline}>
                   {n.tags?.map(tagID => {
                     const tag = model.library.getTag(tagID);
                     return <DivTag $color={tag?.color} key={tagID}>#{tag?.name}</DivTag>;
@@ -590,73 +591,43 @@ export default function EditorPane() {
                 if (n.type == NodeType.Text) {
                   const textNode = n as TextNode;
 
-                  content = <DivNode $selected={isSelected}>
-                    <TextNodeContent node={textNode} />
-                    {tags}
-                  </DivNode>;
+                  content = <TextNodeContent node={textNode} />;
                 } else if (n.type == NodeType.Image) {
                   const imageNode = n as ImageNode;
 
-                  content = <DivNode $block $selected={isSelected}>
-                    <ImageNodeContent node={imageNode} />
-                    {tags}
-                  </DivNode>
+                  content = <ImageNodeContent node={imageNode} />;
                 } else if (n.type == NodeType.Directory) {
                   const dNode = n as DirectoryNode;
 
-                  content = <DivNode $selected={isSelected}>
-                    <DirectoryNodeContent node={dNode} />
-                    {tags}
-                  </DivNode>;
+                  content = <DirectoryNodeContent node={dNode} />;
                 } else if (n.type == NodeType.Page) {
                   const pNode = n as PageNode;
 
-                  content = <DivNode $selected={isSelected}>
-                    <PageNodeContent node={pNode} />
-                    {tags}
-                  </DivNode>;
+                  content = <PageNodeContent node={pNode} />;
                 } else if (n.type == NodeType.Anchor) {
                   const anchor = n as AnchorNode;
 
-                  content = <DivNode $block $selected={isSelected}>
-                    <AnchorNodeContent node={anchor} />
-                    {tags}
-                  </DivNode>;
+                  content = <AnchorNodeContent node={anchor} />;
                 } else if (n.type == NodeType.Code) {
                   const codeNode = n as CodeNode;
 
-                  content = <DivNode $block $selected={isSelected}>
-                    <CodeNodeContent node={codeNode} />
-                    {tags}
-                  </DivNode>;
+                  content = <CodeNodeContent node={codeNode} />;
                 } else if (n.type == NodeType.Math) {
                   const mathNode = n as MathNode;
 
-                  content = <DivNode $block $selected={isSelected}>
-                    <MathNodeContent node={mathNode} />
-                    {tags}
-                  </DivNode>;
+                  content = <MathNodeContent node={mathNode} />;
                 } else if (n.type == NodeType.Heading) {
                   const headingNode = n as HeadingNode;
 
-                  content = <DivNode $selected={isSelected}>
-                    <HeadingNodeContent node={headingNode} />
-                    {tags}
-                  </DivNode>;
+                  content = <HeadingNodeContent node={headingNode} />;
                 } else if (n.type == NodeType.Quote) {
                   const quoteNode = n as QuoteNode;
 
-                  content = <DivNode $block $selected={isSelected}>
-                    <QuoteNodeContent node={quoteNode} />
-                    {tags}
-                  </DivNode>;
+                  content = <QuoteNodeContent node={quoteNode} />;
                 } else if (n.type == NodeType.Canvas) {
                   const canvasNode = n as CanvasNode;
 
-                  content = <DivNode $block $selected={isSelected}>
-                    <CanvasNodeContent node={canvasNode} />
-                    {tags}
-                  </DivNode>
+                  content = <CanvasNodeContent node={canvasNode} />;
                 }
 
                 const itemStyle = n.parent?.list;
@@ -675,7 +646,10 @@ export default function EditorPane() {
                   itemStyle={itemStyle}
                   listStyleType={listStyleType}
                 >
-                  {content}
+                  <DivNode $block={tagInline} $selected={isSelected}>
+                    {content}
+                    {tags}
+                  </DivNode>
                 </Row>;
               })
             }
@@ -746,5 +720,20 @@ function chooseReadableTextColor(backgroundColor: string, textColor1: string, te
     return textColor1;
   } else {
     return textColor2;
+  }
+}
+
+function isTagInline(nodeType: NodeType) {
+  switch (nodeType) {
+    case NodeType.Image:
+    case NodeType.Anchor:
+    case NodeType.Code:
+    case NodeType.Math:
+    case NodeType.Heading:
+    case NodeType.Quote:
+    case NodeType.Canvas:
+      return true;
+    default:
+      return false;
   }
 }
