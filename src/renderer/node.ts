@@ -187,6 +187,7 @@ export interface File {
 export interface Tag {
   id: string;
   name: string;
+  color?: string;
 }
 
 export namespace ReservedID {

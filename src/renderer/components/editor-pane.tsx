@@ -3,6 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime';
 import { useModel, useObservable } from 'kyoka';
 import ContentEditable from 'react-contenteditable'
+import styled from 'styled-components';
+import * as chroma from 'chroma-js';
 
 import { isHTTPURL } from '../utils';
 import Model, { DirectoryView, ViewType } from '../model.js';
@@ -22,7 +24,6 @@ import QuoteNodeContent from './node-content/quote-node-content';
 import CanvasNodeContent from './node-content/canvas-node-content';
 import { elementToInlineNode } from '../tree';
 import { isHTMLEmpty, parseHTMLFragment } from '../html';
-import styled from 'styled-components';
 
 const DivEditorPane = styled.div`
   flex: 1 1 0;
@@ -73,9 +74,9 @@ const DivTags = styled.div`
   user-select: none;
 `;
 
-const DivTag = styled.div`
-  background-color: ${props => props.theme.colorEditorTagBack};
-  color: ${props => props.theme.colorEditorTagFore};
+const DivTag = styled.div<{ $color?: string }>`
+  background-color: ${props => props.$color ?? props.theme.colorEditorTagBack};
+  color: ${props => chooseReadableTextColor(props.$color ?? props.theme.colorEditorTagBack, props.theme.colorEditorTagBack, props.theme.colorEditorTagFore)};
   padding: 0px 6px;
   font-size: 10px;
   border-radius: 6px;
@@ -577,10 +578,11 @@ export default function EditorPane() {
                 const id = n.id;
                 const isSelected = id == selected;
 
-                const tagNames = n.tags?.map(t => '#' + model.library.getTag(t)?.name);
-
                 const tags = <DivTags>
-                  {tagNames?.map(t => <DivTag key={t}>{t}</DivTag>)}
+                  {n.tags?.map(tagID => {
+                    const tag = model.library.getTag(tagID);
+                    return <DivTag $color={tag?.color} key={tagID}>#{tag?.name}</DivTag>;
+                  })}
                 </DivTags>;
 
                 let content;
@@ -734,4 +736,15 @@ function getAncestorID(element: HTMLElement | null): string | null {
   }
 
   return getAncestorID(element.parentElement);
+}
+
+function chooseReadableTextColor(backgroundColor: string, textColor1: string, textColor2: string) {
+  const contrast1 = chroma.contrast(backgroundColor, textColor1);
+  const contrast2 = chroma.contrast(backgroundColor, textColor2);
+
+  if (contrast1 > contrast2) {
+    return textColor1;
+  } else {
+    return textColor2;
+  }
 }

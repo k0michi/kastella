@@ -4,10 +4,11 @@ import Model, { DateView, DirectoryView, TagView, ViewType } from '../model';
 import { isDirectory, visit } from '../tree';
 import { DirectoryNode } from '../node';
 import { toDateString } from '../utils';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import Dialog from './dialog';
 import { CommonDialog, CommonDialogButton, CommonDialogButtons, CommonDialogButtonsLeft, CommonDialogButtonsRight, CommonDialogTextInput, CommonDialogTitle } from './common-dialog';
 import { TagMenu } from '../../common/menu';
+import * as chroma from 'chroma-js';
 
 const pathExp = /^\/(([^\/]+)\/)*([^\/]+)?$/;
 const tagExp = /^\S+$/;
@@ -54,7 +55,21 @@ const DivItem = styled.div<{ $selected?: boolean, $dragged?: boolean }>`
   background-color: ${props => props.$selected ? props.theme.colorExplorerSelected : 'unset'};
 `;
 
+const DivDialogRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  margin: 8px 0;
+
+  * {
+    display: block;
+  }
+`;
+
+const kDefaultTagColor = '#fff';
+
 export default function ExplorerPane() {
+  const theme = useTheme();
   const model = useModel<Model>();
   const nodes = useObservable(model.library.nodes);
   const tags = useObservable(model.library.tags);
@@ -66,6 +81,7 @@ export default function ExplorerPane() {
 
   const [tagModalOpen, setTagModalOpen] = React.useState(false);
   const [tagInput, setTagInput] = React.useState('');
+  const [tagColor, setTagColor] = React.useState(chroma.random().hex());
   const [validTag, setValidTag] = React.useState<boolean>(false);
 
   const [dates, setDates] = React.useState<string[]>([]);
@@ -181,12 +197,14 @@ export default function ExplorerPane() {
       </DivExplorerPane>
       <CommonDialog open={modalOpen}>
         <CommonDialogTitle>Create New Directory</CommonDialogTitle>
-        Path <CommonDialogTextInput invalid={!validPath} placeholder='/.../...'
-          onChange={e => {
-            setValidPath(pathExp.test(e.target.value));
-            setDirectoryPath(e.target.value);
-          }}
-          value={directoryPath} />
+        <DivDialogRow>
+          <label>Path</label><CommonDialogTextInput invalid={!validPath} placeholder='/.../...'
+            onChange={e => {
+              setValidPath(pathExp.test(e.target.value));
+              setDirectoryPath(e.target.value);
+            }}
+            value={directoryPath} />
+        </DivDialogRow>
         <CommonDialogButtons>
           <CommonDialogButtonsLeft>
             <CommonDialogButton onClick={e => {
@@ -208,12 +226,20 @@ export default function ExplorerPane() {
       </CommonDialog>
       <CommonDialog open={tagModalOpen}>
         <CommonDialogTitle>Create New Tag</CommonDialogTitle>
-        Tag name <CommonDialogTextInput invalid={!validTag} placeholder='tag'
-          onChange={e => {
-            setValidTag(tagExp.test(e.target.value));
-            setTagInput(e.target.value);
-          }}
-          value={tagInput} />
+        <DivDialogRow>
+          <label>Tag name</label><CommonDialogTextInput invalid={!validTag} placeholder='tag'
+            onChange={e => {
+              setValidTag(tagExp.test(e.target.value));
+              setTagInput(e.target.value);
+            }}
+            value={tagInput} />
+        </DivDialogRow>
+        <DivDialogRow>
+          <label>Color</label>
+          <input type="color" value={tagColor} onChange={e => {
+            setTagColor(e.target.value);
+          }} />
+        </DivDialogRow>
         <CommonDialogButtons>
           <CommonDialogButtonsLeft>
             <CommonDialogButton onClick={e => {
@@ -224,10 +250,11 @@ export default function ExplorerPane() {
           <CommonDialogButtonsRight>
             <CommonDialogButton highlighted onClick={e => {
               if (tagExp.test(tagInput)) {
-                model.library.createTag(tagInput);
+                model.library.createTag(tagInput, tagColor);
               }
 
               setTagInput('');
+              setTagColor(chroma.random().hex());
               setTagModalOpen(false);
             }} disabled={!validTag}>OK</CommonDialogButton>
           </CommonDialogButtonsRight>

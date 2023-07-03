@@ -1,5 +1,8 @@
 # Version History
 
+## Version 14
+タグの色を追加
+
 ## Version 13
 Canvasを追加
 

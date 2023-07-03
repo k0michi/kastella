@@ -7,7 +7,7 @@ import { visit } from "./tree";
 import { AnchorNode, DirectoryNode, File, ImageNode, ItemStyle as ListStyle, MathNode, Node, NodeType, ReservedID, Tag, CodeNode, TextNode, CanvasNode, InlineNode } from "./node";
 import EventHandler from "./event-handler";
 
-export const LIBRARY_VERSION = 13;
+export const LIBRARY_VERSION = 14;
 
 export interface Library {
   nodes: Node;
@@ -790,14 +790,14 @@ export default class LibraryModel {
 
   // Tags
 
-  createTag(name: string) {
-    if (this.tags.get().find(t => compareTag(t.name, name) == 0) != null) {
+  createTag(name: string, color?: string) {
+    if (this.findTag(name) != null) {
       throw new Error(`Tag '${name}' already exists`);
     }
 
     const id = uuidv4();
 
-    this.tags.get().push({ id, name });
+    this.tags.get().push({ id, name, color });
 
     this.tags.set(this.tags.get());
     this.save();
