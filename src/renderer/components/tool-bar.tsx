@@ -216,13 +216,13 @@ export default function ToolBar() {
 
         const fileID = uuidv4();
         await bridge.writeTextFile(fileID, json, 'application/json');
-        const now = await bridge.now();
+        const now = Timestamp.fromNs(await bridge.now());
 
         const file: File = {
           id: fileID,
           type: 'application/json',
-          modified: Timestamp.fromNs(now),
-          created: Timestamp.fromNs(now),
+          modified: now,
+          created: now,
         };
 
         model.library.addFile(file);
@@ -233,8 +233,8 @@ export default function ToolBar() {
         const previewFile: File = {
           id: previewFileID,
           type: 'image/svg+xml',
-          modified: Timestamp.fromNs(now),
-          created: Timestamp.fromNs(now),
+          modified: now,
+          created: now,
         };
 
         model.library.addFile(previewFile);
@@ -242,7 +242,7 @@ export default function ToolBar() {
         let tagIDs: string[] = model.getViewTags();
         const parentID = model.getViewDirectory();
 
-        model.library.addCanvasNode(fileID, previewFileID, Timestamp.fromNs(now), parentID, tagIDs);
+        model.library.addCanvasNode(fileID, previewFileID, now, parentID, tagIDs);
 
         setOpenCanvasModal(false);
       }} />
