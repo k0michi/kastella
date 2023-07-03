@@ -64,10 +64,10 @@ export default function ToolBar() {
   return (
     <>
       <DivToolBar>
-        <ToolButton onClick={e => {
+        <ToolButton title='Math Block' onClick={e => {
           setOpenMathModal(true);
         }}><IconMathFunction stroke={2} size={16} /></ToolButton>
-        <ToolButton onClick={e => {
+        <ToolButton title='Heading' onClick={e => {
           const selected = model.selected.get();
 
           if (selected != undefined) {
@@ -78,7 +78,7 @@ export default function ToolBar() {
             }
           }
         }}><IconHeading stroke={2} size={16} /></ToolButton>
-        <ToolButton onClick={e => {
+        <ToolButton title='Quote' onClick={e => {
           const selected = model.selected.get();
 
           if (selected != undefined) {
@@ -89,28 +89,28 @@ export default function ToolBar() {
             }
           }
         }}><IconQuote stroke={2} size={16} /></ToolButton>
-        <ToolButton onClick={e => {
+        <ToolButton title='Item Style: None' onClick={e => {
           const selected = model.selected.get();
 
           if (selected != undefined) {
             model.library.setListStyle(selected, undefined);
           }
         }}><IconMenu2 stroke={2} size={16} /></ToolButton>
-        <ToolButton onClick={e => {
+        <ToolButton title='Item Style: Unordered' onClick={e => {
           const selected = model.selected.get();
 
           if (selected != undefined) {
             model.library.setListStyle(selected, ItemStyle.Unordered);
           }
         }}><IconList stroke={2} size={16} /></ToolButton>
-        <ToolButton onClick={e => {
+        <ToolButton title='Item Style: Ordered' onClick={e => {
           const selected = model.selected.get();
 
           if (selected != undefined) {
             model.library.setListStyle(selected, ItemStyle.Ordered);
           }
         }}><IconListNumbers stroke={2} size={16} /></ToolButton>
-        <ToolButton onClick={async e => {
+        <ToolButton title='Image' onClick={async e => {
           const result = await bridge.openFile(FileType.Image);
 
           if (result != null) {
@@ -119,7 +119,7 @@ export default function ToolBar() {
             }
           }
         }}><IconPhoto stroke={2} size={16} /></ToolButton>
-        <ToolButton onClick={async e => {
+        <ToolButton title='Code Block from File' onClick={async e => {
           const result = await bridge.openFile(FileType.Text);
 
           if (result != null) {
@@ -128,31 +128,31 @@ export default function ToolBar() {
             }
           }
         }}><IconFileCode stroke={2} size={16} /></ToolButton>
-        <ToolButton onClick={async e => {
+        <ToolButton title='Canvas' onClick={async e => {
           setOpenCanvasModal(true);
         }}><IconBrush stroke={2} size={16} /></ToolButton>
-        <ToolButton onClick={e => {
+        <ToolButton title='Bold' onClick={e => {
           document.execCommand('bold');
         }}><IconBold stroke={2} size={16} /></ToolButton>
-        <ToolButton onClick={e => {
+        <ToolButton title='Italic' onClick={e => {
           document.execCommand('italic');
         }}><IconItalic stroke={2} size={16} /></ToolButton>
-        <ToolButton onClick={e => {
+        <ToolButton title='Underline' onClick={e => {
           document.execCommand('underline');
         }}><IconUnderline stroke={2} size={16} /></ToolButton>
-        <ToolButton onClick={e => {
+        <ToolButton title='Strikethrough' onClick={e => {
           document.execCommand('strikeThrough');
         }}><IconStrikethrough stroke={2} size={16} /></ToolButton>
-        <ToolButton onClick={e => {
+        <ToolButton title='Subscript' onClick={e => {
           document.execCommand('subscript');
         }}><IconSubscript stroke={2} size={16} /></ToolButton>
-        <ToolButton onClick={e => {
+        <ToolButton title='Superscript' onClick={e => {
           document.execCommand('superscript');
         }}><IconSuperscript stroke={2} size={16} /></ToolButton>
-        <ToolButton onClick={e => {
+        <ToolButton title='Clear Formatting' onClick={e => {
           document.execCommand('removeFormat');
         }}><IconClearFormatting stroke={2} size={16} /></ToolButton>
-        <ToolButton onClick={e => {
+        <ToolButton title='Code' onClick={e => {
           const selection = window.getSelection();
           const range = selection?.getRangeAt(0);
 
