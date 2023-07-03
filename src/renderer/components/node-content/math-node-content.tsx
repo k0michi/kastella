@@ -20,7 +20,11 @@ export interface MathNodeContentProps {
 
 export default function MathNodeContent(props: MathNodeContentProps) {
   return <DivMath dangerouslySetInnerHTML={{
-    __html: katex.renderToString(props.node.expression, { displayMode: true })
+    __html: katex.renderToString(props.node.expression, {
+      displayMode: true,
+      strict: true,
+      trust: false,
+    })
   }}>
   </DivMath>;
 }

@@ -52,7 +52,9 @@ export default function ToolBar() {
 
     try {
       result = Katex.renderToString(exp, {
-        displayMode: true
+        displayMode: true,
+        strict: true,
+        trust: false,
       });
     } catch (e) {
       return e as Error;
