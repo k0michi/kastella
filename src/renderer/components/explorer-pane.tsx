@@ -5,7 +5,6 @@ import { isDirectory, visit } from '../tree';
 import { DirectoryNode } from '../node';
 import { toDateString } from '../utils';
 import styled, { useTheme } from 'styled-components';
-import Dialog from './dialog';
 import { CommonDialog, CommonDialogButton, CommonDialogButtons, CommonDialogButtonsLeft, CommonDialogButtonsRight, CommonDialogTextInput, CommonDialogTitle } from './common-dialog';
 import { TagMenu } from '../../common/menu';
 import * as chroma from 'chroma-js';
@@ -65,8 +64,6 @@ const DivDialogRow = styled.div`
     display: block;
   }
 `;
-
-const kDefaultTagColor = '#fff';
 
 export default function ExplorerPane() {
   const theme = useTheme();
