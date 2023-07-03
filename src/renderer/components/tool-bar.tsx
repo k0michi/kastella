@@ -2,12 +2,11 @@ import * as React from 'react';
 import Katex from 'katex';
 import { v4 as uuidv4 } from 'uuid';
 import { useModel, useObservable } from 'kyoka';
-import Model, { DirectoryView, TagView, ViewType } from '../model';
+import Model from '../model';
 import Timestamp from '../timestamp';
 import { File, ItemStyle, NodeType } from '../node';
 import { IconMathFunction, IconHeading, IconQuote, IconList, IconListNumbers, IconMenu2, IconPhoto, IconFileText, IconCode, IconBold, IconAnchor, IconLink, IconBrush, IconItalic, IconStrikethrough, IconUnderline, IconSubscript, IconSuperscript, IconClearFormatting, IconFileCode } from '@tabler/icons';
 import { FileType } from '../../common/fetch';
-import { ExcalidrawAPIRefValue, ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types/types';
 import ToolButton from './tool-button';
 import styled from 'styled-components';
 import { CommonDialog, CommonDialogButton, CommonDialogButtons, CommonDialogButtonsLeft, CommonDialogButtonsRight, CommonDialogTitle } from './common-dialog';
@@ -42,13 +41,11 @@ const DivMathPreview = styled.div<{ $error?: boolean }>`
 
 export default function ToolBar() {
   const model = useModel<Model>();
-  const selected = useObservable(model.selected);
 
   const [openMathModal, setOpenMathModal] = React.useState(false);
   const [exp, setExp] = React.useState<string>('');
 
   const [openCanvasModal, setOpenCanvasModal] = React.useState(false);
-  const [excalidrawAPI, setExcalidrawAPI] = React.useState<ExcalidrawAPIRefValue | null>(null);
 
   const rendered = React.useMemo(() => {
     let result;
