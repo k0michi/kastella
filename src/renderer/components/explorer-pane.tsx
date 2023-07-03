@@ -52,6 +52,10 @@ const DivItem = styled.div<{ $selected?: boolean, $dragged?: boolean }>`
   border-radius: 3px;
   border: 1px solid ${props => props.$dragged ? props.theme.colorExplorerSelected : 'transparent'};
   background-color: ${props => props.$selected ? props.theme.colorExplorerSelected : 'unset'};
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  align-items: center;
 `;
 
 const DivDialogRow = styled.div`
@@ -63,6 +67,13 @@ const DivDialogRow = styled.div`
   * {
     display: block;
   }
+`;
+
+const DivTagCircle = styled.div<{ $color?: string }>`
+  width: 0.75em;
+  height: 0.75em;
+  border-radius: 0.75em;
+  background-color: ${props => props.$color ?? props.theme.colorEditorTagBack};
 `;
 
 export default function ExplorerPane() {
@@ -178,7 +189,10 @@ export default function ExplorerPane() {
               onClick={e => {
                 model.changeView({ 'type': 'tag', tag: t.id } as TagView);
               }}>
-              {t.name}
+              <DivTagCircle $color={t.color} />
+              <div>
+                {t.name}
+              </div>
             </DivItem>)}
           </div>
         </DivSection>
