@@ -7,10 +7,9 @@ import { toDateString } from '../utils';
 import styled, { useTheme } from 'styled-components';
 import { CommonDialog, CommonDialogButton, CommonDialogButtons, CommonDialogButtonsLeft, CommonDialogButtonsRight, CommonDialogTextInput, CommonDialogTitle } from './common-dialog';
 import { TagMenu } from '../../common/menu';
-import * as chroma from 'chroma-js';
+import CreateTagDialog from './create-tag-dialog';
 
 const pathExp = /^\/(([^\/]+)\/)*([^\/]+)?$/;
-const tagExp = /^\S+$/;
 
 const DivExplorerPane = styled.div`
   flex: 0 0 200px;
@@ -58,7 +57,7 @@ const DivItem = styled.div<{ $selected?: boolean, $dragged?: boolean }>`
   align-items: center;
 `;
 
-const DivDialogRow = styled.div`
+export const DivDialogRow = styled.div`
   display: flex;
   flex-direction: row;
   gap: 8px;
@@ -78,7 +77,6 @@ const DivTagCircle = styled.div<{ $color?: string }>`
 `;
 
 export default function ExplorerPane() {
-  const theme = useTheme();
   const model = useModel<Model>();
   const nodes = useObservable(model.library.nodes);
   const tags = useObservable(model.library.tags);
@@ -89,9 +87,6 @@ export default function ExplorerPane() {
   const [validPath, setValidPath] = React.useState<boolean>(false);
 
   const [tagModalOpen, setTagModalOpen] = React.useState(false);
-  const [tagInput, setTagInput] = React.useState('');
-  const [tagColor, setTagColor] = React.useState(chroma.random().hex());
-  const [validTag, setValidTag] = React.useState<boolean>(false);
 
   const [dates, setDates] = React.useState<string[]>([]);
   const [draggedOver, setDraggedOver] = React.useState<string | undefined | boolean>(false);
@@ -236,42 +231,12 @@ export default function ExplorerPane() {
           </CommonDialogButtonsRight>
         </CommonDialogButtons>
       </CommonDialog>
-      <CommonDialog open={tagModalOpen}>
-        <CommonDialogTitle>Create New Tag</CommonDialogTitle>
-        <DivDialogRow>
-          <label>Tag name</label><CommonDialogTextInput invalid={!validTag} placeholder='tag'
-            onChange={e => {
-              setValidTag(tagExp.test(e.target.value));
-              setTagInput(e.target.value);
-            }}
-            value={tagInput} />
-        </DivDialogRow>
-        <DivDialogRow>
-          <label>Color</label>
-          <input type="color" value={tagColor} onChange={e => {
-            setTagColor(e.target.value);
-          }} />
-        </DivDialogRow>
-        <CommonDialogButtons>
-          <CommonDialogButtonsLeft>
-            <CommonDialogButton onClick={e => {
-              setTagInput('');
-              setTagModalOpen(false)
-            }}>Cancel</CommonDialogButton>
-          </CommonDialogButtonsLeft>
-          <CommonDialogButtonsRight>
-            <CommonDialogButton highlighted onClick={e => {
-              if (tagExp.test(tagInput)) {
-                model.library.createTag(tagInput, tagColor);
-              }
-
-              setTagInput('');
-              setTagColor(chroma.random().hex());
-              setTagModalOpen(false);
-            }} disabled={!validTag}>OK</CommonDialogButton>
-          </CommonDialogButtonsRight>
-        </CommonDialogButtons>
-      </CommonDialog>
+      <CreateTagDialog open={tagModalOpen} onOK={e => {
+        model.library.createTag(e.tagName, e.tagColor);
+        setTagModalOpen(false);
+      }} onCancel={() => {
+        setTagModalOpen(false);
+      }} />
     </>
   );
 }
