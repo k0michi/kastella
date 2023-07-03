@@ -4,6 +4,8 @@ import * as chroma from 'chroma-js';
 import { CommonDialog, CommonDialogButton, CommonDialogButtons, CommonDialogButtonsLeft, CommonDialogButtonsRight, CommonDialogTextInput, CommonDialogTitle } from './common-dialog';
 import { DivDialogRow } from './explorer-pane';
 import { RegExpression } from '../reg-expression';
+import { useModel } from 'kyoka';
+import Model from '../model';
 
 export interface CreateTagDialogOKEvent {
   tagName: string;
@@ -17,6 +19,7 @@ export interface CreateTagDialogProps {
 }
 
 export default function CreateTagDialog(props: CreateTagDialogProps) {
+  const model = useModel<Model>();
   const [tagInput, setTagInput] = React.useState('');
   const [tagColor, setTagColor] = React.useState(chroma.random().hex());
   const [validTag, setValidTag] = React.useState<boolean>(false);
@@ -26,7 +29,13 @@ export default function CreateTagDialog(props: CreateTagDialogProps) {
     <DivDialogRow>
       <label>Tag name</label><CommonDialogTextInput invalid={!validTag} placeholder='tag'
         onChange={e => {
-          setValidTag(RegExpression.tag.test(e.target.value));
+          let valid = RegExpression.tag.test(e.target.value);
+
+          if (model.library.findTag(e.target.value) != null) {
+            valid = false;
+          }
+
+          setValidTag(valid);
           setTagInput(e.target.value);
         }}
         value={tagInput} />
