@@ -24,7 +24,7 @@ import QuoteNodeContent from './node-content/quote-node-content';
 import CanvasNodeContent from './node-content/canvas-node-content';
 import { elementToInlineNode } from '../tree';
 import { isHTMLEmpty, parseHTMLFragment } from '../html';
-import { isSupportedImageFileType, isSupportedTextFileType } from '../file-type';
+import { isSupportedImageFileType, isSupportedTextFileType } from '../../common/file-type';
 
 const DivEditorPane = styled.div`
   flex: 1 1 0;

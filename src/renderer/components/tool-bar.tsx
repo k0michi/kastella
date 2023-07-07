@@ -6,11 +6,11 @@ import Model from '../model';
 import Timestamp from '../timestamp';
 import { File, ItemStyle, NodeType } from '../node';
 import { IconMathFunction, IconHeading, IconQuote, IconList, IconListNumbers, IconMenu2, IconPhoto, IconFileText, IconCode, IconBold, IconAnchor, IconLink, IconBrush, IconItalic, IconStrikethrough, IconUnderline, IconSubscript, IconSuperscript, IconClearFormatting, IconFileCode } from '@tabler/icons';
-import { FileType } from '../../common/fetch';
 import ToolButton from './tool-button';
 import styled from 'styled-components';
 import { CommonDialog, CommonDialogButton, CommonDialogButtons, CommonDialogButtonsLeft, CommonDialogButtonsRight, CommonDialogTitle } from './common-dialog';
 import CanvasDialog from './excalidraw-dialog';
+import { FileType, FileKind } from '../../common/file-type';
 
 const DivToolBar = styled.div`
   border-bottom: 1px solid ${props => props.theme.colorBorder};
@@ -113,7 +113,7 @@ export default function ToolBar() {
           }
         }}><IconListNumbers stroke={2} size={16} /></ToolButton>
         <ToolButton title='Image' onClick={async e => {
-          const result = await bridge.openFile(FileType.Image);
+          const result = await bridge.openFile(FileKind.Image);
 
           if (result != null) {
             for (const filePath of result) {
@@ -122,7 +122,7 @@ export default function ToolBar() {
           }
         }}><IconPhoto stroke={2} size={16} /></ToolButton>
         <ToolButton title='Code Block from File' onClick={async e => {
-          const result = await bridge.openFile(FileType.Text);
+          const result = await bridge.openFile(FileKind.Text);
 
           if (result != null) {
             for (const filePath of result) {
@@ -217,12 +217,12 @@ export default function ToolBar() {
         const svg = e.svg;
 
         const fileID = uuidv4();
-        await bridge.writeTextFile(fileID, json, 'application/json');
+        await bridge.writeTextFile(fileID, json, FileType.JSON);
         const now = Timestamp.fromNs(await bridge.now());
 
         const file: File = {
           id: fileID,
-          type: 'application/json',
+          type: FileType.JSON,
           modified: now,
           created: now,
         };
@@ -230,11 +230,11 @@ export default function ToolBar() {
         model.library.addFile(file);
 
         const previewFileID = uuidv4();
-        await bridge.writeTextFile(previewFileID, svg, 'image/svg+xml');
+        await bridge.writeTextFile(previewFileID, svg, FileType.SVG);
 
         const previewFile: File = {
           id: previewFileID,
-          type: 'image/svg+xml',
+          type: FileType.SVG,
           modified: now,
           created: now,
         };

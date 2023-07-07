@@ -7,7 +7,7 @@ import mime from "mime";
 import Timestamp from "./timestamp";
 import { inlineNodeToString, visit } from "./tree";
 import { DateTimeFormatter } from "@js-joda/core";
-import { isSupportedImageFileType, isSupportedTextFileType } from "./file-type";
+import { isSupportedImageFileType, isSupportedTextFileType } from "../common/file-type";
 // import { validateLibrary } from "./validate";
 
 export enum ViewType {

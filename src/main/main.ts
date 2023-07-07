@@ -9,7 +9,7 @@ import * as os from 'os';
 import * as crypto from 'crypto';
 
 import { fetchFile, fetchMeta } from './fetch.js';
-import { FileType } from '../common/fetch.js';
+import { FileKind, FileType } from '../common/file-type.js';
 import { ChannelTypes, Channels, Handler } from '../common/ipc.js';
 import { TagMenu } from '../common/menu.js';
 
@@ -228,8 +228,8 @@ handle(Channels.writeTextFile, async (e, id: string, data: string, type: string)
   return await fs.writeFile(destPath, data);
 });
 
-handle(Channels.openFile, async (e, fileType: FileType) => {
-  if (fileType == FileType.Text) {
+handle(Channels.openFile, async (e, fileKind: FileKind) => {
+  if (fileKind == FileKind.Text) {
     const result = await dialog.showOpenDialog({
       properties: ['openFile', 'multiSelections']
     });
@@ -241,7 +241,7 @@ handle(Channels.openFile, async (e, fileType: FileType) => {
     return result.filePaths;
   }
 
-  if (fileType == FileType.Image) {
+  if (fileKind == FileKind.Image) {
     const result = await dialog.showOpenDialog({
       title: 'Open image file',
       properties: ['openFile', 'multiSelections'],
