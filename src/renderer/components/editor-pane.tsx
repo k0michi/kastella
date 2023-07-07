@@ -104,7 +104,7 @@ export default function EditorPane() {
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
 
   React.useEffect(() => {
-    const onScroll = (e: Event) => {
+    const onWheel = (e: Event) => {
       const editor = editorRef.current!;
 
       const clientHeight = editor.clientHeight;
@@ -121,10 +121,10 @@ export default function EditorPane() {
       }
     }
 
-    editorRef.current?.addEventListener('scroll', onScroll);
+    editorRef.current?.addEventListener('wheel', onWheel);
 
     return () => {
-      editorRef.current?.removeEventListener('scroll', onScroll);
+      editorRef.current?.removeEventListener('wheel', onWheel);
     };
   }, []);
 
@@ -146,6 +146,7 @@ export default function EditorPane() {
 
   React.useEffect(() => {
     const resizeObserver = new ResizeObserver(entries => {
+      console.log(atBottom)
       if (atBottom) {
         editorRef.current?.scroll(0, editorRef.current?.scrollHeight);
       }
