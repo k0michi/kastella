@@ -10,7 +10,7 @@ import * as crypto from 'crypto';
 
 import { fetchFile, fetchMeta } from './fetch.js';
 import { FileKind, FileType } from '../common/file-type.js';
-import { ChannelTypes, Channels, Handler } from '../common/ipc.js';
+import { ChannelType, Channel, Handler } from '../common/ipc.js';
 import { TagMenu } from '../common/menu.js';
 
 // Paths
@@ -144,22 +144,22 @@ app.on('window-all-closed', function () {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
-function handle<C extends keyof ChannelTypes>(channel: C, handler: Handler<ChannelTypes[C]>) {
+function handle<C extends keyof ChannelType>(channel: C, handler: Handler<ChannelType[C]>) {
   ipcMain.handle(channel, handler as (event: IpcMainInvokeEvent, ...args: any[]) => (Promise<void>) | (any));
 }
 
-handle(Channels.readLibrary, async e => {
+handle(Channel.readLibrary, async e => {
   const filePath = path.join(libraryPath, 'data.json');
   return await fs.readFile(filePath, 'utf-8');
 });
 
-handle(Channels.writeLibrary, async (e, content: string) => {
+handle(Channel.writeLibrary, async (e, content: string) => {
   const filePath = path.join(libraryPath, 'data.json');
   await fs.mkdir(libraryPath, { recursive: true });
   return await fs.writeFile(filePath, content);
 });
 
-handle(Channels.copyFile, async (e, id: string, filePath: string) => {
+handle(Channel.copyFile, async (e, id: string, filePath: string) => {
   const ext = path.extname(filePath);
   await fs.mkdir(path.join(libraryPath, 'files'), { recursive: true });
   const destPath = path.join(libraryPath, 'files', id + ext);
@@ -178,57 +178,57 @@ async function findFile(id: string) {
   throw new Error('Not found');
 }
 
-handle(Channels.readFile, async (e, id: string) => {
+handle(Channel.readFile, async (e, id: string) => {
   const found = await findFile(id);
   return await fs.readFile(found);
 });
 
-handle(Channels.readTextFile, async (e, id: string) => {
+handle(Channel.readTextFile, async (e, id: string) => {
   const found = await findFile(id);
   return await fs.readFile(found, 'utf-8');
 });
 
-handle(Channels.removeFile, async (e, id: string) => {
+handle(Channel.removeFile, async (e, id: string) => {
   const found = await findFile(id);
   return await fs.rm(found);
 });
 
-handle(Channels.basename, (e, filePath: string) => {
+handle(Channel.basename, (e, filePath: string) => {
   return path.basename(filePath);
 });
 
-handle(Channels.getMTime, async (e, filePath: string) => {
+handle(Channel.getMTime, async (e, filePath: string) => {
   const stat = await fs.stat(filePath, { bigint: true });
   return stat.mtimeNs;
 });
 
-handle(Channels.now, (e) => {
+handle(Channel.now, (e) => {
   return now();
 });
 
-handle(Channels.fetchMeta, async (e, url: string) => {
+handle(Channel.fetchMeta, async (e, url: string) => {
   return await fetchMeta(url);
 });
 
-handle(Channels.fetchFile, async (e, url: string) => {
+handle(Channel.fetchFile, async (e, url: string) => {
   return await fetchFile(url);
 });
 
-handle(Channels.writeFile, async (e, id: string, data: Uint8Array, type: string) => {
+handle(Channel.writeFile, async (e, id: string, data: Uint8Array, type: string) => {
   const ext = mime.getExtension(type);
   await fs.mkdir(path.join(libraryPath, 'files'), { recursive: true });
   const destPath = path.join(libraryPath, 'files', id + '.' + ext);
   return await fs.writeFile(destPath, data);
 });
 
-handle(Channels.writeTextFile, async (e, id: string, data: string, type: string) => {
+handle(Channel.writeTextFile, async (e, id: string, data: string, type: string) => {
   const ext = mime.getExtension(type);
   await fs.mkdir(path.join(libraryPath, 'files'), { recursive: true });
   const destPath = path.join(libraryPath, 'files', id + '.' + ext);
   return await fs.writeFile(destPath, data);
 });
 
-handle(Channels.openFile, async (e, fileKind: FileKind) => {
+handle(Channel.openFile, async (e, fileKind: FileKind) => {
   if (fileKind == FileKind.Text) {
     const result = await dialog.showOpenDialog({
       properties: ['openFile', 'multiSelections']
@@ -260,19 +260,19 @@ handle(Channels.openFile, async (e, fileKind: FileKind) => {
   return null;
 });
 
-handle(Channels.setEdited, (e, edited: boolean) => {
+handle(Channel.setEdited, (e, edited: boolean) => {
   mainWindow?.setDocumentEdited(edited);
 });
 
-handle(Channels.shouldUseDarkColors, (e) => {
+handle(Channel.shouldUseDarkColors, (e) => {
   return nativeTheme.shouldUseDarkColors;
 });
 
 nativeTheme.on('updated', () => {
-  mainWindow?.webContents.send(Channels.nativeThemeUpdate);
+  mainWindow?.webContents.send(Channel.nativeThemeUpdate);
 });
 
-handle(Channels.showTagMenu, (e) => {
+handle(Channel.showTagMenu, (e) => {
   return new Promise<TagMenu | null>((resolve, reject) => {
     const tagMenu = Menu.buildFromTemplate([{
       label: 'Edit Tag', click: () => {
@@ -292,10 +292,10 @@ handle(Channels.showTagMenu, (e) => {
   });
 });
 
-handle(Channels.getDeviceID, (e) => {
+handle(Channel.getDeviceID, (e) => {
   return deviceID;
 });
 
-handle(Channels.getHostname, (e) => {
+handle(Channel.getHostname, (e) => {
   return os.hostname();
 });

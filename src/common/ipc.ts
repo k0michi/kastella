@@ -3,7 +3,7 @@ import { FetchedFile, FetchedMeta } from "./fetch";
 import { TagMenu } from "./menu";
 import { FileKind } from "./file-type";
 
-export interface ChannelTypes {
+export interface ChannelType {
   readLibrary: () => Promise<string>;
   writeLibrary: (content: string) => Promise<void>;
   copyFile: (id: string, filePath: string) => Promise<void>;
@@ -25,7 +25,7 @@ export interface ChannelTypes {
   getHostname: () => string;
 }
 
-export enum Channels {
+export enum Channel {
   readLibrary = 'readLibrary',
   writeLibrary = 'writeLibrary',
   copyFile = 'copyFile',

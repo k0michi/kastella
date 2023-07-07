@@ -1,36 +1,36 @@
 import { ipcRenderer, contextBridge } from 'electron';
-import { ChannelTypes, Channels, Invoke } from '../common/ipc.js';
+import { ChannelType, Channel, Invoke } from '../common/ipc.js';
 
-function makeInvoke<K extends keyof ChannelTypes>(channel: K) {
-  const invoke = ((...args) => ipcRenderer.invoke(channel, ...args)) as Invoke<ChannelTypes[K]>;
+function makeInvoke<K extends keyof ChannelType>(channel: K) {
+  const invoke = ((...args) => ipcRenderer.invoke(channel, ...args)) as Invoke<ChannelType[K]>;
   return invoke;
 }
 
 export class Bridge {
-  readLibrary = makeInvoke(Channels.readLibrary);
-  writeLibrary = makeInvoke(Channels.writeLibrary);
-  copyFile = makeInvoke(Channels.copyFile);
-  readFile = makeInvoke(Channels.readFile);
-  readTextFile = makeInvoke(Channels.readTextFile);
-  removeFile = makeInvoke(Channels.removeFile);
-  basename = makeInvoke(Channels.basename);
-  getMTime = makeInvoke(Channels.getMTime);
-  now = makeInvoke(Channels.now);
-  fetchMeta = makeInvoke(Channels.fetchMeta);
-  fetchFile = makeInvoke(Channels.fetchFile);
-  writeFile = makeInvoke(Channels.writeFile);
-  writeTextFile = makeInvoke(Channels.writeTextFile);
-  openFile = makeInvoke(Channels.openFile);
-  setEdited = makeInvoke(Channels.setEdited);
-  shouldUseDarkColors = makeInvoke(Channels.shouldUseDarkColors);
-  showTagMenu = makeInvoke(Channels.showTagMenu);
-  getDeviceID = makeInvoke(Channels.getDeviceID);
-  getHostname = makeInvoke(Channels.getHostname);
+  readLibrary = makeInvoke(Channel.readLibrary);
+  writeLibrary = makeInvoke(Channel.writeLibrary);
+  copyFile = makeInvoke(Channel.copyFile);
+  readFile = makeInvoke(Channel.readFile);
+  readTextFile = makeInvoke(Channel.readTextFile);
+  removeFile = makeInvoke(Channel.removeFile);
+  basename = makeInvoke(Channel.basename);
+  getMTime = makeInvoke(Channel.getMTime);
+  now = makeInvoke(Channel.now);
+  fetchMeta = makeInvoke(Channel.fetchMeta);
+  fetchFile = makeInvoke(Channel.fetchFile);
+  writeFile = makeInvoke(Channel.writeFile);
+  writeTextFile = makeInvoke(Channel.writeTextFile);
+  openFile = makeInvoke(Channel.openFile);
+  setEdited = makeInvoke(Channel.setEdited);
+  shouldUseDarkColors = makeInvoke(Channel.shouldUseDarkColors);
+  showTagMenu = makeInvoke(Channel.showTagMenu);
+  getDeviceID = makeInvoke(Channel.getDeviceID);
+  getHostname = makeInvoke(Channel.getHostname);
   onNativeThemeUpdate = (handler: () => void) => {
-    ipcRenderer.on(Channels.nativeThemeUpdate, handler);
+    ipcRenderer.on(Channel.nativeThemeUpdate, handler);
   };
   offNativeThemeUpdate = (handler: () => void) => {
-    ipcRenderer.off(Channels.nativeThemeUpdate, handler);
+    ipcRenderer.off(Channel.nativeThemeUpdate, handler);
   };
 }
 
