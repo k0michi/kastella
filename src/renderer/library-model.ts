@@ -6,6 +6,7 @@ import { Version10, Version11, Version15, Version5, Version9 } from "./compat";
 import { visit } from "./tree";
 import { AnchorNode, DirectoryNode, File, ImageNode, ItemStyle as ListStyle, MathNode, Node, NodeType, ReservedID, Tag, CodeNode, TextNode, CanvasNode, InlineNode, Device } from "./node";
 import EventHandler from "./event-handler";
+import chroma from "chroma-js";
 
 export const LIBRARY_VERSION = 16;
 
@@ -836,7 +837,7 @@ export default class LibraryModel {
 
     const id = uuidv4();
 
-    this.tags.get().push({ id, name, color });
+    this.tags.get().push({ id, name, color: color ?? chroma.random().hex() });
 
     this.tags.set(this.tags.get());
     this.save();
