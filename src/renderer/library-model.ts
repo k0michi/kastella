@@ -67,6 +67,10 @@ export default class LibraryModel {
       data = Version15.convert(data);
     }
 
+    if (data.version > LIBRARY_VERSION) {
+      throw new Error(`Library version ${data.version} is not compatible with application version`);
+    }
+
     return data as Library;
   }
 
