@@ -1,5 +1,8 @@
 # Version Library Changelog
 
+## Version 16
+どのタグも必ず色を持つように変更
+
 ## Version 15
 書き込んだデバイスIDを記録するように
 

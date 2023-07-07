@@ -189,6 +189,7 @@ export interface File {
 export interface Tag {
   id: string;
   name: string;
+  // If color == undefined, it means 'inherited'
   color?: string;
 }
 

@@ -1,3 +1,4 @@
+import chroma from 'chroma-js';
 import { DirectoryNode } from './node';
 import { visit } from './tree';
 
@@ -84,6 +85,16 @@ export namespace Version11 {
       if (node.type == 'text-embed') {
         node.type = 'code';
       }
+    }
+
+    return data;
+  }
+}
+
+export namespace Version15 {
+  export function convert(data: any) {
+    for (const tag of data.tags) {
+      tag.color =  tag.color ?? chroma.random().hex();
     }
 
     return data;

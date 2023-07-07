@@ -2,12 +2,12 @@ import { Observable } from "kyoka";
 import { v4 as uuidv4 } from 'uuid';
 import Timestamp from "./timestamp";
 import { arrayInsertBefore, arrayRemove, round } from "./utils";
-import { Version10, Version11, Version5, Version9 } from "./compat";
+import { Version10, Version11, Version15, Version5, Version9 } from "./compat";
 import { visit } from "./tree";
 import { AnchorNode, DirectoryNode, File, ImageNode, ItemStyle as ListStyle, MathNode, Node, NodeType, ReservedID, Tag, CodeNode, TextNode, CanvasNode, InlineNode, Device } from "./node";
 import EventHandler from "./event-handler";
 
-export const LIBRARY_VERSION = 15;
+export const LIBRARY_VERSION = 16;
 
 export interface Library {
   nodes: Node;
@@ -60,6 +60,11 @@ export default class LibraryModel {
     if (data.version <= 14) {
       console.log(`Migrating from version 14...`);
       data.devices = [];
+    }
+
+    if (data.version <= 15) {
+      console.log(`Migrating from version 15...`);
+      data = Version15.convert(data);
     }
 
     return data as Library;
