@@ -135,6 +135,8 @@ export default class LibraryModel {
     this.files.set(data.files);
     this.tags.set(data.tags);
     this.instances.set(data.instances);
+
+    // FIXME: These functions may be called even after another library is loaded. This should be canceled.
     await this.registerInstanceIfNeeded();
     await this.updateInstanceInfo();
     this.update();
@@ -931,13 +933,12 @@ export default class LibraryModel {
   }
 
   async registerInstanceIfNeeded() {
-    const id = await bridge.getInstanceID();
+    const id = await this.getThisInstanceID();
+    const hostname = await bridge.getHostname();
+    const username = await bridge.getUsername();
+    const now = await Timestamp.now();
 
-    if (this.getInstance(id) == null) {
-      const hostname = await bridge.getHostname();
-      const username = await bridge.getUsername();
-      const now = await Timestamp.now();
-
+    if (this.getInstance(id) == undefined) {
       this.instances.get().push({
         id,
         hostname: hostname,
