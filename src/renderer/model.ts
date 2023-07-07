@@ -7,6 +7,7 @@ import mime from "mime";
 import Timestamp from "./timestamp";
 import { inlineNodeToString, visit } from "./tree";
 import { DateTimeFormatter } from "@js-joda/core";
+import { isSupportedImageFileType, isSupportedTextFileType } from "./file-type";
 // import { validateLibrary } from "./validate";
 
 export enum ViewType {
@@ -93,6 +94,11 @@ export default class Model {
 
   async importImageFile(filePath: string) {
     const mimeType = mime.getType(filePath);
+
+    if (!isSupportedImageFileType(mimeType)) {
+      throw new Error(`File type ${mimeType} is not supported`);
+    }
+
     const accessed = Timestamp.fromNs(await bridge.now());
     const modified = Timestamp.fromNs(await bridge.getMTime(filePath));
     const id = uuidv4();
@@ -114,6 +120,11 @@ export default class Model {
 
   async importTextFile(filePath: string) {
     const mimeType = mime.getType(filePath);
+
+    if (!isSupportedTextFileType(mimeType)) {
+      throw new Error(`File type ${mimeType} is not supported`);
+    }
+
     const accessed = Timestamp.fromNs(await bridge.now());
     const modified = Timestamp.fromNs(await bridge.getMTime(filePath));
     const id = uuidv4();

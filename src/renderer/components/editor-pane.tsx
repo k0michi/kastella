@@ -24,6 +24,7 @@ import QuoteNodeContent from './node-content/quote-node-content';
 import CanvasNodeContent from './node-content/canvas-node-content';
 import { elementToInlineNode } from '../tree';
 import { isHTMLEmpty, parseHTMLFragment } from '../html';
+import { isSupportedImageFileType, isSupportedTextFileType } from '../file-type';
 
 const DivEditorPane = styled.div`
   flex: 1 1 0;
@@ -166,11 +167,11 @@ export default function EditorPane() {
         const filePath = f.path;
         const mimeType = mime.getType(filePath);
 
-        if (mimeType == 'image/png' || mimeType == 'image/jpeg' || mimeType == 'image/gif') {
+        if (isSupportedImageFileType(mimeType)) {
           await model.importImageFile(filePath);
         }
 
-        if (mimeType == 'text/plain') {
+        if (isSupportedTextFileType(mimeType)) {
           await model.importTextFile(filePath);
         }
       }
