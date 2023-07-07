@@ -292,10 +292,14 @@ handle(Channel.showTagMenu, (e) => {
   });
 });
 
-handle(Channel.getDeviceID, (e) => {
+handle(Channel.getInstanceID, (e) => {
   return deviceID;
 });
 
 handle(Channel.getHostname, (e) => {
   return os.hostname();
+});
+
+handle(Channel.getUsername, (e) => {
+  return os.userInfo().username;
 });

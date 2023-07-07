@@ -21,8 +21,9 @@ export interface ChannelType {
   setEdited: (edited: boolean) => void;
   showTagMenu: () => Promise<TagMenu | null>;
   shouldUseDarkColors: () => boolean;
-  getDeviceID: () => string;
+  getInstanceID: () => string;
   getHostname: () => string;
+  getUsername: () => string;
 }
 
 export enum Channel {
@@ -43,8 +44,9 @@ export enum Channel {
   setEdited = 'setEdited',
   shouldUseDarkColors = 'shouldUseDarkColors',
   showTagMenu = 'showTagMenu',
-  getDeviceID = 'getDeviceID',
+  getInstanceID = 'getInstanceID',
   getHostname = 'getHostname',
+  getUsername = 'getUsername',
 
   nativeThemeUpdate = 'nativeThemeUpdate',
 }

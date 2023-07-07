@@ -193,10 +193,12 @@ export interface Tag {
   color?: string;
 }
 
-export interface Device {
+export interface Instance {
   id: string;
-  name: string;
-  registeredAt: Timestamp;
+  hostname: string;
+  username: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
 }
 
 export namespace ReservedID {

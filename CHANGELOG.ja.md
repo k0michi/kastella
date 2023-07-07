@@ -1,5 +1,8 @@
 # Version Library Changelog
 
+## Version 17
+`device`を`instance`と名称変更。ユーザー名も記録するように
+
 ## Version 16
 どのタグも必ず色を持つように変更
 

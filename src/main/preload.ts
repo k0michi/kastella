@@ -24,8 +24,9 @@ export class Bridge {
   setEdited = makeInvoke(Channel.setEdited);
   shouldUseDarkColors = makeInvoke(Channel.shouldUseDarkColors);
   showTagMenu = makeInvoke(Channel.showTagMenu);
-  getDeviceID = makeInvoke(Channel.getDeviceID);
+  getInstanceID = makeInvoke(Channel.getInstanceID);
   getHostname = makeInvoke(Channel.getHostname);
+  getUsername = makeInvoke(Channel.getUsername);
   onNativeThemeUpdate = (handler: () => void) => {
     ipcRenderer.on(Channel.nativeThemeUpdate, handler);
   };

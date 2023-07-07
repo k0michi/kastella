@@ -2,19 +2,19 @@ import { Observable } from "kyoka";
 import { v4 as uuidv4 } from 'uuid';
 import Timestamp from "./timestamp";
 import { arrayInsertBefore, arrayRemove, round } from "./utils";
-import { Version10, Version11, Version15, Version5, Version9 } from "./compat";
+import { Version10, Version11, Version14, Version15, Version16, Version5, Version9 } from "./compat";
 import { visit } from "./tree";
-import { AnchorNode, DirectoryNode, File, ImageNode, ItemStyle as ListStyle, MathNode, Node, NodeType, ReservedID, Tag, CodeNode, TextNode, CanvasNode, InlineNode, Device } from "./node";
+import { AnchorNode, DirectoryNode, File, ImageNode, ItemStyle as ListStyle, MathNode, Node, NodeType, ReservedID, Tag, CodeNode, TextNode, CanvasNode, InlineNode, Instance } from "./node";
 import EventHandler from "./event-handler";
 import chroma from "chroma-js";
 
-export const LIBRARY_VERSION = 16;
+export const LIBRARY_VERSION = 17;
 
 export interface Library {
   nodes: Node;
   files: File[];
   tags: Tag[];
-  devices: Device[];
+  instances: Instance[];
   version: number;
 }
 
@@ -22,7 +22,7 @@ export default class LibraryModel {
   nodes = new Observable<Node>(LibraryModel.blankTree()); // mutable
   files = new Observable<File[]>([]); // mutable
   tags = new Observable<Tag[]>([]); // mutable
-  devices = new Observable<Device[]>([]); // mutable
+  instances = new Observable<Instance[]>([]); // mutable
   nodeMap = new Map<string, Node>();
   saveHandler = new EventHandler();
   updateHandler = new EventHandler();
@@ -32,7 +32,7 @@ export default class LibraryModel {
       nodes: LibraryModel.blankTree(),
       files: [],
       tags: [],
-      devices: [],
+      instances: [],
       version: LIBRARY_VERSION
     });
   }
@@ -60,12 +60,17 @@ export default class LibraryModel {
 
     if (data.version <= 14) {
       console.log(`Migrating from version 14...`);
-      data.devices = [];
+      data = Version14.convert(data);
     }
 
     if (data.version <= 15) {
       console.log(`Migrating from version 15...`);
       data = Version15.convert(data);
+    }
+
+    if (data.version <= 16) {
+      console.log(`Migrating from version 16...`);
+      data = Version16.convert(data);
     }
 
     if (data.version > LIBRARY_VERSION) {
@@ -97,7 +102,7 @@ export default class LibraryModel {
       nodes: this.nodes.get(),
       files: this.files.get(),
       tags: this.tags.get(),
-      devices: this.devices.get(),
+      instances: this.instances.get(),
       version: LIBRARY_VERSION
     };
 
@@ -110,7 +115,7 @@ export default class LibraryModel {
     });
   }
 
-  initialize(data: Library) {
+  async initialize(data: Library) {
     // Initialize parent
     LibraryModel.assignParent(data.nodes);
 
@@ -129,7 +134,9 @@ export default class LibraryModel {
     this.nodes.set(data.nodes);
     this.files.set(data.files);
     this.tags.set(data.tags);
-    this.devices.set(data.devices);
+    this.instances.set(data.instances);
+    await this.registerInstanceIfNeeded();
+    await this.updateInstanceInfo();
     this.update();
   }
 
@@ -198,7 +205,7 @@ export default class LibraryModel {
 
   async addTextNode(text: string, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
     const id = uuidv4();
-    const deviceID = await this.getCurrentDeviceID();
+    const instanceID = await this.getThisInstanceID();
 
     if (tags?.length == 0) {
       tags = undefined;
@@ -210,8 +217,8 @@ export default class LibraryModel {
       tags,
       created: timeStamp,
       modified: timeStamp,
-      createdBy: deviceID,
-      modifiedBy: deviceID,
+      createdBy: instanceID,
+      modifiedBy: instanceID,
       id,
       children: []
     };
@@ -226,7 +233,7 @@ export default class LibraryModel {
     }
 
     const id = uuidv4();
-    const deviceID = await this.getCurrentDeviceID();
+    const instanceID = await this.getThisInstanceID();
 
     if (tags?.length == 0) {
       tags = undefined;
@@ -238,8 +245,8 @@ export default class LibraryModel {
       tags,
       created: timeStamp,
       modified: timeStamp,
-      createdBy: deviceID,
-      modifiedBy: deviceID,
+      createdBy: instanceID,
+      modifiedBy: instanceID,
       id,
       children: []
     };
@@ -250,7 +257,7 @@ export default class LibraryModel {
 
   async addImageNode(file: File, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
     const id = uuidv4();
-    const deviceID = await this.getCurrentDeviceID();
+    const instanceID = await this.getThisInstanceID();
 
     if (tags?.length == 0) {
       tags = undefined;
@@ -262,8 +269,8 @@ export default class LibraryModel {
       tags,
       created: timeStamp,
       modified: timeStamp,
-      createdBy: deviceID,
-      modifiedBy: deviceID,
+      createdBy: instanceID,
+      modifiedBy: instanceID,
       id,
       children: []
     };
@@ -275,7 +282,7 @@ export default class LibraryModel {
 
   async addCodeNode(file: File, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
     const id = uuidv4();
-    const deviceID = await this.getCurrentDeviceID();
+    const instanceID = await this.getThisInstanceID();
 
     if (tags?.length == 0) {
       tags = undefined;
@@ -287,8 +294,8 @@ export default class LibraryModel {
       tags,
       created: timeStamp,
       modified: timeStamp,
-      createdBy: deviceID,
-      modifiedBy: deviceID,
+      createdBy: instanceID,
+      modifiedBy: instanceID,
       id,
       children: []
     };
@@ -300,7 +307,7 @@ export default class LibraryModel {
 
   async addDirectoryNode(name: string, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
     const id = uuidv4();
-    const deviceID = await this.getCurrentDeviceID();
+    const instanceID = await this.getThisInstanceID();
 
     if (tags?.length == 0) {
       tags = undefined;
@@ -312,8 +319,8 @@ export default class LibraryModel {
       tags,
       created: timeStamp,
       modified: timeStamp,
-      createdBy: deviceID,
-      modifiedBy: deviceID,
+      createdBy: instanceID,
+      modifiedBy: instanceID,
       id,
       children: []
     };
@@ -335,7 +342,7 @@ export default class LibraryModel {
     parent: Node | string,
     tags?: string[]) {
     const id = uuidv4();
-    const deviceID = await this.getCurrentDeviceID();
+    const instanceID = await this.getThisInstanceID();
 
     if (tags?.length == 0) {
       tags = undefined;
@@ -346,8 +353,8 @@ export default class LibraryModel {
       ...anchor,
       created: timeStamp,
       modified: timeStamp,
-      createdBy: deviceID,
-      modifiedBy: deviceID,
+      createdBy: instanceID,
+      modifiedBy: instanceID,
       id,
       children: []
     };
@@ -358,7 +365,7 @@ export default class LibraryModel {
 
   async addMathNode(exp: string, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
     const id = uuidv4();
-    const deviceID = await this.getCurrentDeviceID();
+    const instanceID = await this.getThisInstanceID();
 
     if (tags?.length == 0) {
       tags = undefined;
@@ -370,8 +377,8 @@ export default class LibraryModel {
       tags,
       created: timeStamp,
       modified: timeStamp,
-      createdBy: deviceID,
-      modifiedBy: deviceID,
+      createdBy: instanceID,
+      modifiedBy: instanceID,
       id,
       children: []
     };
@@ -382,7 +389,7 @@ export default class LibraryModel {
 
   async addCanvasNode(fileID: string, previewFileID: string, timeStamp: Timestamp, parent: Node | string, tags?: string[]) {
     const id = uuidv4();
-    const deviceID = await this.getCurrentDeviceID();
+    const instanceID = await this.getThisInstanceID();
 
     if (tags?.length == 0) {
       tags = undefined;
@@ -395,8 +402,8 @@ export default class LibraryModel {
       tags,
       created: timeStamp,
       modified: timeStamp,
-      createdBy: deviceID,
-      modifiedBy: deviceID,
+      createdBy: instanceID,
+      modifiedBy: instanceID,
       id,
       children: []
     };
@@ -917,31 +924,45 @@ export default class LibraryModel {
   }
 
 
-  // Devices
+  // Instances
 
-  async getCurrentDeviceID() {
-    await this.registerCurrentDeviceIfNeeded();
-
-    return await bridge.getDeviceID();
+  async getThisInstanceID() {
+    return await bridge.getInstanceID();
   }
 
-  async registerCurrentDeviceIfNeeded() {
-    const id = await bridge.getDeviceID();
+  async registerInstanceIfNeeded() {
+    const id = await bridge.getInstanceID();
 
-    if (this.findDeviceByID(id) == null) {
+    if (this.getInstance(id) == null) {
       const hostname = await bridge.getHostname();
+      const username = await bridge.getUsername();
       const now = await Timestamp.now();
 
-      this.devices.get().push({
+      this.instances.get().push({
         id,
-        name: hostname,
-        registeredAt: now
+        hostname: hostname,
+        username: username,
+        createdAt: now,
+        updatedAt: now,
       });
     }
   }
 
-  findDeviceByID(id: string) {
-    return this.devices.get().find(d => d.id == id);
+  async updateInstanceInfo() {
+    const instance = this.getInstance(await this.getThisInstanceID());
+
+    if (instance == undefined) {
+      throw new Error('Instance not found');
+    }
+
+    instance.hostname = await bridge.getHostname();
+    instance.username = await bridge.getUsername();
+    instance.updatedAt = await Timestamp.now();
+    this.instances.set(this.instances.get());
+  }
+
+  getInstance(id: string) {
+    return this.instances.get().find(d => d.id == id);
   }
 
 

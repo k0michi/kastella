@@ -91,12 +91,40 @@ export namespace Version11 {
   }
 }
 
+export namespace Version14 {
+  export function convert(data: any) {
+    data.devices = [];
+    return data;
+  }
+}
+
 export namespace Version15 {
   export function convert(data: any) {
     for (const tag of data.tags) {
-      tag.color =  tag.color ?? chroma.random().hex();
+      tag.color = tag.color ?? chroma.random().hex();
     }
 
+    return data;
+  }
+}
+
+export namespace Version16 {
+  export function convert(data: any) {
+    data.instances = [];
+
+    for (const device of data.devices) {
+      const instance = {
+        id: device.id,
+        hostname: device.name,
+        username: '(unknown)',
+        createdAt: device.registeredAt,
+        updatedAt: device.registeredAt,
+      };
+
+      data.instances.push(instance);
+    }
+
+    delete data.devices;
     return data;
   }
 }
