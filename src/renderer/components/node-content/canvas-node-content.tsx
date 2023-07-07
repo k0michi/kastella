@@ -7,9 +7,9 @@ import styled from 'styled-components';
 import SVGImage from '../svg-image';
 
 const ImageNodeImage = styled(SVGImage)`
-  max-width: 100%;
-
   svg {
+    max-width: 100%;
+    height: fit-content;
     border-radius: 4px;
     display: block;
   }
