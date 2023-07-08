@@ -905,7 +905,10 @@ export default class LibraryModel {
     for (const n of visit(this.nodes.get())) {
       if (n.tags != null) {
         const found = n.tags.findIndex(t => t == id);
-        arrayRemove(n.tags, found);
+
+        if (found != -1) {
+          arrayRemove(n.tags, found);
+        }
       }
     }
 
