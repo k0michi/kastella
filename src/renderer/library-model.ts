@@ -876,8 +876,20 @@ export default class LibraryModel {
     this.save();
   }
 
+  // Remove all tag reference and the tag
   removeTag(id: string) {
-    // TODO
+    for (const n of visit(this.nodes.get())) {
+      if (n.tags != null) {
+        const found = n.tags.findIndex(t => t == id);
+        arrayRemove(n.tags, found);
+      }
+    }
+
+    const found = this.tags.get().findIndex(t => t.id == id);
+    arrayRemove(this.tags.get(), found);
+    this.tags.set(this.tags.get());
+    this.nodes.set(this.nodes.get());
+    this.save();
   }
 
 

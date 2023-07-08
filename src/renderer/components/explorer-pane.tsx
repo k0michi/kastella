@@ -177,7 +177,7 @@ export default function ExplorerPane() {
                     // TODO
                     break;
                   case TagMenu.deleteTag:
-                    // TODO
+                    model.library.removeTag(t.id);
                     break;
                 }
                 console.log(selected);
