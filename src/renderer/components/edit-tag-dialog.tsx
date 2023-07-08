@@ -29,6 +29,7 @@ export default function EditTagDialog(props: EditTagDialogProps) {
     if (props.open) {
       setTagInput(model.library.getTag(props.tagID)?.name!);
       setTagColor(model.library.getTag(props.tagID)?.color!);
+      setValidTag(true);
     }
   }, [props.open]);
 
@@ -38,8 +39,9 @@ export default function EditTagDialog(props: EditTagDialogProps) {
       <label>Tag name</label><CommonDialogTextInput invalid={!validTag} placeholder='tag'
         onChange={e => {
           let valid = RegExpression.tag.test(e.target.value);
+          const found = model.library.findTag(e.target.value);
 
-          if (model.library.findTag(e.target.value) != null) {
+          if (found != null && found.id != props.tagID) {
             valid = false;
           }
 
