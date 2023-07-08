@@ -10,6 +10,7 @@ import { CommonDialog, CommonDialogButton, CommonDialogButtons, CommonDialogButt
 import { TagMenu } from '../../common/menu';
 import CreateTagDialog from './create-tag-dialog';
 import { RegExpression } from '../reg-expression';
+import EditTagDialog from './edit-tag-dialog';
 
 const DivExplorerPane = styled.div`
   flex: 0 0 200px;
@@ -87,6 +88,9 @@ export default function ExplorerPane() {
   const [validPath, setValidPath] = React.useState<boolean>(false);
 
   const [tagModalOpen, setTagModalOpen] = React.useState(false);
+
+  const [tagEditModalOpen, setTagEditModalOpen] = React.useState(false);
+  const [tagEditing, setTagEditing] = React.useState<string>();
 
   const [dates, setDates] = React.useState<string[]>([]);
   const [draggedOver, setDraggedOver] = React.useState<string | undefined | boolean>(false);
@@ -174,7 +178,8 @@ export default function ExplorerPane() {
 
                 switch (selected) {
                   case TagMenu.editTag:
-                    // TODO
+                    setTagEditModalOpen(true);
+                    setTagEditing(t.id);
                     break;
                   case TagMenu.deleteTag:
                     model.library.removeTag(t.id);
@@ -236,6 +241,13 @@ export default function ExplorerPane() {
         setTagModalOpen(false);
       }} onCancel={() => {
         setTagModalOpen(false);
+      }} />
+      <EditTagDialog open={tagEditModalOpen} tagID={tagEditing!} onOK={e => {
+        model.library.setTagName(tagEditing!, e.tagName);
+        model.library.setTagColor(tagEditing!, e.tagColor);
+        setTagEditModalOpen(false);
+      }} onCancel={() => {
+        setTagEditModalOpen(false);
       }} />
     </>
   );

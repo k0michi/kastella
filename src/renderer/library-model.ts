@@ -853,6 +853,30 @@ export default class LibraryModel {
     return id;
   }
 
+  setTagName(id: string, name: string) {
+    const tag = this.getTag(id);
+
+    if (tag == null) {
+      throw new Error('Tag not found');
+    }
+
+    tag.name = name;
+    this.tags.set(this.tags.get());
+    this.save();
+  }
+
+  setTagColor(id: string, color: string) {
+    const tag = this.getTag(id);
+
+    if (tag == null) {
+      throw new Error('Tag not found');
+    }
+
+    tag.color = color;
+    this.tags.set(this.tags.get());
+    this.save();
+  }
+
   findTag(name: string) {
     return this.tags.get().find(t => compareTag(t.name, name) == 0);
   }
