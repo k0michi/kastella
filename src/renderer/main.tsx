@@ -96,6 +96,18 @@ const DivMain = styled.div`
   overflow-x: hidden;
 `;
 
+const DivResizer = styled.div`
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: 4px;
+  margin-left: -4px;
+  border-left: 4px solid transparent;
+  cursor: col-resize;
+  resize: horizontal;
+  background-color: ${props => props.theme.colorBorder};
+  background-clip: padding-box;
+`;
+
 const model = new Model();
 model.loadLibrary();
 
@@ -118,12 +130,42 @@ function App() {
   const model = useModel<Model>();
   const darkMode = useObservable(model.darkMode);
 
+  // https://codesandbox.io/s/react-resizable-sidebar-kz9de
+  const sidebarRef = React.useRef<HTMLDivElement>(null);
+  const [resizing, setResizing] = React.useState(false);
+  const [sidebarWidth, setSidebarWidth] = React.useState(200);
+
+  const startResizing = React.useCallback(() => {
+    setResizing(true);
+  }, []);
+
+  const stopResizing = React.useCallback(() => {
+    setResizing(false);
+  }, []);
+
+  const onMouseMove = React.useCallback((e: MouseEvent) => {
+    if (resizing) {
+      setSidebarWidth(e.clientX - sidebarRef.current!.getBoundingClientRect().left);
+    }
+  }, [resizing]);
+
+  React.useEffect(() => {
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", stopResizing);
+
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", stopResizing);
+    };
+  }, [onMouseMove, stopResizing]);
+
   return <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
     <GlobalStyle />
     <DivLayoutRoot>
       <ToolBar />
       <DivMain>
-        <ExplorerPane />
+        <ExplorerPane ref={sidebarRef} width={sidebarWidth} />
+        <DivResizer onMouseDown={e => startResizing()} />
         <EditorPane />
       </DivMain>
       <StatusBar />

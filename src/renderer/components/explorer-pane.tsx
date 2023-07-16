@@ -12,8 +12,10 @@ import CreateTagDialog from './create-tag-dialog';
 import { RegExpression } from '../reg-expression';
 import EditTagDialog from './edit-tag-dialog';
 
-const DivExplorerPane = styled.div`
-  flex: 0 0 200px;
+const DivExplorerPane = styled.div<{ $width: number }>`
+  flex: 0 0 ${props => props.$width}px;
+  min-width: 150px;
+  max-width: 400px;
   top: 0;
   padding: 12px;
   overflow-y: auto;
@@ -77,7 +79,11 @@ const DivTagCircle = styled.div<{ $color?: string }>`
   background-color: ${props => props.$color ?? props.theme.colorEditorTagBack};
 `;
 
-export default function ExplorerPane() {
+export interface ExplorerPaneProps {
+  width: number;
+}
+
+const ExplorerPane = React.forwardRef<HTMLDivElement, ExplorerPaneProps>((props, ref) => {
   const model = useModel<Model>();
   const nodes = useObservable(model.library.nodes);
   const tags = useObservable(model.library.tags);
@@ -114,7 +120,7 @@ export default function ExplorerPane() {
 
   return (
     <>
-      <DivExplorerPane>
+      <DivExplorerPane ref={ref} $width={props.width}>
         <DivSection>
           <DivSectionHeader>
             <DivSectionName>TREE</DivSectionName>
@@ -251,4 +257,6 @@ export default function ExplorerPane() {
       }} />
     </>
   );
-}
+});
+
+export default ExplorerPane;
