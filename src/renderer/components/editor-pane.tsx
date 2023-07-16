@@ -25,6 +25,7 @@ import CanvasNodeContent from './node-content/canvas-node-content';
 import { elementToInlineNode } from '../tree';
 import { isHTMLEmpty, parseHTMLFragment } from '../html';
 import { isSupportedImageFileType, isSupportedTextFileType } from '../../common/file-type';
+import { NodeMenu } from '../../common/menu';
 
 const DivEditorPane = styled.div`
   flex: 1 1 0;
@@ -648,7 +649,13 @@ export default function EditorPane() {
                   itemStyle={itemStyle}
                   listStyleType={listStyleType}
                 >
-                  <DivNode $block={tagInline} $selected={isSelected}>
+                  <DivNode $block={tagInline} $selected={isSelected} onMouseDown={async e => {
+                    if (e.button == 2) {
+                      const menu = await bridge.showNodeMenu();
+
+                      // TODO
+                    }
+                  }}>
                     {content}
                     {tags}
                   </DivNode>

@@ -24,6 +24,7 @@ export class Bridge {
   setEdited = makeInvoke(Channel.setEdited);
   shouldUseDarkColors = makeInvoke(Channel.shouldUseDarkColors);
   showTagMenu = makeInvoke(Channel.showTagMenu);
+  showNodeMenu = makeInvoke(Channel.showNodeMenu);
   getInstanceID = makeInvoke(Channel.getInstanceID);
   getHostname = makeInvoke(Channel.getHostname);
   getUsername = makeInvoke(Channel.getUsername);

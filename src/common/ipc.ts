@@ -1,6 +1,6 @@
 import { IpcMainInvokeEvent } from "electron";
 import { FetchedFile, FetchedMeta } from "./fetch";
-import { TagMenu } from "./menu";
+import { NodeMenu, TagMenu } from "./menu";
 import { FileKind } from "./file-type";
 
 export interface ChannelType {
@@ -20,6 +20,7 @@ export interface ChannelType {
   openFile: (fileType: FileKind) => Promise<string[] | null>;
   setEdited: (edited: boolean) => void;
   showTagMenu: () => Promise<TagMenu | null>;
+  showNodeMenu: () => Promise<NodeMenu | null>;
   shouldUseDarkColors: () => boolean;
   getInstanceID: () => string;
   getHostname: () => string;
@@ -44,6 +45,7 @@ export enum Channel {
   setEdited = 'setEdited',
   shouldUseDarkColors = 'shouldUseDarkColors',
   showTagMenu = 'showTagMenu',
+  showNodeMenu = 'showNodeMenu',
   getInstanceID = 'getInstanceID',
   getHostname = 'getHostname',
   getUsername = 'getUsername',

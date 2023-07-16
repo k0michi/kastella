@@ -11,7 +11,7 @@ import * as crypto from 'crypto';
 import { fetchFile, fetchMeta } from './fetch.js';
 import { FileKind, FileType } from '../common/file-type.js';
 import { ChannelType, Channel, Handler } from '../common/ipc.js';
-import { TagMenu } from '../common/menu.js';
+import { NodeMenu, TagMenu } from '../common/menu.js';
 
 // Paths
 const devURL = `http://localhost:5173/`;
@@ -284,6 +284,30 @@ handle(Channel.showTagMenu, (e) => {
       }
     }]);
     tagMenu.popup({
+      window: BrowserWindow.fromWebContents(e.sender) ?? undefined,
+      callback() {
+        resolve(null);
+      },
+    });
+  });
+});
+
+handle(Channel.showNodeMenu, (e) => {
+  return new Promise<NodeMenu | null>((resolve, reject) => {
+    const nodeMenu = Menu.buildFromTemplate([{
+      label: 'Edit Tag', click: () => {
+        resolve(NodeMenu.editTags);
+      }
+    }, {
+      label: 'Show Info', click: () => {
+        resolve(NodeMenu.showInfo);
+      }
+    }, {
+      label: 'Delete Node', click: () => {
+        resolve(NodeMenu.deleteNode);
+      }
+    }]);
+    nodeMenu.popup({
       window: BrowserWindow.fromWebContents(e.sender) ?? undefined,
       callback() {
         resolve(null);
