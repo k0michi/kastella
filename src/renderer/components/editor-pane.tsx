@@ -650,12 +650,12 @@ export default function EditorPane() {
                   itemStyle={itemStyle}
                   listStyleType={listStyleType}
                 >
-                  <DivNode $block={tagInline} $selected={isSelected} onMouseDown={async e => {
-                    if (e.button == 2) {
-                      const menu = await bridge.showNodeMenu();
+                  <DivNode $block={tagInline} $selected={isSelected} onContextMenu={async e => {
+                    e.preventDefault();
 
-                      // TODO
-                    }
+                    const menu = await bridge.showNodeMenu();
+
+                    // TODO
                   }}>
                     {content}
                     {tags}
