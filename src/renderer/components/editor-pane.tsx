@@ -26,6 +26,7 @@ import { elementToInlineNode } from '../tree';
 import { isHTMLEmpty, parseHTMLFragment } from '../html';
 import { isSupportedImageFileType, isSupportedTextFileType } from '../../common/file-type';
 import { NodeMenu } from '../../common/menu';
+import { RegExpression } from '../reg-expression';
 
 const DivEditorPane = styled.div`
   flex: 1 1 0;
@@ -696,11 +697,10 @@ export default function EditorPane() {
 
 // '... #tagName' => ['...', ['tagName']]
 function splitTags(string: string): [string, string[]] {
-  const tagExp = /\s+#([a-zA-Z0-9]+)$/;
   let result: RegExpExecArray | null;
   const tags: string[] = [];
 
-  while (string = string.trim(), result = tagExp.exec(string), result != null) {
+  while (string = string.trim(), result = RegExpression.suffixedTag.exec(string), result != null) {
     tags.push(result[1]);
     string = string.substring(0, result.index);
   }
